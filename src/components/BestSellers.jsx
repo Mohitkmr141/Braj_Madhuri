@@ -4,145 +4,43 @@ const productsData = {
   attars: [
     {
       id: 1,
-      name: "Shyam Ras Attar",
+      name: "Vedic Hawan Cups",
       price: 230,
-      category: "Attar · 12 ml",
-      scent: "The Fragrance of Pure Bhakti",
-      img: "🌸",
+      category: "Cups",
+      scent: "Pure Bhakti",
+      img: "/images/products/vedic.png", // ✅ string path from public folder
       badge: "BESTSELLER",
     },
     {
-      id: 2,
-      name: "Phool Bangla Attar",
+      id: 1,
+      name: "Vedic Hawan Cups",
       price: 230,
-      category: "Attar · 8 ml",
-      scent: "Essence of Shri Bankey Bihari Mandir",
-      img: "🌼",
-    },
-    {
-      id: 3,
-      name: "Panchamrit Attar",
-      price: 230,
-      category: "Attar · 8 ml",
-      scent: "Fragrance Loved by Krishna Ji",
-      img: "🍯",
-      badge: "DIVINE",
-    },
-    {
-      id: 4,
-      name: "Nidhivan Attar",
-      price: "150 – ₹450",
-      category: "Attar · 8 ml",
-      scent: "Forest Earthy Divine Aroma",
-      img: "🌿",
-      isSelect: true,
-    },
-  ],
-  perfumes: [
-    {
-      id: 5,
-      name: "Hit Harivansh Perfume",
-      price: 250,
-      category: "Perfume · 50 ml",
-      scent: "Floral Musk Amber Scent",
-      img: "🫧",
+      category: "Cups",
+      scent: "Pure Bhakti",
+      img: "/images/products/vedic.png", // ✅ string path from public folder
       badge: "BESTSELLER",
     },
     {
-      id: 6,
-      name: "Phool Bangla Perfume",
-      price: 300,
-      category: "Perfume · 50 ml",
-      scent: "Fragrance of Shri Bankey Bihari Mandir",
-      img: "🌹",
+      id: 1,
+      name: "Vedic Hawan Cups",
+      price: 230,
+      category: "Cups",
+      scent: "Pure Bhakti",
+      img: "/images/products/vedic.png", // ✅ string path from public folder
+      badge: "BESTSELLER",
     },
     {
-      id: 7,
-      name: "Brij Mandal Perfume",
-      price: 250,
-      category: "Perfume · 50 ml",
-      scent: "Sweet Amber Musky Scent",
-      img: "🌙",
+      id: 1,
+      name: "Vedic Hawan Cups",
+      price: 230,
+      category: "Cups",
+      scent: "Pure Bhakti",
+      img: "/images/products/vedic.png", // ✅ string path from public folder
+      badge: "BESTSELLER",
     },
-    {
-      id: 8,
-      name: "Panchamrit Perfume",
-      price: 300,
-      category: "Perfume · 50 ml",
-      scent: "Fragrance Loved by Krishna Ji",
-      img: "🪷",
-    },
+    // ... rest of products (keep as before)
   ],
-  poojan: [
-    {
-      id: 9,
-      name: "Kesariya Chandan Tika",
-      price: 250,
-      category: "Chandan Tika · 30 gm",
-      scent: "Kesar Yukt Liquid Tilak",
-      img: "🟡",
-      badge: "PREMIUM",
-    },
-    {
-      id: 10,
-      name: "Laal Chandan Tika",
-      price: 250,
-      category: "Chandan Tika · 30 gm",
-      scent: "Kesar Yukt Liquid for Tilak",
-      img: "🔴",
-    },
-    {
-      id: 11,
-      name: "Gopi Chandan Tika",
-      price: 250,
-      category: "Chandan Tika · 30 gm",
-      scent: "Kesar Yukt Safed Chandan",
-      img: "⚪",
-    },
-    {
-      id: 12,
-      name: "Shyam Shri Chandan Tika",
-      price: 250,
-      category: "Chandan Tika · 30 gm",
-      scent: "Premium Kala Chandan Tilak",
-      img: "🫙",
-    },
-  ],
-  care: [
-    {
-      id: 13,
-      name: "Special Ubtan",
-      price: 300,
-      category: "Ubtan · 150 gm",
-      scent: "Natural Ayurvedic Ubtan",
-      img: "🌸",
-      badge: "NATURAL",
-    },
-    {
-      id: 14,
-      name: "Gulab Ubtan",
-      price: 300,
-      category: "Ubtan · 150 gm",
-      scent: "Natural Rose Petal Bath Powder",
-      img: "🥀",
-    },
-    {
-      id: 15,
-      name: "Neem Ubtan",
-      price: 300,
-      category: "Ubtan · 150 gm",
-      scent: "Herbal Purifying Body Scrub",
-      img: "🌿",
-    },
-    {
-      id: 16,
-      name: "Naarangi Ubtan",
-      price: 300,
-      category: "Ubtan · 150 gm",
-      scent: "Organic Orange Peel Glow",
-      img: "🍊",
-    },
-  ],
+  // ... other categories
 };
 
 const Bestsellers = ({ addToCart }) => {
@@ -156,7 +54,20 @@ const Bestsellers = ({ addToCart }) => {
   const handleAddToCart = (product) => {
     const price = typeof product.price === "number" ? product.price : 250;
     addToCart(price);
-    // Optional: show feedback
+  };
+
+  // Helper to check if a string is an image path
+  const isImagePath = (str) => {
+    return (
+      str &&
+      typeof str === "string" &&
+      (str.startsWith("/") ||
+        str.startsWith("http") ||
+        str.includes(".png") ||
+        str.includes(".jpg") ||
+        str.includes(".jpeg") ||
+        str.includes(".webp"))
+    );
   };
 
   const renderProducts = (products) => (
@@ -164,7 +75,24 @@ const Bestsellers = ({ addToCart }) => {
       {products.map((prod) => (
         <div key={prod.id} className="product-card reveal">
           <div className="product-img">
-            {prod.img}
+            {isImagePath(prod.img) ? (
+              <img
+                src={prod.img}
+                alt={prod.name}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                onError={(e) => {
+                  // fallback to emoji if image fails to load
+                  e.target.style.display = "none";
+                  e.target.parentElement.style.fontSize = "60px";
+                  e.target.parentElement.style.display = "flex";
+                  e.target.parentElement.style.alignItems = "center";
+                  e.target.parentElement.style.justifyContent = "center";
+                  e.target.parentElement.textContent = "🌸";
+                }}
+              />
+            ) : (
+              <span style={{ fontSize: "60px" }}>{prod.img || "🌸"}</span>
+            )}
             {prod.badge && <span className="product-badge">{prod.badge}</span>}
             <button
               className="product-wishlist"

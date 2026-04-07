@@ -17,7 +17,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
           </div>
           <div className="logo-text">
             <div className="logo-name">The Braj Madhuri</div>
-            <div className="logo-tagline">सुगंध वृंदावन की</div>
+            <div className="logo-tagline">Meenakshi Vashisht</div>
             <div className="logo-ornament"></div>
           </div>
         </div>
