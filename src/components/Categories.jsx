@@ -1,7 +1,7 @@
 import React from "react";
 
 const categories = [
-  { icon: "🌺", name: "ATTARS", sub: "Alcohol-free itra" },
+  { icon: "🌺", name: "TULSI MALA ORIGINAL", sub: "100% ORIGINAL TULSI MALA" },
   { icon: "🧴", name: "PERFUMES", sub: "Divine sprays" },
   { icon: "🏠", name: "HOME FRAGRANCE", sub: "Aroma oils & more" },
   { icon: "✨", name: "PERSONAL CARE", sub: "Ubtan & Gulab Jal" },

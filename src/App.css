@@ -41,57 +41,51 @@
   .announcement span { color: #fff; font-weight: 500; }
 
   /* ─── HEADER (FIXED) ─── */
-  header {
-    background: var(--cream);
-    border-bottom: 1px solid rgba(201,151,42,0.25);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(8px);
-  }
+ header {
+  background: var(--cream);
+  border-bottom: 1px solid rgba(201,151,42,0.25);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
 
-  .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 60px;
-    max-width: 1400px;
-    margin: 0 auto;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
+ .header-top {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+}
 
   /* Logo + brand combined */
   .logo-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: rgba(201,151,42,0.05);
-    padding: 6px 20px 6px 10px;
-    border-radius: 60px;
-    transition: all 0.2s;
-  }
+  width: 100%;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+ 
 
-  .logo-img {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    background: var(--cream);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.08);
-    border: 2px solid var(--gold-light);
-  }
 
-  .logo-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+ 
+.logo-img img {
+  width: 100%;
+  height:580px;
+  max-height: 450px;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
 
+
+.logo-text,
+.logo-name,
+.logo-tagline,
+.logo-ornament {
+  display: none;
+}
   .logo-text {
     display: flex;
     flex-direction: column;
@@ -122,11 +116,15 @@
     margin-top: 5px;
   }
 
-  .header-icons {
-    display: flex;
-    align-items: center;
-    gap: 22px;
-  }
+.header-icons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 22px;
+  padding: 8px 40px;
+  background: var(--cream);
+  border-top: 1px solid rgba(201,151,42,0.15);
+}
 
   .icon-btn {
     display: flex;
@@ -1321,3 +1319,6 @@
     .newsletter-input { border-right: 1px solid rgba(201,151,42,0.4); border-radius: 2px; }
     .newsletter-btn { border-radius: 2px; }
   }
+
+
+  

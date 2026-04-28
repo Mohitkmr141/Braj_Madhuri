@@ -4,11 +4,10 @@ const productsData = {
   attars: [
     {
       id: 1,
-      name: "Vedic Hawan Cups",
-      price: 230,
-      category: "Cups",
-      scent: "Pure Bhakti",
-      img: "/images/products/vedic.png", // ✅ string path from public folder
+      name: "100% Original Japa Mala",
+      price: 239,
+      category: "Japa Essentials",
+      img: "/images/products/Japa Essentials/Japa_Bag.png",
       badge: "BESTSELLER",
     },
     {
@@ -17,7 +16,7 @@ const productsData = {
       price: 230,
       category: "Cups",
       scent: "Pure Bhakti",
-      img: "/images/products/vedic.png", // ✅ string path from public folder
+      img: "/images/products/Japa Essentials/Japa_Combo.png", // ✅ string path from public folder
       badge: "BESTSELLER",
     },
     {
@@ -26,7 +25,7 @@ const productsData = {
       price: 230,
       category: "Cups",
       scent: "Pure Bhakti",
-      img: "/images/products/vedic.png", // ✅ string path from public folder
+      img: "/images/products/Japa Essentials/Sakshi_Mala.png", // ✅ string path from public folder
       badge: "BESTSELLER",
     },
     {
@@ -35,9 +34,74 @@ const productsData = {
       price: 230,
       category: "Cups",
       scent: "Pure Bhakti",
-      img: "/images/products/vedic.png", // ✅ string path from public folder
+      img: "/images/products/Japa Essentials/Japa_Bag.png", // ✅ string path from public folder
       badge: "BESTSELLER",
     },
+    {
+      id: 1,
+      name: "Vedic Hawan Cups",
+      price: 230,
+      category: "Cups",
+      scent: "Pure Bhakti",
+      img: "/images/products/Incense & Dhoop Sticks/Kesar_Chandan.png", // ✅ string path from public folder
+      badge: "BESTSELLER",
+    },
+    {
+      id: 1,
+      name: "Vedic Hawan Cups",
+      price: 230,
+      category: "Cups",
+      scent: "Pure Bhakti",
+      img: "/images/products/Incense & Dhoop Sticks/PanchRatan_Dhoop.png", // ✅ string path from public folder
+      badge: "BESTSELLER",
+    },
+    {
+      id: 1,
+      name: "Vedic Hawan Cups",
+      price: 230,
+      category: "Cups",
+      scent: "Pure Bhakti",
+      img: "/images/products/Incense & Dhoop Sticks/SandalWood_Stick.png", // ✅ string path from public folder
+      badge: "BESTSELLER",
+    },
+    {
+      id: 1,
+      name: "Vedic Hawan Cups",
+      price: 230,
+      category: "Cups",
+      scent: "Pure Bhakti",
+      img: "/images/products/Incense & Dhoop Sticks/PanchRatan_Dhoop.png", // ✅ string path from public folder
+      badge: "BESTSELLER",
+    },
+    {
+      id: 1,
+      name: "Vedic Hawan Cups",
+      price: 230,
+      category: "Cups",
+      scent: "Pure Bhakti",
+      img: "/images/products/Incense & Dhoop Sticks/Mogra.png", // ✅ string path from public folder
+      badge: "BESTSELLER",
+    },
+    {
+      id: 1,
+      name: "Vedic Hawan Cups",
+      price: 230,
+      category: "Cups",
+      scent: "Pure Bhakti",
+      img: "/images/products/Incense & Dhoop Sticks/PanchRatan_Dhoop.png", // ✅ string path from public folder
+      badge: "BESTSELLER",
+    },
+    {
+      id: 1,
+      name: "Vedic Hawan Cups",
+      price: 230,
+      category: "Cups",
+      scent: "Pure Bhakti",
+      img: "/images/products/Incense & Dhoop Sticks/Gulab.png", // ✅ string path from public folder
+      badge: "BESTSELLER",
+    },
+    
+
     // ... rest of products (keep as before)
   ],
   // ... other categories
