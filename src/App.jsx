@@ -11,6 +11,7 @@ import Reviews from "./components/Reviews.jsx";
 import Newsletter from "./components/Newsletter.jsx";
 import Footer from "./components/Footer.jsx";
 import FloatingCart from "./components/FloatingCart.jsx";
+import CategoryGalleries from "./components/Categories.jsx";
 
 function App() {
   const [cartCount, setCartCount] = useState(0);
@@ -42,8 +43,9 @@ function App() {
       <Header cartCount={cartCount} cartTotal={cartTotal} />
       <Hero />
       <TrustBar />
-      <Categories />
-      <Bestsellers addToCart={addToCart} />
+      <CategoryGalleries />
+
+      {/* <Bestsellers addToCart={addToCart} /> */}
       <FeaturedBanner />
       <ComboPacks addToCart={addToCart} />
       <Story />

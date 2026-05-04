@@ -1,0 +1,96 @@
+/* src/components/CategoryGalleries.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Nunito:wght@300;400;500&display=swap');
+
+:root {
+  --saffron:     #e8650a;
+  --gold:        #c9960c;
+  --gold-light:  #f5d876;
+  --cream:       #fdf6ec;
+  --dark:        #1a1208;
+  --muted:       #7a6a55;
+  --card-radius: 12px;
+  --gap:         16px;
+}
+
+/* ── Page wrapper ───────────────────────────────────────────── */
+.galleries-wrapper {
+  background-color: var(--cream);
+  min-height: 100vh;
+  padding: 48px 24px 80px;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ── Section / category block ──────────────────────────────── */
+.category-gallery {
+  margin-bottom: 64px;
+}
+
+.category-gallery h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 600;
+  color: var(--dark);
+  margin: 0 0 6px;
+  letter-spacing: 0.02em;
+}
+
+/* decorative underline */
+.category-gallery h2::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin-top: 8px;
+  margin-bottom: 24px;
+  background: linear-gradient(90deg, var(--saffron), var(--gold-light));
+  border-radius: 2px;
+}
+
+/* ── Responsive image grid ──────────────────────────────────── */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--gap);
+}
+
+/* ── Individual image card ──────────────────────────────────── */
+.image-grid img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: var(--card-radius);
+  background: #ede0cc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  display: block;
+}
+
+.image-grid img:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(232, 101, 10, 0.2);
+}
+
+/* ── Responsive breakpoints ─────────────────────────────────── */
+@media (max-width: 600px) {
+  .image-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .galleries-wrapper {
+    padding: 32px 16px 60px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .image-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+
+  .galleries-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}
