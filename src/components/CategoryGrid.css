@@ -1,0 +1,73 @@
+.category-section {
+  padding: 40px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* ── Grid: 3 columns like screenshot ── */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 600px) {
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Each cell ── */
+.category-cell {
+  cursor: pointer;
+}
+
+.category-cell:hover .category-img-wrapper img {
+  transform: scale(1.04);
+}
+
+/* ── Image box ── */
+.category-img-wrapper {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #f0f0f0;
+}
+
+.category-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+/* ── Label below image ── */
+.category-name {
+  margin: 8px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #222;
+  letter-spacing: 0.3px;
+}
+
+/* ── Explore button ── */
+.explore-btn {
+  margin-top: 8px;
+  padding: 10px 28px;
+  background: transparent;
+  border: 1.5px solid #333;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.explore-btn:hover {
+  background: #333;
+  color: #fff;
+}

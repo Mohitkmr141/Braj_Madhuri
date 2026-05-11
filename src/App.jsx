@@ -12,7 +12,8 @@ import Newsletter from "./components/Newsletter.jsx";
 import Footer from "./components/Footer.jsx";
 import FloatingCart from "./components/FloatingCart.jsx";
 import CategoryGalleries from "./components/Categories.jsx";
-
+import CategoryGrid from "./components/CategoryGrid.jsx";
+;
 function App() {
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
@@ -21,6 +22,8 @@ function App() {
     setCartCount((prev) => prev + 1);
     setCartTotal((prev) => prev + price);
   };
+
+  const [activeCategory, setActiveCategory] = useState(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -43,9 +46,9 @@ function App() {
       <Header cartCount={cartCount} cartTotal={cartTotal} />
       <Hero />
       <TrustBar />
-      <CategoryGalleries />
+      <CategoryGalleries filterFolder={activeCategory} />
+      <CategoryGrid onExplore={(folder) => setActiveCategory(folder)} />
 
-      {/* <Bestsellers addToCart={addToCart} /> */}
       <FeaturedBanner />
       <ComboPacks addToCart={addToCart} />
       <Story />
@@ -53,8 +56,13 @@ function App() {
       <Newsletter />
       <Footer />
       <FloatingCart cartCount={cartCount} />
+
+      {/* Full product gallery below */}
     </>
   );
 }
 
 export default App;
+
+
+
