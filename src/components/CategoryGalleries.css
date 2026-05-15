@@ -1,7 +1,8 @@
 /* src/components/CategoryGalleries.css */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Nunito:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Nunito:wght@300;400;500;600&display=swap');
 
+/* ── Variables ─────────────────────────────────────────────── */
 :root {
   --saffron:     #e8650a;
   --gold:        #c9960c;
@@ -10,7 +11,7 @@
   --dark:        #1a1208;
   --muted:       #7a6a55;
   --card-radius: 12px;
-  --gap:         16px;
+  --gap:         20px;
 }
 
 /* ── Page wrapper ───────────────────────────────────────────── */
@@ -18,235 +19,230 @@
   background-color: var(--cream);
   min-height: 100vh;
   padding: 48px 24px 80px;
+  max-width: 1400px;
+  margin: 0 auto;
   font-family: 'Nunito', sans-serif;
 }
 
-/* ── Section / category block ──────────────────────────────── */
+/* ── Section block ──────────────────────────────────────────── */
 .category-gallery {
-  margin-bottom: 64px;
+  margin-bottom: 72px;
 }
 
-.category-gallery h2 {
+/* ── Section title ──────────────────────────────────────────── */
+.category-title {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
   font-weight: 600;
   color: var(--dark);
-  margin: 0 0 6px;
   letter-spacing: 0.02em;
-}
-
-/* decorative underline */
-.category-gallery h2::after {
-  content: '';
-  display: block;
-  width: 56px;
-  height: 3px;
-  margin-top: 8px;
-  margin-bottom: 24px;
-  background: linear-gradient(90deg, var(--saffron), var(--gold-light));
-  border-radius: 2px;
-}
-
-/* ── Responsive image grid ──────────────────────────────────── */
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: var(--gap);
-}
-
-/* ── Individual image card ──────────────────────────────────── */
-.image-grid img {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  border-radius: var(--card-radius);
-  background: #ede0cc;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  display: block;
-}
-
-.image-grid img:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 8px 24px rgba(232, 101, 10, 0.2);
-}
-
-/* ── Responsive breakpoints ─────────────────────────────────── */
-@media (max-width: 600px) {
-  .image-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .galleries-wrapper {
-    padding: 32px 16px 60px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .image-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
-
-  .galleries-wrapper {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-}
-
-.image-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.image-card img {
-  width: 100%;
-  border-radius: 8px;
-}
-
-.item-description {
-  font-size: 0.9rem;
-  color: #555;
-  margin: 0;
-}
-
-.item-price {
-  font-size: 1rem;
-  font-weight: bold;
-  color: #222;
-  margin: 0;
-}
-
-/* ── Wrapper ── */
-.galleries-wrapper {
-  padding: 40px 20px;
-  max-width: 1300px;
-  margin: 0 auto;
-}
-
-/* ── Section title like "Our Best Sellers" ── */
-.category-title {
   text-align: center;
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 32px;
-  position: relative;
+  margin: 0 0 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 16px;
-  color: #1a1a1a;
+  gap: 20px;
 }
 
-/* horizontal lines on both sides of title */
+/* horizontal lines flanking the title */
 .category-title::before,
 .category-title::after {
   content: "";
   flex: 1;
   height: 1px;
-  background: #ddd;
+  background: linear-gradient(90deg, transparent, #d4b896, transparent);
 }
 
-/* ── Grid ── */
+/* ── Responsive grid ────────────────────────────────────────── */
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--gap);
 }
 
-@media (max-width: 1024px) {
-  .image-grid { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 1100px) {
+  .image-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 }
 
 @media (max-width: 768px) {
-  .image-grid { grid-template-columns: repeat(2, 1fr); }
+  .image-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .galleries-wrapper { padding: 32px 16px 60px; }
 }
 
-@media (max-width: 480px) {
-  .image-grid { grid-template-columns: 1fr; }
+@media (max-width: 420px) {
+  .image-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
 }
 
-/* ── Card ── */
+/* ── Card ───────────────────────────────────────────────────── */
 .image-card {
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ede3d5;
+  border-radius: var(--card-radius);
   overflow: hidden;
   background: #fff;
-  transition: box-shadow 0.2s ease;
   cursor: pointer;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 .image-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 28px rgba(232, 101, 10, 0.13);
+  transform: translateY(-3px);
 }
 
-/* ── Image wrapper (for badge positioning) ── */
+/* ── Image wrapper ──────────────────────────────────────────── */
 .image-card-img-wrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 4;      /* portrait ratio like your screenshot */
+  aspect-ratio: 1 / 1;
+  max-height: 180px;
   overflow: hidden;
-  background: #f9f9f9;
+  background: #f3ece0;
+  flex-shrink: 0;
 }
 
 .image-card-img-wrapper img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  display: block;
+  transition: transform 0.35s ease;
 }
 
 .image-card:hover .image-card-img-wrapper img {
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
-/* ── Discount badge ── */
+/* ── Discount badge ─────────────────────────────────────────── */
 .discount-badge {
   position: absolute;
   top: 10px;
   left: 10px;
-  background: #c0392b;
+  background: var(--saffron);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 4px;
-  letter-spacing: 0.5px;
-  z-index: 1;
+  letter-spacing: 0.4px;
+  z-index: 2;
 }
 
-/* ── Card info (below image) ── */
+/* ── Slideshow buttons ──────────────────────────────────────── */
+.slide-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.88);
+  border: none;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dark);
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s;
+  z-index: 3;
+}
+
+.image-card-img-wrapper:hover .slide-btn {
+  opacity: 1;
+}
+
+.slide-btn:hover {
+  background: #fff;
+}
+
+.slide-btn--prev { left: 8px; }
+.slide-btn--next { right: 8px; }
+
+/* ── Slide counter (top-right) ──────────────────────────────── */
+.slide-counter {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.42);
+  color: #fff;
+  font-size: 11px;
+  font-family: 'Nunito', sans-serif;
+  padding: 3px 8px;
+  border-radius: 20px;
+  z-index: 3;
+  letter-spacing: 0.3px;
+}
+
+/* ── Dots ───────────────────────────────────────────────────── */
+.slide-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 3;
+}
+
+.slide-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.slide-dot--active {
+  background: #fff;
+  transform: scale(1.35);
+}
+
+/* ── Card info ──────────────────────────────────────────────── */
 .image-card-info {
   padding: 12px 14px 16px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .item-description {
-  font-size: 14px;
-  color: #333;
-  margin: 0 0 8px;
-  line-height: 1.4;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.45;
   font-weight: 500;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* ── Pricing ── */
+/* ── Pricing ────────────────────────────────────────────────── */
 .item-pricing {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .item-price {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--dark);
 }
 
 .item-original-price {
   font-size: 13px;
-  color: #aaa;
+  color: #bbb;
   text-decoration: line-through;
 }
