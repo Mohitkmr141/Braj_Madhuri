@@ -56,13 +56,18 @@ export default function CategoryGalleries({ filterFolder, addToCart }) {
 function ProductCard({ folderName, images, data, addToCart }) {
   const [current, setCurrent] = useState(0);
   const total = images.length;
+  const activeImage = images[current];
+  const activeData = {
+    ...data,
+    ...(data.items?.[activeImage.fileName] ?? {}),
+  };
 
   const prev = () => setCurrent((c) => (c - 1 + total) % total);
   const next = () => setCurrent((c) => (c + 1) % total);
 
   const discount =
-    data.originalPrice && data.price
-      ? Math.round((1 - data.price / data.originalPrice) * 100)
+    activeData.originalPrice && activeData.price
+      ? Math.round((1 - activeData.price / activeData.originalPrice) * 100)
       : null;
 
   return (
@@ -71,8 +76,8 @@ function ProductCard({ folderName, images, data, addToCart }) {
         {discount && <span className="discount-badge">{discount}% OFF</span>}
 
         <img
-          src={images[current].src}
-          alt={data.description ?? formatFolderName(folderName)}
+          src={activeImage.src}
+          alt={activeData.title ?? activeData.description ?? formatFolderName(folderName)}
           loading="lazy"
         />
 
@@ -112,22 +117,25 @@ function ProductCard({ folderName, images, data, addToCart }) {
       </div>
 
       <div className="image-card-info">
+        <h3 className="item-title">
+          {activeData.title ?? formatFolderName(folderName)}
+        </h3>
         <p className="item-description">
-          {data.description ?? formatFolderName(folderName)}
+          {activeData.description ?? formatFolderName(folderName)}
         </p>
         <div className="item-pricing">
-          {data.price !== undefined && (
-            <span className="item-price">INR {data.price}.00</span>
+          {activeData.price !== undefined && (
+            <span className="item-price">INR {activeData.price}.00</span>
           )}
-          {data.originalPrice && (
+          {activeData.originalPrice && (
             <span className="item-original-price">
-              INR {data.originalPrice}.00
+              INR {activeData.originalPrice}.00
             </span>
           )}
         </div>
         <button
           className="add-cart-btn gallery-cart-btn"
-          onClick={() => addToCart?.(data.price ?? 250)}
+          onClick={() => addToCart?.(activeData.price ?? 250)}
         >
           Add To Cart
         </button>
