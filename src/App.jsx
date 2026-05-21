@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import Header from "./components/Header.jsx";
 import Hero from "./components/Hero.jsx";
 import TrustBar from "./components/TrustBar.jsx";
-import Categories from "./components/Categories.jsx";
-import Bestsellers from "./components/BestSellers.jsx";
 import FeaturedBanner from "./components/FeaturedBanner.jsx";
 import ComboPacks from "./components/ComboPacks.jsx";
 import Story from "./components/Story.jsx";
@@ -13,7 +11,7 @@ import Footer from "./components/Footer.jsx";
 import FloatingCart from "./components/FloatingCart.jsx";
 import CategoryGalleries from "./components/Categories.jsx";
 import CategoryGrid from "./components/CategoryGrid.jsx";
-;
+
 function App() {
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
@@ -46,9 +44,8 @@ function App() {
       <Header cartCount={cartCount} cartTotal={cartTotal} />
       <Hero />
       <TrustBar />
-      <CategoryGalleries filterFolder={activeCategory} />
       <CategoryGrid onExplore={(folder) => setActiveCategory(folder)} />
-
+      <CategoryGalleries filterFolder={activeCategory} addToCart={addToCart} />
       <FeaturedBanner />
       <ComboPacks addToCart={addToCart} />
       <Story />
@@ -56,13 +53,10 @@ function App() {
       <Newsletter />
       <Footer />
       <FloatingCart cartCount={cartCount} />
-
-      {/* Full product gallery below */}
     </>
   );
 }
 
 export default App;
-
 
 

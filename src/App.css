@@ -1220,10 +1220,12 @@
     bottom: 30px; right: 30px;
     background: var(--maroon);
     color: var(--ivory);
-    width: 58px; height: 58px;
+    width: 64px; height: 64px;
     border-radius: 50%;
     border: none;
-    font-size: 22px;
+    font-size: 12px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.8px;
     cursor: pointer;
     box-shadow: 0 6px 24px rgba(123,27,42,0.4);
     display: flex; align-items: center; justify-content: center;

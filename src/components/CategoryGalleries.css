@@ -246,3 +246,10 @@
   color: #bbb;
   text-decoration: line-through;
 }
+
+.gallery-cart-btn {
+  align-self: center;
+  margin-top: 4px;
+  width: 100%;
+  max-width: 140px;
+}

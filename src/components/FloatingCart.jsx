@@ -2,8 +2,8 @@ import React from "react";
 
 const FloatingCart = ({ cartCount }) => {
   return (
-    <button className="float-cart" title="View Cart">
-      🛒
+    <button className="float-cart" title="View Cart" aria-label="View cart">
+      Cart
       <span className="float-cart-badge">{cartCount}</span>
     </button>
   );

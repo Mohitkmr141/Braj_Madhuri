@@ -1,18 +1,27 @@
 import React from "react";
 
+const values = [
+  ["Natural Purity", "Carefully selected ingredients for devotional use"],
+  ["Devotional Craft", "Made with bhakti and dedication in Vrindavan"],
+  ["Premium Quality", "Thoughtful products for daily seva and gifting"],
+  ["Swift Delivery", "Pan-India delivery with careful packaging"],
+];
+
 const Story = () => {
   return (
     <section className="story-section" id="story">
       <div className="story-inner">
         <div className="story-visual">
           <div className="story-big-box">
-            <div className="story-big-text">VM</div>
-            <div className="story-big-icon">🪷</div>
-            <div className="story-big-label">वृंदावन महक</div>
+            <div className="story-big-text">BM</div>
+            <div className="story-big-icon" aria-hidden="true">
+              *
+            </div>
+            <div className="story-big-label">Braj Madhuri</div>
           </div>
           <div className="story-float-card top-right">
-            <span className="float-num">4.9★</span>
-            <span className="float-label">Google Rating</span>
+            <span className="float-num">4.9</span>
+            <span className="float-label">Customer Rating</span>
           </div>
           <div className="story-float-card bottom-left">
             <span className="float-num">10,000+</span>
@@ -26,56 +35,29 @@ const Story = () => {
             <br />
             Crafted with Devotion
           </h2>
-          <div className="section-divider" style={{ margin: "20px 0" }}></div>
+          <div className="section-divider" style={{ margin: "20px 0" }} />
           <p>
-            Vrindavan Mahak was established in Vrindavan Dham, devoted to
-            offering premium spiritual essentials for Pooja. We believe that
-            fragrance is the language of devotion — a bridge between the devotee
-            and the divine.
+            The Braj Madhuri brings together spiritual essentials for pooja,
+            gifting, and daily seva. Every collection is chosen with attention
+            to purity, presentation, and the devotional feeling of Braj.
           </p>
           <p>
-            From our Attars and Perfumes to Chandan Tika, Ubtan, Agarbatti, and
-            Dhoop Sticks, every product is crafted with purity, devotion, and
-            uncompromising quality — inspired by the bhakti of Shri Krishna's
-            eternal abode.
+            From dhoop sticks and chandan tilak to poshak, vastra, japa mala,
+            and shringar items, the store is designed to help devotees find
+            beautiful essentials in one place.
           </p>
           <div className="story-values">
-            <div className="value-item">
-              <span className="value-icon">🌿</span>
-              <div>
-                <span className="value-title">NATURAL PURITY</span>
-                <span className="value-desc">
-                  Only natural, alcohol-free ingredients in our attars
+            {values.map(([title, desc]) => (
+              <div className="value-item" key={title}>
+                <span className="value-icon" aria-hidden="true">
+                  *
                 </span>
+                <div>
+                  <span className="value-title">{title}</span>
+                  <span className="value-desc">{desc}</span>
+                </div>
               </div>
-            </div>
-            <div className="value-item">
-              <span className="value-icon">🙏</span>
-              <div>
-                <span className="value-title">DEVOTIONAL CRAFT</span>
-                <span className="value-desc">
-                  Made with bhakti and dedication in Vrindavan
-                </span>
-              </div>
-            </div>
-            <div className="value-item">
-              <span className="value-icon">⭐</span>
-              <div>
-                <span className="value-title">PREMIUM QUALITY</span>
-                <span className="value-desc">
-                  Rated #1 Spiritual Brand on Amazon India
-                </span>
-              </div>
-            </div>
-            <div className="value-item">
-              <span className="value-icon">📦</span>
-              <div>
-                <span className="value-title">SWIFT DELIVERY</span>
-                <span className="value-desc">
-                  Pan-India delivery with careful packaging
-                </span>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

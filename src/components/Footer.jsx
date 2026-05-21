@@ -4,13 +4,10 @@ const Footer = () => {
   return (
     <footer>
       <div className="footer-inner">
-        {/* Brand */}
         <div className="footer-brand">
           <div className="logo-name">The Braj Madhuri</div>
-        
         </div>
 
-        {/* Social Media Links */}
         <div className="footer-social">
           <a
             href="https://www.instagram.com/brajmadhuri.official"
@@ -38,19 +35,17 @@ const Footer = () => {
           </a>
         </div>
 
-        {/* Contact */}
         <div className="footer-contact">
-          <a href="tel:+91XXXXXXXXXX">+91 08448904455</a>
+          <a href="tel:+918448904455">+91 84489 04455</a>
           <a href="mailto:brajmadhuriofficial@gmail.com">
             brajmadhuriofficial@gmail.com
           </a>
         </div>
       </div>
 
-      {/* Bottom */}
       <div className="footer-bottom">
-        <p>© 2026 The Braj Madhuri · All rights reserved 🪷</p>
-        <p>🙏 Jai Shri Krishna · Radhe Radhe</p>
+        <p>Copyright 2026 The Braj Madhuri. All rights reserved.</p>
+        <p>Jai Shri Krishna. Radhe Radhe.</p>
       </div>
     </footer>
   );

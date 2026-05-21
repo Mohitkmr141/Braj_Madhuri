@@ -19,26 +19,41 @@ Object.entries(allImages).forEach(([path, url]) => {
 });
 
 const PRODUCTS = Object.keys(PRODUCT_MAP).sort();
+const formatFolderName = (name) => name.replaceAll("-", " ");
 
-export default function CategoryGalleries() {
+export default function CategoryGalleries({ filterFolder, addToCart }) {
+  const visibleProducts = filterFolder
+    ? PRODUCTS.filter((folderName) => folderName === filterFolder)
+    : PRODUCTS;
+
   return (
-    <div className="galleries-wrapper">
-      {/* ✅ This grid wrapper was missing — cards were stacking full-width */}
+    <section className="galleries-wrapper" id="collections">
+      <div className="section-header">
+        <span className="section-eyebrow">
+          {filterFolder ? "Selected Category" : "Shop By Collection"}
+        </span>
+        <h2 className="section-title">
+          {filterFolder ? formatFolderName(filterFolder) : "Devotional Essentials"}
+        </h2>
+        <div className="section-divider" />
+      </div>
+
       <div className="image-grid">
-        {PRODUCTS.map((folderName) => (
+        {visibleProducts.map((folderName) => (
           <ProductCard
             key={folderName}
             folderName={folderName}
             images={PRODUCT_MAP[folderName]}
             data={PRODUCT_DATA[folderName] ?? {}}
+            addToCart={addToCart}
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 
-function ProductCard({ folderName, images, data }) {
+function ProductCard({ folderName, images, data, addToCart }) {
   const [current, setCurrent] = useState(0);
   const total = images.length;
 
@@ -51,13 +66,13 @@ function ProductCard({ folderName, images, data }) {
       : null;
 
   return (
-    <div className="image-card">
+    <article className="image-card reveal">
       <div className="image-card-img-wrapper">
         {discount && <span className="discount-badge">{discount}% OFF</span>}
 
         <img
           src={images[current].src}
-          alt={data.description ?? folderName}
+          alt={data.description ?? formatFolderName(folderName)}
           loading="lazy"
         />
 
@@ -66,14 +81,14 @@ function ProductCard({ folderName, images, data }) {
             <button
               className="slide-btn slide-btn--prev"
               onClick={prev}
-              aria-label="Previous"
+              aria-label="Previous image"
             >
               &#8249;
             </button>
             <button
               className="slide-btn slide-btn--next"
               onClick={next}
-              aria-label="Next"
+              aria-label="Next image"
             >
               &#8250;
             </button>
@@ -84,7 +99,7 @@ function ProductCard({ folderName, images, data }) {
                   key={i}
                   className={`slide-dot${i === current ? " slide-dot--active" : ""}`}
                   onClick={() => setCurrent(i)}
-                  aria-label={`Image ${i + 1}`}
+                  aria-label={`Show image ${i + 1}`}
                 />
               ))}
             </div>
@@ -97,18 +112,26 @@ function ProductCard({ folderName, images, data }) {
       </div>
 
       <div className="image-card-info">
-        <p className="item-description">{data.description ?? folderName}</p>
+        <p className="item-description">
+          {data.description ?? formatFolderName(folderName)}
+        </p>
         <div className="item-pricing">
           {data.price !== undefined && (
-            <span className="item-price">₹{data.price}.00</span>
+            <span className="item-price">INR {data.price}.00</span>
           )}
           {data.originalPrice && (
             <span className="item-original-price">
-              ₹{data.originalPrice}.00
+              INR {data.originalPrice}.00
             </span>
           )}
         </div>
+        <button
+          className="add-cart-btn gallery-cart-btn"
+          onClick={() => addToCart?.(data.price ?? 250)}
+        >
+          Add To Cart
+        </button>
       </div>
-    </div>
+    </article>
   );
 }

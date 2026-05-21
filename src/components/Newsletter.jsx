@@ -9,18 +9,18 @@ const Newsletter = () => {
       >
         Stay Blessed
       </span>
-      <h2>🪷 Join Our Devotional Community</h2>
+      <h2>Join Our Devotional Community</h2>
       <p>
         Get updates on new arrivals, divine offers, and spiritual insights from
-        Vrindavan Mahak
+        The Braj Madhuri.
       </p>
       <div className="newsletter-form">
         <input
           type="email"
           className="newsletter-input"
-          placeholder="Enter your email address…"
+          placeholder="Enter your email address..."
         />
-        <button className="newsletter-btn">SUBSCRIBE</button>
+        <button className="newsletter-btn">Subscribe</button>
       </div>
     </section>
   );
