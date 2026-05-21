@@ -52,11 +52,10 @@ function App() {
       <Reviews />
       <Newsletter />
       <Footer />
-      <FloatingCart cartCount={cartCount} />
+      <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
     </>
   );
 }
 
 export default App;
-
 

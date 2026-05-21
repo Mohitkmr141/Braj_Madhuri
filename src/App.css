@@ -1224,6 +1224,7 @@
     width: 64px; height: 64px;
     border-radius: 50%;
     border: none;
+    text-decoration: none;
     font-size: 12px;
     font-family: 'Cinzel', serif;
     letter-spacing: 0.8px;

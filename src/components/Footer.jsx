@@ -17,22 +17,6 @@ const Footer = () => {
           >
             Instagram
           </a>
-          <a
-            href="https://youtube.com/@YOUR_HANDLE"
-            target="_blank"
-            rel="noreferrer"
-            className="social-btn"
-          >
-            YouTube
-          </a>
-          <a
-            href="https://facebook.com/YOUR_HANDLE"
-            target="_blank"
-            rel="noreferrer"
-            className="social-btn"
-          >
-            Facebook
-          </a>
         </div>
 
         <div className="footer-contact">

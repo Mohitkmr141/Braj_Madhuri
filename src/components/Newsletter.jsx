@@ -14,14 +14,24 @@ const Newsletter = () => {
         Get updates on new arrivals, divine offers, and spiritual insights from
         The Braj Madhuri.
       </p>
-      <div className="newsletter-form">
+      <form
+        className="newsletter-form"
+        action="mailto:brajmadhuriofficial@gmail.com"
+        method="post"
+        encType="text/plain"
+      >
         <input
           type="email"
+          name="email"
           className="newsletter-input"
           placeholder="Enter your email address..."
+          autoComplete="email"
+          required
         />
-        <button className="newsletter-btn">Subscribe</button>
-      </div>
+        <button className="newsletter-btn" type="submit">
+          Subscribe
+        </button>
+      </form>
     </section>
   );
 };
