@@ -9,7 +9,7 @@
 .category-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: clamp(14px, 2vw, 24px);
   margin-bottom: 28px;
 }
 
@@ -21,43 +21,103 @@
 
 /* ── Each cell ── */
 .category-cell {
+  position: relative;
   cursor: pointer;
   appearance: none;
-  background: transparent;
-  border: 0;
+  background: #fffdf8;
+  border: 1px solid rgba(122, 86, 48, 0.14);
+  border-radius: 8px;
   color: inherit;
   font: inherit;
-  padding: 0;
+  padding: 10px 10px 14px;
   text-align: center;
+  box-shadow: 0 14px 34px rgba(57, 35, 17, 0.08);
+  overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.category-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(232, 101, 10, 0.12), transparent 42%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.category-cell:hover {
+  border-color: rgba(201, 150, 12, 0.34);
+  box-shadow: 0 22px 52px rgba(57, 35, 17, 0.14);
+  transform: translateY(-5px);
+}
+
+.category-cell:hover::after {
+  opacity: 1;
 }
 
 .category-cell:hover .category-img-wrapper img {
-  transform: scale(1.04);
+  filter: drop-shadow(0 18px 22px rgba(57, 35, 17, 0.2));
+  transform: scale(1.055) translateY(-3px);
 }
 
 /* ── Image box ── */
 .category-img-wrapper {
+  position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
-  border-radius: 4px;
-  background: #f0f0f0;
+  border-radius: 6px;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255,255,255,0.92) 0 28%, rgba(250,238,222,0.82) 58%, rgba(244,221,192,0.92) 100%),
+    linear-gradient(135deg, #fbefe0, #fff8ed);
+  padding: clamp(12px, 4vw, 24px);
+}
+
+.category-img-wrapper::before,
+.category-img-wrapper::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.category-img-wrapper::before {
+  inset: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 5px;
+}
+
+.category-img-wrapper::after {
+  left: 18%;
+  right: 18%;
+  bottom: 12px;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(67, 42, 20, 0.14);
+  filter: blur(10px);
 }
 
 .category-img-wrapper img {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
+  object-fit: contain;
+  object-position: center;
+  filter: drop-shadow(0 12px 16px rgba(57, 35, 17, 0.14));
+  transition: filter 0.35s ease, transform 0.35s ease;
 }
 
 /* ── Label below image ── */
 .category-name {
-  margin: 8px 0 0;
+  position: relative;
+  z-index: 1;
+  margin: 12px 0 0;
   font-size: 14px;
-  font-weight: 500;
-  color: #222;
-  letter-spacing: 0.3px;
+  font-weight: 700;
+  color: #2a1a0e;
+  letter-spacing: 0;
+  line-height: 1.35;
 }
 
 /* ── Explore button ── */
