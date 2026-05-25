@@ -15,10 +15,14 @@ Object.entries(allImages).forEach(([path, url]) => {
   }
 });
 
-const CATEGORIES = Object.entries(CATEGORY_MAP);
 const formatFolderName = (name) => name.replaceAll("-", " ");
+const CATEGORIES = Object.entries(CATEGORY_MAP).sort(([left], [right]) =>
+  formatFolderName(left).localeCompare(formatFolderName(right), "en", {
+    numeric: true,
+  }),
+);
 
-export default function CategoryGrid({ onExplore }) {
+export default function CategoryGrid({ activeCategory, onExplore }) {
   return (
     <section className="category-section" aria-label="Product categories">
       <div className="section-header">
@@ -32,17 +36,28 @@ export default function CategoryGrid({ onExplore }) {
           <button
             key={folder}
             className="category-cell"
+            type="button"
             onClick={() => onExplore?.(folder)}
+            aria-pressed={activeCategory === folder}
           >
             <div className="category-img-wrapper">
-              <img src={imgUrl} alt={formatFolderName(folder)} loading="lazy" />
+              <img
+                src={imgUrl}
+                alt={formatFolderName(folder)}
+                decoding="async"
+                loading="lazy"
+              />
             </div>
             <p className="category-name">{formatFolderName(folder)}</p>
           </button>
         ))}
       </div>
 
-      <button className="explore-btn" onClick={() => onExplore?.()}>
+      <button
+        className="explore-btn"
+        type="button"
+        onClick={() => onExplore?.()}
+      >
         Explore Our Collection
       </button>
     </section>

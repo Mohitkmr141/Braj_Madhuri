@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Header from "./components/Header.jsx";
 import Hero from "./components/Hero.jsx";
 import TrustBar from "./components/TrustBar.jsx";
@@ -15,37 +15,81 @@ import CategoryGrid from "./components/CategoryGrid.jsx";
 function App() {
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
+  const [activeCategory, setActiveCategory] = useState(null);
 
   const addToCart = (price = 250) => {
     setCartCount((prev) => prev + 1);
     setCartTotal((prev) => prev + price);
   };
 
-  const [activeCategory, setActiveCategory] = useState(null);
+  const cartAnnouncement = useMemo(() => {
+    if (cartCount === 0) {
+      return "Cart is empty.";
+    }
+
+    return `${cartCount} item${cartCount === 1 ? "" : "s"} in cart totaling INR ${cartTotal.toLocaleString("en-IN")}.`;
+  }, [cartCount, cartTotal]);
+
+  const handleExploreCategory = (folder = null) => {
+    setActiveCategory(folder);
+    document.getElementById("collections")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   useEffect(() => {
+    const revealTargets = [...document.querySelectorAll(".reveal")];
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (prefersReducedMotion) {
+      revealTargets.forEach((element) => element.classList.add("visible"));
+      return undefined;
+    }
+
+    const timers = [];
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry, i) => {
+        entries.forEach((entry, index) => {
           if (entry.isIntersecting) {
-            setTimeout(() => entry.target.classList.add("visible"), i * 80);
+            const timer = window.setTimeout(() => {
+              entry.target.classList.add("visible");
+            }, index * 80);
+            timers.push(timer);
             observer.unobserve(entry.target);
           }
         });
       },
       { threshold: 0.12 },
     );
-    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+
+    revealTargets.forEach((element) => observer.observe(element));
+
+    return () => {
+      observer.disconnect();
+      timers.forEach((timer) => window.clearTimeout(timer));
+    };
   }, []);
 
   return (
     <>
+      <p className="visually-hidden" aria-live="polite">
+        {cartAnnouncement}
+      </p>
       <Header cartCount={cartCount} cartTotal={cartTotal} />
       <Hero />
       <TrustBar />
-      <CategoryGrid onExplore={(folder) => setActiveCategory(folder)} />
-      <CategoryGalleries filterFolder={activeCategory} addToCart={addToCart} />
+      <CategoryGrid
+        activeCategory={activeCategory}
+        onExplore={handleExploreCategory}
+      />
+      <CategoryGalleries
+        addToCart={addToCart}
+        filterFolder={activeCategory}
+        onClearFilter={() => handleExploreCategory(null)}
+      />
       <FeaturedBanner />
       <ComboPacks addToCart={addToCart} />
       <Story />
@@ -58,4 +102,3 @@ function App() {
 }
 
 export default App;
-

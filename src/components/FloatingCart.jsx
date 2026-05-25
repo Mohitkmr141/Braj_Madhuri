@@ -6,10 +6,18 @@ const FloatingCart = ({ cartCount = 0, cartTotal = 0 }) => {
       className="float-cart"
       href="#collections"
       title="View cart"
-      aria-label={`View cart: ${cartCount} items, INR ${cartTotal.toLocaleString("en-IN")}`}
+      aria-label={
+        cartCount > 0
+          ? `View cart: ${cartCount} items, INR ${cartTotal.toLocaleString("en-IN")}`
+          : "Browse the collection. Your cart is empty."
+      }
     >
       {cartCount > 0 ? `INR ${cartTotal.toLocaleString("en-IN")}` : "Cart"}
-      <span className="float-cart-badge">{cartCount}</span>
+      {cartCount > 0 && (
+        <span className="float-cart-badge" aria-hidden="true">
+          {cartCount}
+        </span>
+      )}
     </a>
   );
 };

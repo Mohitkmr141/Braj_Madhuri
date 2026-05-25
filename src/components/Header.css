@@ -184,6 +184,8 @@
 
     /* === MOBILE DRAWER === */
     .bm-overlay {
+      appearance: none;
+      border: none;
       display: none;
       position: fixed;
       inset: 0;

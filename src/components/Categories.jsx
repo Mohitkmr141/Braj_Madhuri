@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import "./CategoryGalleries.css";
 import PRODUCT_DATA from "../data/productData.js";
 
@@ -18,13 +18,39 @@ Object.entries(allImages).forEach(([path, url]) => {
   PRODUCT_MAP[folderName].push({ src: url, fileName: rawName });
 });
 
-const PRODUCTS = Object.keys(PRODUCT_MAP).sort();
 const formatFolderName = (name) => name.replaceAll("-", " ");
+const formatCurrency = (value) =>
+  new Intl.NumberFormat("en-IN", {
+    currency: "INR",
+    maximumFractionDigits: 0,
+    style: "currency",
+  }).format(value);
 
-export default function CategoryGalleries({ filterFolder, addToCart }) {
-  const visibleProducts = filterFolder
-    ? PRODUCTS.filter((folderName) => folderName === filterFolder)
-    : PRODUCTS;
+const PRODUCTS = Object.entries(PRODUCT_MAP)
+  .map(([folderName, images]) => [
+    folderName,
+    [...images].sort((left, right) =>
+      left.fileName.localeCompare(right.fileName, "en", { numeric: true }),
+    ),
+  ])
+  .sort(([left], [right]) =>
+    formatFolderName(left).localeCompare(formatFolderName(right), "en", {
+      numeric: true,
+    }),
+  );
+
+export default function CategoryGalleries({
+  filterFolder,
+  addToCart,
+  onClearFilter,
+}) {
+  const visibleProducts = useMemo(
+    () =>
+      filterFolder
+        ? PRODUCTS.filter(([folderName]) => folderName === filterFolder)
+        : PRODUCTS,
+    [filterFolder],
+  );
 
   return (
     <section className="galleries-wrapper" id="collections">
@@ -39,15 +65,31 @@ export default function CategoryGalleries({ filterFolder, addToCart }) {
       </div>
 
       <div className="image-grid">
-        {visibleProducts.map((folderName) => (
-          <ProductCard
-            key={folderName}
-            folderName={folderName}
-            images={PRODUCT_MAP[folderName]}
-            data={PRODUCT_DATA[folderName] ?? {}}
-            addToCart={addToCart}
-          />
-        ))}
+        {visibleProducts.length > 0 ? (
+          visibleProducts.map(([folderName, images]) => (
+            <ProductCard
+              key={folderName}
+              addToCart={addToCart}
+              data={PRODUCT_DATA[folderName] ?? {}}
+              folderName={folderName}
+              images={images}
+            />
+          ))
+        ) : (
+          <div className="empty-state">
+            <p className="empty-state__title">No products found for this category.</p>
+            <p className="empty-state__body">
+              Try another collection to continue browsing the catalog.
+            </p>
+            <button
+              className="explore-btn empty-state__button"
+              type="button"
+              onClick={onClearFilter}
+            >
+              View All Collections
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -55,8 +97,14 @@ export default function CategoryGalleries({ filterFolder, addToCart }) {
 
 function ProductCard({ folderName, images, data, addToCart }) {
   const [current, setCurrent] = useState(0);
-  const total = images.length;
-  const activeImage = images[current];
+  const safeImages = images ?? [];
+  const total = safeImages.length;
+  const activeImage = safeImages[current] ?? safeImages[0];
+
+  if (!activeImage) {
+    return null;
+  }
+
   const activeData = {
     ...data,
     ...(data.items?.[activeImage.fileName] ?? {}),
@@ -78,6 +126,7 @@ function ProductCard({ folderName, images, data, addToCart }) {
         <img
           src={activeImage.src}
           alt={activeData.title ?? activeData.description ?? formatFolderName(folderName)}
+          decoding="async"
           loading="lazy"
         />
 
@@ -85,6 +134,7 @@ function ProductCard({ folderName, images, data, addToCart }) {
           <>
             <button
               className="slide-btn slide-btn--prev"
+              type="button"
               onClick={prev}
               aria-label="Previous image"
             >
@@ -92,6 +142,7 @@ function ProductCard({ folderName, images, data, addToCart }) {
             </button>
             <button
               className="slide-btn slide-btn--next"
+              type="button"
               onClick={next}
               aria-label="Next image"
             >
@@ -99,10 +150,11 @@ function ProductCard({ folderName, images, data, addToCart }) {
             </button>
 
             <div className="slide-dots">
-              {images.map((_, i) => (
+              {safeImages.map((image, i) => (
                 <button
-                  key={i}
+                  key={image.fileName}
                   className={`slide-dot${i === current ? " slide-dot--active" : ""}`}
+                  type="button"
                   onClick={() => setCurrent(i)}
                   aria-label={`Show image ${i + 1}`}
                 />
@@ -125,16 +177,17 @@ function ProductCard({ folderName, images, data, addToCart }) {
         </p>
         <div className="item-pricing">
           {activeData.price !== undefined && (
-            <span className="item-price">INR {activeData.price}.00</span>
+            <span className="item-price">{formatCurrency(activeData.price)}</span>
           )}
           {activeData.originalPrice && (
             <span className="item-original-price">
-              INR {activeData.originalPrice}.00
+              {formatCurrency(activeData.originalPrice)}
             </span>
           )}
         </div>
         <button
           className="add-cart-btn gallery-cart-btn"
+          type="button"
           onClick={() => addToCart?.(activeData.price ?? 250)}
         >
           Add To Cart

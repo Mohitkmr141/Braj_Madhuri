@@ -1,6 +1,8 @@
 import React from "react";
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer>
       <div className="footer-inner">
@@ -28,7 +30,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <p>Copyright 2026 The Braj Madhuri. All rights reserved.</p>
+        <p>Copyright {currentYear} The Braj Madhuri. All rights reserved.</p>
         <p>Jai Shri Krishna. Radhe Radhe.</p>
       </div>
     </footer>

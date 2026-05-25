@@ -54,6 +54,7 @@ function ComboPacks({ addToCart }) {
                 </div>
                 <button
                   className="add-cart-btn"
+                  type="button"
                   onClick={() => addToCart?.(combo.price)}
                 >
                   Add

@@ -13,6 +13,7 @@ const NAV_ITEMS = [
 const Header = ({ cartCount = 0, cartTotal = 0 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [navSticky, setNavSticky] = useState(false);
+  const closeMenu = () => setMenuOpen(false);
 
   useEffect(() => {
     const onScroll = () => setNavSticky(window.scrollY > 10);
@@ -29,32 +30,59 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    const previousOverflow = document.body.style.overflow;
+
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    }
+
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
     };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) {
+      return undefined;
+    }
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        closeMenu();
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
   }, [menuOpen]);
 
   return (
     <>
-      <div
+      <button
+        type="button"
         className={`bm-overlay ${menuOpen ? "open" : ""}`}
-        onClick={() => setMenuOpen(false)}
-        aria-hidden="true"
+        onClick={closeMenu}
+        aria-label="Close menu"
+        aria-hidden={!menuOpen}
+        tabIndex={menuOpen ? 0 : -1}
       />
 
       <aside
         className={`bm-drawer ${menuOpen ? "open" : ""}`}
+        aria-hidden={!menuOpen}
         aria-label="Navigation"
+        aria-modal={menuOpen}
+        role="dialog"
       >
         <div className="bm-drawer__head">
           <span className="bm-drawer__title">The Braj Madhuri</span>
           <button
+            type="button"
             className="bm-drawer__close"
-            onClick={() => setMenuOpen(false)}
+            onClick={closeMenu}
             aria-label="Close menu"
           >
-            X
+            <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <nav className="bm-drawer__nav">
@@ -63,7 +91,8 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
               key={item}
               href={href}
               className={`bm-drawer__link ${item === "Home" ? "active" : ""}`}
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
+              aria-current={item === "Home" ? "page" : undefined}
             >
               {item}
             </a>
@@ -84,6 +113,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
 
         <div className="bm-banner__ham">
           <button
+            type="button"
             className={`bm-hamburger ${menuOpen ? "open" : ""}`}
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -99,7 +129,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
           <a
             href="#collections"
             className="bm-cart"
-            aria-label={`Cart: ${cartCount} items`}
+            aria-label={`View collection. Cart has ${cartCount} item${cartCount === 1 ? "" : "s"} worth INR ${cartTotal.toLocaleString("en-IN")}.`}
           >
             <span className="bm-cart__icon" aria-hidden="true">
               Cart
@@ -131,6 +161,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
               key={item}
               href={href}
               className={`bm-nav-link ${item === "Home" ? "active" : ""}`}
+              aria-current={item === "Home" ? "page" : undefined}
             >
               {item}
             </a>
@@ -139,6 +170,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
         <div className="bm-nav__mobile-bar">
           <span className="bm-nav__mobile-title">The Braj Madhuri</span>
           <button
+            type="button"
             className={`bm-hamburger bm-hamburger-plain ${menuOpen ? "open" : ""}`}
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
