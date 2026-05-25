@@ -1,21 +1,20 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Header from "./components/Header.jsx";
-import Hero from "./components/Hero.jsx";
-import TrustBar from "./components/TrustBar.jsx";
-import FeaturedBanner from "./components/FeaturedBanner.jsx";
-import ComboPacks from "./components/ComboPacks.jsx";
-import Story from "./components/Story.jsx";
-import Reviews from "./components/Reviews.jsx";
 import Newsletter from "./components/Newsletter.jsx";
 import Footer from "./components/Footer.jsx";
 import FloatingCart from "./components/FloatingCart.jsx";
-import CategoryGalleries from "./components/Categories.jsx";
-import CategoryGrid from "./components/CategoryGrid.jsx";
+
+const HomePage = lazy(() => import("./pages/HomePage.jsx"));
+const ShopPage = lazy(() => import("./pages/ShopPage.jsx"));
+const CombosPage = lazy(() => import("./pages/CombosPage.jsx"));
+const AboutPage = lazy(() => import("./pages/AboutPage.jsx"));
+const ContactPage = lazy(() => import("./pages/ContactPage.jsx"));
 
 function App() {
+  const location = useLocation();
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
-  const [activeCategory, setActiveCategory] = useState(null);
 
   const addToCart = (price = 250) => {
     setCartCount((prev) => prev + 1);
@@ -30,13 +29,9 @@ function App() {
     return `${cartCount} item${cartCount === 1 ? "" : "s"} in cart totaling INR ${cartTotal.toLocaleString("en-IN")}.`;
   }, [cartCount, cartTotal]);
 
-  const handleExploreCategory = (folder = null) => {
-    setActiveCategory(folder);
-    document.getElementById("collections")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  };
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [location.pathname]);
 
   useEffect(() => {
     const revealTargets = [...document.querySelectorAll(".reveal")];
@@ -48,6 +43,8 @@ function App() {
       revealTargets.forEach((element) => element.classList.add("visible"));
       return undefined;
     }
+
+    revealTargets.forEach((element) => element.classList.remove("visible"));
 
     const timers = [];
     const observer = new IntersectionObserver(
@@ -71,7 +68,7 @@ function App() {
       observer.disconnect();
       timers.forEach((timer) => window.clearTimeout(timer));
     };
-  }, []);
+  }, [location.pathname, location.search]);
 
   return (
     <>
@@ -79,21 +76,25 @@ function App() {
         {cartAnnouncement}
       </p>
       <Header cartCount={cartCount} cartTotal={cartTotal} />
-      <Hero />
-      <TrustBar />
-      <CategoryGrid
-        activeCategory={activeCategory}
-        onExplore={handleExploreCategory}
-      />
-      <CategoryGalleries
-        addToCart={addToCart}
-        filterFolder={activeCategory}
-        onClearFilter={() => handleExploreCategory(null)}
-      />
-      <FeaturedBanner />
-      <ComboPacks addToCart={addToCart} />
-      <Story />
-      <Reviews />
+      <Suspense
+        fallback={
+          <main className="page-loading" aria-busy="true">
+            <p>Loading devotional collections...</p>
+          </main>
+        }
+      >
+        <Routes>
+          <Route path="/" element={<HomePage addToCart={addToCart} />} />
+          <Route path="/shop" element={<ShopPage addToCart={addToCart} />} />
+          <Route
+            path="/combos"
+            element={<CombosPage addToCart={addToCart} />}
+          />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="*" element={<Navigate replace to="/" />} />
+        </Routes>
+      </Suspense>
       <Newsletter />
       <Footer />
       <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />

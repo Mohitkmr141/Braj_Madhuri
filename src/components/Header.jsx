@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { Link, NavLink } from "react-router-dom";
 import heroBanner from "../assets/Brand-Logo.png";
 import "./Header.css";
 
 const NAV_ITEMS = [
-  ["Home", "#home"],
-  ["Shop", "#collections"],
-  ["Combos", "#combos"],
-  ["About Us", "#story"],
-  ["Contact", "mailto:brajmadhuriofficial@gmail.com"],
+  ["Home", "/"],
+  ["Shop", "/shop"],
+  ["Combos", "/combos"],
+  ["About Us", "/about"],
+  ["Contact", "/contact"],
 ];
 
 const Header = ({ cartCount = 0, cartTotal = 0 }) => {
@@ -86,16 +87,17 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
           </button>
         </div>
         <nav className="bm-drawer__nav">
-          {NAV_ITEMS.map(([item, href]) => (
-            <a
+          {NAV_ITEMS.map(([item, to]) => (
+            <NavLink
               key={item}
-              href={href}
-              className={`bm-drawer__link ${item === "Home" ? "active" : ""}`}
-              onClick={closeMenu}
-              aria-current={item === "Home" ? "page" : undefined}
+              to={to}
+              end={to === "/"}
+              className={({ isActive }) =>
+                `bm-drawer__link${isActive ? " active" : ""}`
+              }
             >
               {item}
-            </a>
+            </NavLink>
           ))}
         </nav>
       </aside>
@@ -126,8 +128,8 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
         </div>
 
         <div className="bm-banner__cart">
-          <a
-            href="#collections"
+          <Link
+            to="/shop"
             className="bm-cart"
             aria-label={`View collection. Cart has ${cartCount} item${cartCount === 1 ? "" : "s"} worth INR ${cartTotal.toLocaleString("en-IN")}.`}
           >
@@ -142,7 +144,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
                 {cartCount > 99 ? "99+" : cartCount}
               </span>
             )}
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -156,19 +158,23 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
         aria-label="Main navigation"
       >
         <div className="bm-nav__inner">
-          {NAV_ITEMS.map(([item, href]) => (
-            <a
+          {NAV_ITEMS.map(([item, to]) => (
+            <NavLink
               key={item}
-              href={href}
-              className={`bm-nav-link ${item === "Home" ? "active" : ""}`}
-              aria-current={item === "Home" ? "page" : undefined}
+              to={to}
+              end={to === "/"}
+              className={({ isActive }) =>
+                `bm-nav-link${isActive ? " active" : ""}`
+              }
             >
               {item}
-            </a>
+            </NavLink>
           ))}
         </div>
         <div className="bm-nav__mobile-bar">
-          <span className="bm-nav__mobile-title">The Braj Madhuri</span>
+          <Link className="bm-nav__mobile-title" to="/">
+            The Braj Madhuri
+          </Link>
           <button
             type="button"
             className={`bm-hamburger bm-hamburger-plain ${menuOpen ? "open" : ""}`}

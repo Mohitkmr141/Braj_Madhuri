@@ -1,10 +1,11 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const FloatingCart = ({ cartCount = 0, cartTotal = 0 }) => {
   return (
-    <a
+    <Link
       className="float-cart"
-      href="#collections"
+      to="/shop"
       title="View cart"
       aria-label={
         cartCount > 0
@@ -18,7 +19,7 @@ const FloatingCart = ({ cartCount = 0, cartTotal = 0 }) => {
           {cartCount}
         </span>
       )}
-    </a>
+    </Link>
   );
 };
 

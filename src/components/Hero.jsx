@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function Hero() {
   return (
@@ -18,12 +19,12 @@ function Hero() {
           daily seva products curated with purity and care.
         </p>
         <div className="hero-ctas">
-          <a className="btn-primary" href="#collections">
+          <Link className="btn-primary" to="/shop">
             Shop Collection
-          </a>
-          <a className="btn-outline" href="#story">
+          </Link>
+          <Link className="btn-outline" to="/about">
             Our Story
-          </a>
+          </Link>
         </div>
       </div>
 
