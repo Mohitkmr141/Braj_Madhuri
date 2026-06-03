@@ -92,6 +92,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
               key={item}
               to={to}
               end={to === "/"}
+              onClick={closeMenu}
               className={({ isActive }) =>
                 `bm-drawer__link${isActive ? " active" : ""}`
               }
@@ -134,7 +135,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
             aria-label={`View collection. Cart has ${cartCount} item${cartCount === 1 ? "" : "s"} worth INR ${cartTotal.toLocaleString("en-IN")}.`}
           >
             <span className="bm-cart__icon" aria-hidden="true">
-              Cart
+              Bag
             </span>
             <span className="bm-cart__label">
               {cartCount > 0 ? `INR ${cartTotal.toLocaleString("en-IN")}` : "Cart"}

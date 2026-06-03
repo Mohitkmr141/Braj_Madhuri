@@ -63,6 +63,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: clamp(16px, 2vw, 28px);
+  align-items: stretch;
 }
 
 .empty-state {
@@ -117,6 +118,7 @@
     linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,249,241,0.96)),
     var(--surface);
   cursor: pointer;
+  min-width: 0;
   box-shadow: var(--shadow-soft);
   isolation: isolate;
   transition:
@@ -258,6 +260,10 @@
   transform: translateY(-50%) scale(1.07);
 }
 
+.slide-btn:focus-visible {
+  opacity: 1;
+}
+
 .slide-btn--prev { left: 8px; }
 .slide-btn--next { right: 8px; }
 
@@ -329,6 +335,7 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 .item-description {
