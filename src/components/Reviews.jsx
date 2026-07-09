@@ -38,9 +38,27 @@ function Reviews() {
           <article className="review-card reveal" key={review.name}>
             <div className="review-quote">"</div>
             <p className="review-text">{review.text}</p>
-            <div className="review-stars" aria-label="5 star rating">
-              {STAR_RATING}
-            </div>
+            <iframe
+              src="https://www.instagram.com/p/DX2FinLiVQ0/embed"
+              width="400"
+              height="550"
+              frameBorder="0"
+              scrolling="no"
+              allowTransparency="true"
+              allow="encrypted-media"
+              title="Instagram Reviews"
+              style={{
+                background: "white",
+                border: "1px solid #dbdbdb",
+                borderRadius: "8px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                display: "block",
+                margin: "0 auto",
+                maxWidth: "100%",
+                minWidth: "326px",
+                padding: "0",
+              }}
+            />
             <div className="review-author">
               <div className="review-avatar" aria-hidden="true">
                 {review.name.charAt(0)}
@@ -58,3 +76,4 @@ function Reviews() {
 }
 
 export default Reviews;
+
