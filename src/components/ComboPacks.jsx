@@ -37,7 +37,7 @@ function ComboPacks({ addToCart }) {
           <article className="combo-card reveal" key={combo.title}>
             <div className="combo-header">
               <div className="combo-icons" aria-hidden="true">
-                *
+                🪷
               </div>
               <h3>{combo.title}</h3>
             </div>

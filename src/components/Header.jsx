@@ -1,6 +1,10 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
-import heroBanner from "../assets/Brand-Logo.png";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import heroBanner from "../../public/Brand-Logo.jpeg";
+import SearchBar from "./SearchBar.jsx";
 import "./Header.css";
 
 const NAV_ITEMS = [
@@ -12,9 +16,14 @@ const NAV_ITEMS = [
 ];
 
 const Header = ({ cartCount = 0, cartTotal = 0 }) => {
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [navSticky, setNavSticky] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [suggestionQuery, setSuggestionQuery] = useState("");
   const closeMenu = () => setMenuOpen(false);
+  const closeSearch = () => { setSearchOpen(false); setSuggestionQuery(""); };
+  const isActive = (to) => (to === "/" ? pathname === "/" : pathname === to);
 
   useEffect(() => {
     const onScroll = () => setNavSticky(window.scrollY > 10);
@@ -59,6 +68,38 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
 
   return (
     <>
+      {/* Search Overlay */}
+      {searchOpen && (
+        <div className="search-overlay" role="dialog" aria-label="Search" onClick={(e) => { if (e.target === e.currentTarget) closeSearch(); }}>
+          <p className="search-overlay__heading">What are you looking for?</p>
+          <p className="search-overlay__subheading">Search our entire devotional collection</p>
+          <div className="search-overlay__inner">
+            <SearchBar onClose={closeSearch} initialQuery={suggestionQuery} />
+            <button
+              type="button"
+              className="search-overlay__close"
+              onClick={closeSearch}
+              aria-label="Close search"
+            >
+              ×
+            </button>
+          </div>
+          <div className="search-suggestions" aria-label="Popular searches">
+            {["Agarbatti", "Japa Mala", "Poshak", "Dhoop", "Chandan", "Combo Pack"].map((chip) => (
+              <button
+                key={chip}
+                type="button"
+                className="search-suggestion-chip"
+                onClick={() => {
+                  setSuggestionQuery(chip);
+                }}
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       <button
         type="button"
         className={`bm-overlay ${menuOpen ? "open" : ""}`}
@@ -88,30 +129,23 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
         </div>
         <nav className="bm-drawer__nav">
           {NAV_ITEMS.map(([item, to]) => (
-            <NavLink
+            <Link
               key={item}
-              to={to}
-              end={to === "/"}
+              href={to}
               onClick={closeMenu}
-              className={({ isActive }) =>
-                `bm-drawer__link${isActive ? " active" : ""}`
-              }
+              className={`bm-drawer__link${isActive(to) ? " active" : ""}`}
             >
               {item}
-            </NavLink>
+            </Link>
           ))}
         </nav>
       </aside>
 
       <div className="bm-banner">
         <img
-          src={heroBanner}
+          src={heroBanner.src}
           alt="The Braj Madhuri"
           className="bm-banner__img"
-          onError={(e) => {
-            e.currentTarget.style.background = "#f5ede0";
-            e.currentTarget.onerror = null;
-          }}
         />
 
         <div className="bm-banner__ham">
@@ -130,7 +164,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
 
         <div className="bm-banner__cart">
           <Link
-            to="/shop"
+            href="/shop"
             className="bm-cart"
             aria-label={`View collection. Cart has ${cartCount} item${cartCount === 1 ? "" : "s"} worth INR ${cartTotal.toLocaleString("en-IN")}.`}
           >
@@ -158,35 +192,60 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
         className={`bm-nav-bar ${navSticky ? "sticky" : ""}`}
         aria-label="Main navigation"
       >
+        {/* Desktop nav links */}
         <div className="bm-nav__inner">
           {NAV_ITEMS.map(([item, to]) => (
-            <NavLink
+            <Link
               key={item}
-              to={to}
-              end={to === "/"}
-              className={({ isActive }) =>
-                `bm-nav-link${isActive ? " active" : ""}`
-              }
+              href={to}
+              className={`bm-nav-link${isActive(to) ? " active" : ""}`}
             >
               {item}
-            </NavLink>
+            </Link>
           ))}
-        </div>
-        <div className="bm-nav__mobile-bar">
-          <Link className="bm-nav__mobile-title" to="/">
-            The Braj Madhuri
-          </Link>
+          {/* Search button */}
           <button
             type="button"
-            className={`bm-hamburger bm-hamburger-plain ${menuOpen ? "open" : ""}`}
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
+            className="header-search-btn"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Open search"
+            style={{ marginLeft: "auto" }}
           >
-            <span />
-            <span />
-            <span />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span>Search</span>
           </button>
+        </div>
+        <div className="bm-nav__mobile-bar">
+          <Link className="bm-nav__mobile-title" href="/">
+            The Braj Madhuri
+          </Link>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <button
+              type="button"
+              className="header-search-btn"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Open search"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className={`bm-hamburger bm-hamburger-plain ${menuOpen ? "open" : ""}`}
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </div>
         </div>
       </nav>
     </>

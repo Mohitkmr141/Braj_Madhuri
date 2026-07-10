@@ -1,11 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const FloatingCart = ({ cartCount = 0, cartTotal = 0 }) => {
   return (
     <Link
       className="float-cart"
-      to="/shop"
+      href="/shop"
       title="View cart"
       aria-label={
         cartCount > 0

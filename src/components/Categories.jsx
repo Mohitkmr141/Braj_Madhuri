@@ -1,21 +1,16 @@
+"use client";
+
 import React, { useMemo, useState } from "react";
+import Image from "next/image";
 import "./CategoryGalleries.css";
 import PRODUCT_DATA from "../data/productData.js";
-
-const allImages = import.meta.glob(
-  "../assets/images/**/*.{png,jpg,jpeg,webp,svg}",
-  { eager: true, import: "default" },
-);
+import PRODUCT_IMAGE_MAP from "../data/productImages.js";
 
 const PRODUCT_MAP = {};
 
-Object.entries(allImages).forEach(([path, url]) => {
-  const parts = path.split("/");
-  const folderName = parts[parts.length - 2];
-  const rawName = parts[parts.length - 1].split(".")[0];
-
+Object.entries(PRODUCT_IMAGE_MAP).forEach(([folderName, images]) => {
   if (!PRODUCT_MAP[folderName]) PRODUCT_MAP[folderName] = [];
-  PRODUCT_MAP[folderName].push({ src: url, fileName: rawName });
+  PRODUCT_MAP[folderName].push(...images);
 });
 
 const formatFolderName = (name) => name.replaceAll("-", " ");
@@ -123,11 +118,12 @@ function ProductCard({ folderName, images, data, addToCart }) {
       <div className="image-card-img-wrapper">
         {discount && <span className="discount-badge">{discount}% OFF</span>}
 
-        <img
-          src={activeImage.src}
+        <Image
+          src={activeImage.image}
           alt={activeData.title ?? activeData.description ?? formatFolderName(folderName)}
           decoding="async"
-          loading="lazy"
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
 
         {total > 1 && (

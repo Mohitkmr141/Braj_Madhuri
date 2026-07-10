@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const specials = [
   ["Nidhivan Perfume", "INR 120 - INR 200"],
@@ -18,10 +18,10 @@ const FeaturedBanner = () => {
             Sacred <em>Scents</em> of Braj
           </h2>
           <p className="featured-desc">
-            Experience gentle devotional fragrances inspired by Vrindavan's
+            Experience gentle devotional fragrances inspired by Vrindavan&apos;s
             lanes, ghats, temples, and daily seva traditions.
           </p>
-          <Link to="/shop" className="btn-primary">
+          <Link href="/shop" className="btn-primary">
             Explore Specials
           </Link>
         </div>
@@ -29,7 +29,7 @@ const FeaturedBanner = () => {
           {specials.map(([name, price]) => (
             <div className="featured-prod reveal" key={name}>
               <div className="featured-prod-icon" aria-hidden="true">
-                *
+                🪷
               </div>
               <div className="featured-prod-name">{name}</div>
               <div className="featured-prod-price">{price}</div>

@@ -15,7 +15,7 @@ const Story = () => {
           <div className="story-big-box">
             <div className="story-big-text">BM</div>
             <div className="story-big-icon" aria-hidden="true">
-              *
+              🪷
             </div>
             <div className="story-big-label">Braj Madhuri</div>
           </div>
@@ -50,7 +50,7 @@ const Story = () => {
             {values.map(([title, desc]) => (
               <div className="value-item" key={title}>
                 <span className="value-icon" aria-hidden="true">
-                  *
+                  ✦
                 </span>
                 <div>
                   <span className="value-title">{title}</span>

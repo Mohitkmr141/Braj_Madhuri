@@ -1,5 +1,7 @@
+"use client";
+
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import Hero from "../components/Hero.jsx";
 import TrustBar from "../components/TrustBar.jsx";
 import FeaturedBanner from "../components/FeaturedBanner.jsx";
@@ -8,17 +10,19 @@ import Story from "../components/Story.jsx";
 import Reviews from "../components/Reviews.jsx";
 import CategoryGalleries from "../components/Categories.jsx";
 import CategoryGrid from "../components/CategoryGrid.jsx";
+import { useCart } from "../context/CartContext.jsx";
 
-function HomePage({ addToCart }) {
-  const navigate = useNavigate();
+function HomePage() {
+  const router = useRouter();
+  const { addToCart } = useCart();
 
   const handleExploreCategory = (folder) => {
     if (folder) {
-      navigate(`/shop?category=${encodeURIComponent(folder)}`);
+      router.push(`/shop?category=${encodeURIComponent(folder)}`);
       return;
     }
 
-    navigate("/shop");
+    router.push("/shop");
   };
 
   return (

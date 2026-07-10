@@ -33,47 +33,50 @@ function Reviews() {
         </p>
       </div>
 
-      <div className="reviews-grid">
-        {reviews.map((review) => (
-          <article className="review-card reveal" key={review.name}>
-            <div className="review-quote">"</div>
-            <p className="review-text">{review.text}</p>
-            <iframe
-              src="https://www.instagram.com/p/DX2FinLiVQ0/embed"
-              width="400"
-              height="550"
-              frameBorder="0"
-              scrolling="no"
-              allowTransparency="true"
-              allow="encrypted-media"
-              title="Instagram Reviews"
-              style={{
-                background: "white",
-                border: "1px solid #dbdbdb",
-                borderRadius: "8px",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                display: "block",
-                margin: "0 auto",
-                maxWidth: "100%",
-                minWidth: "326px",
-                padding: "0",
-              }}
-            />
-            <div className="review-author">
-              <div className="review-avatar" aria-hidden="true">
-                {review.name.charAt(0)}
+      <div className="reviews-layout">
+        <div className="instagram-embed">
+          <iframe
+            src="https://www.instagram.com/p/DX2FinLiVQ0/embed"
+            width="400"
+            height="480"
+            frameBorder="0"
+            allow="encrypted-media"
+            title="Instagram Reviews"
+            style={{
+              background: "white",
+              border: "1px solid #dbdbdb",
+              borderRadius: "8px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              display: "block",
+              margin: "0 auto",
+              maxWidth: "100%",
+              minWidth: "326px",
+              padding: "0",
+              overflow: "hidden",
+            }}
+          />
+        </div>
+
+        <div className="reviews-grid">
+          {reviews.map((review) => (
+            <article className="review-card reveal" key={review.name}>
+              <div className="review-quote">&quot;</div>
+              <p className="review-text">{review.text}</p>
+              <div className="review-author">
+                <div className="review-avatar" aria-hidden="true">
+                  {review.name.charAt(0)}
+                </div>
+                <div>
+                  <div className="review-name">{review.name}</div>
+                  <div className="review-location">{review.location}</div>
+                </div>
               </div>
-              <div>
-                <div className="review-name">{review.name}</div>
-                <div className="review-location">{review.location}</div>
-              </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
 export default Reviews;
-

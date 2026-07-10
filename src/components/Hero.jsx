@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 function Hero() {
   return (
@@ -19,29 +19,16 @@ function Hero() {
           daily seva products curated with purity and care.
         </p>
         <div className="hero-ctas">
-          <Link className="btn-primary" to="/shop">
+          <Link className="btn-primary" href="/shop">
             Shop Collection
           </Link>
-          <Link className="btn-outline" to="/about">
+          <Link className="btn-outline" href="/about">
             Our Story
           </Link>
         </div>
       </div>
 
-      <div className="hero-stats" aria-label="Store highlights">
-        <div className="stat">
-          <span className="stat-num">100+</span>
-          <span className="stat-label">Products</span>
-        </div>
-        <div className="stat">
-          <span className="stat-num">4.9</span>
-          <span className="stat-label">Rating</span>
-        </div>
-        <div className="stat">
-          <span className="stat-num">India</span>
-          <span className="stat-label">Delivery</span>
-        </div>
-      </div>
+
     </section>
   );
 }

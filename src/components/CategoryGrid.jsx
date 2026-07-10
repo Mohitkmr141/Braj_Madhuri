@@ -1,17 +1,14 @@
-import React from "react";
-import "./CategoryGrid.css";
+"use client";
 
-const allImages = import.meta.glob(
-  "../assets/images/**/*.{png,jpg,jpeg,webp,svg}",
-  { eager: true, import: "default" },
-);
+import React from "react";
+import Image from "next/image";
+import "./CategoryGrid.css";
+import PRODUCT_IMAGE_MAP from "../data/productImages.js";
 
 const CATEGORY_MAP = {};
-Object.entries(allImages).forEach(([path, url]) => {
-  const parts = path.split("/");
-  const folderName = parts[parts.length - 2];
+Object.entries(PRODUCT_IMAGE_MAP).forEach(([folderName, images]) => {
   if (!CATEGORY_MAP[folderName]) {
-    CATEGORY_MAP[folderName] = url;
+    CATEGORY_MAP[folderName] = images[0]?.image;
   }
 });
 
@@ -41,11 +38,12 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
             aria-pressed={activeCategory === folder}
           >
             <div className="category-img-wrapper">
-              <img
+              <Image
                 src={imgUrl}
                 alt={formatFolderName(folder)}
                 decoding="async"
-                loading="lazy"
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
               />
             </div>
             <p className="category-name">{formatFolderName(folder)}</p>

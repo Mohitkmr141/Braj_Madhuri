@@ -1,21 +1,25 @@
+"use client";
+
 import React, { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useRouter, useSearchParams } from "next/navigation";
 import CategoryGalleries from "../components/Categories.jsx";
 import CategoryGrid from "../components/CategoryGrid.jsx";
 import FeaturedBanner from "../components/FeaturedBanner.jsx";
+import { useCart } from "../context/CartContext.jsx";
 
-function ShopPage({ addToCart }) {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+function ShopPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { addToCart } = useCart();
   const activeCategory = searchParams.get("category");
 
   const handleExploreCategory = (folder) => {
     if (folder) {
-      navigate(`/shop?category=${encodeURIComponent(folder)}`);
+      router.push(`/shop?category=${encodeURIComponent(folder)}`);
       return;
     }
 
-    navigate("/shop");
+    router.push("/shop");
   };
 
   useEffect(() => {

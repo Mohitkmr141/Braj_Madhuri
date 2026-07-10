@@ -1,8 +1,13 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import ComboPacks from "../components/ComboPacks.jsx";
+"use client";
 
-function CombosPage({ addToCart }) {
+import React from "react";
+import Link from "next/link";
+import ComboPacks from "../components/ComboPacks.jsx";
+import { useCart } from "../context/CartContext.jsx";
+
+function CombosPage() {
+  const { addToCart } = useCart();
+
   return (
     <main className="page-shell">
       <section className="page-hero page-hero--combos">
@@ -23,7 +28,7 @@ function CombosPage({ addToCart }) {
           <span className="section-eyebrow">Need More Choices</span>
           <h2 className="section-title">Mix and match from the full collection.</h2>
         </div>
-        <Link className="btn-primary" to="/shop">
+        <Link className="btn-primary" href="/shop">
           Visit Shop
         </Link>
       </section>

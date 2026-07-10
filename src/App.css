@@ -60,14 +60,12 @@
 
   .announcement span { color: #fff; font-weight: 500; }
 
-  /* ─── HEADER (FIXED) ─── */
+  /* ─── HEADER ─── */
  header {
   background: var(--cream);
   border-bottom: 1px solid rgba(201,151,42,0.25);
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 100;
-  backdrop-filter: blur(8px);
 }
 
  .header-top {
@@ -90,51 +88,40 @@
 
 
  
-.logo-img img {
-  width: 100%;
-  height: auto;
-  max-height: 450px;
-  object-fit: contain;
-  object-position: center;
-  display: block;
+
+/* Dead code removed: .logo-img img was for old header, no longer used */
+
+
+
+/* .logo-text shown only in footer where it is re-declared with explicit styles */
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
+.logo-name {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  color: var(--gold-light);
+  letter-spacing: 1.5px;
+  line-height: 1.1;
+}
 
-.logo-text,
-.logo-name,
-.logo-tagline,
+.logo-tagline {
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  font-size: 12px;
+  color: var(--gold);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
 .logo-ornament {
-  display: none;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(to right, var(--gold), transparent);
+  margin-top: 5px;
 }
-  .logo-text {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .logo-name {
-    font-family: 'Cinzel', serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--maroon);
-    letter-spacing: 1.5px;
-    line-height: 1.1;
-  }
-
-  .logo-tagline {
-    font-family: 'Noto Sans Devanagari', sans-serif;
-    font-size: 12px;
-    color: var(--gold);
-    letter-spacing: 1px;
-    margin-top: 2px;
-  }
-
-  .logo-ornament {
-    width: 80px;
-    height: 2px;
-    background: linear-gradient(to right, var(--gold), transparent);
-    margin-top: 5px;
-  }
 
 .header-icons {
   display: flex;
@@ -184,37 +171,8 @@
 
   .cart-btn:hover { background: var(--maroon-light); }
 
-  nav {
-    border-top: 1px solid rgba(201,151,42,0.2);
-    background: var(--ivory);
-  }
+/* Dead code removed: .nav-inner and .nav-link were for old nav — now handled by Header.css bm-nav-* classes */
 
-  .nav-inner {
-    display: flex;
-    justify-content: center;
-    gap: 0;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 60px;
-    flex-wrap: wrap;
-  }
-
-  .nav-link {
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 1.5px;
-    color: var(--brown);
-    text-decoration: none;
-    padding: 13px 22px;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .nav-link:hover, .nav-link.active {
-    color: var(--saffron);
-    border-bottom-color: var(--saffron);
-  }
 
   /* ─── HERO ─── */
   .hero {
@@ -266,7 +224,7 @@
   .hero-content {
     position: relative;
     z-index: 2;
-    padding: 60px 60px 60px 100px;
+    padding: clamp(30px, 5vw, 60px) clamp(20px, 5vw, 60px) clamp(30px, 5vw, 60px) clamp(24px, 7vw, 100px);
     max-width: 680px;
     animation: fadeInLeft 1s ease both;
   }
@@ -297,19 +255,12 @@
   }
 
   .hero-title {
-    font-family: 'Cinzel', serif;
-    font-size: 62px;
-    font-weight: 700;
-    color: var(--ivory);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 68px;
+    font-weight: 600;
+    color: var(--gold-light);
     line-height: 1.05;
     margin-bottom: 8px;
-  }
-
-  .hero-title span {
-    color: var(--gold-light);
-    font-style: italic;
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 300;
   }
 
   .hero-subtitle-devanagari {
@@ -376,66 +327,11 @@
     border-color: var(--gold-light);
   }
 
-  .hero-image-area {
-    position: absolute;
-    right: 0; top: 0; bottom: 0;
-    width: 48%;
-    overflow: hidden;
-  }
+/* Dead code removed: .hero-image-area, .hero-image-placeholder, .hero-bottle-svg, .hero-stats were for old Hero — elements no longer exist in component */
 
-  .hero-image-placeholder {
-    width: 100%; height: 100%;
-    background: linear-gradient(135deg,
-      rgba(74,44,26,0.3) 0%,
-      rgba(44,14,0,0.5) 50%,
-      rgba(90,35,15,0.4) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
-  .hero-bottle-svg {
-    width: 280px;
-    opacity: 0.9;
-    animation: floatUp 4s ease-in-out infinite;
-  }
+/* Dead code removed: .hero-stats, .stat, .stat-num, .stat-label — hero-stats element was removed from Hero.jsx */
 
-  @keyframes floatUp {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
-  }
-
-  .hero-stats {
-    position: absolute;
-    bottom: 50px;
-    left: 100px;
-    display: flex;
-    gap: 50px;
-    z-index: 2;
-    animation: fadeInUp 1s 0.5s ease both;
-  }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .stat { text-align: center; }
-
-  .stat-num {
-    font-family: 'Cinzel', serif;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--gold-light);
-    display: block;
-  }
-
-  .stat-label {
-    font-size: 12px;
-    color: rgba(250,245,236,0.5);
-    letter-spacing: 1px;
-    font-family: 'Noto Sans Devanagari', sans-serif;
-  }
 
   /* ─── TRUST BAR ─── */
   .trust-bar {
@@ -643,180 +539,15 @@
     color: rgba(250,245,236,0.82);
   }
 
-  /* ─── CATEGORIES ─── */
-  .categories-bg {
-    background: var(--ivory);
-    padding: 80px 0;
-  }
+/* Dead code removed: .categories-bg, .categories-grid, .category-card, .category-icon, .category-sub
+   — CategoryGrid.jsx uses CategoryGrid.css with .category-section, .category-grid, .category-cell */
 
-  .categories-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 60px;
-  }
 
-  .category-card {
-    background: var(--cream);
-    border: 1px solid rgba(201,151,42,0.2);
-    border-radius: 4px;
-    padding: 32px 16px 24px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-decoration: none;
-    display: block;
-    position: relative;
-    overflow: hidden;
-  }
+/* Dead code removed: .products-grid, .product-card, .product-img, .product-badge, .product-wishlist,
+   .product-info, .product-category, .product-name, .product-scent, .product-footer,
+   .product-price, .product-price-sub
+   — Product grid is handled by CategoryGalleries.css image-grid / image-card classes */
 
-  .category-card::before {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(to right, var(--saffron), var(--gold));
-    transform: scaleX(0);
-    transition: transform 0.3s;
-  }
-
-  .category-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 40px var(--shadow);
-    border-color: rgba(201,151,42,0.5);
-  }
-
-  .category-card:hover::before { transform: scaleX(1); }
-
-  .category-icon { font-size: 40px; margin-bottom: 14px; display: block; }
-
-  .category-name {
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 1.5px;
-    color: var(--maroon);
-    font-weight: 600;
-  }
-
-  .category-sub {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 6px;
-    font-style: italic;
-  }
-
-  /* ─── PRODUCT GRID ─── */
-  .products-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 28px;
-  }
-
-  .product-card {
-    background: var(--white);
-    border: 1px solid rgba(201,151,42,0.15);
-    border-radius: 4px;
-    overflow: hidden;
-    transition: all 0.3s;
-    cursor: pointer;
-  }
-
-  .product-card:hover {
-    box-shadow: 0 10px 40px var(--shadow);
-    transform: translateY(-4px);
-    border-color: rgba(201,151,42,0.4);
-  }
-
-  .product-img {
-    aspect-ratio: 1;
-    background: linear-gradient(135deg, var(--saffron-pale), var(--ivory));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 60px;
-    position: relative;
-    overflow: hidden;
-    padding: 16px;
-  }
-
-  .product-badge {
-    position: absolute;
-    top: 12px; left: 12px;
-    background: var(--maroon);
-    color: var(--ivory);
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 1px;
-    padding: 4px 10px;
-    border-radius: 2px;
-  }
-
-  .product-wishlist {
-    position: absolute;
-    top: 12px; right: 12px;
-    background: rgba(255,255,255,0.9);
-    border: none;
-    border-radius: 50%;
-    width: 34px; height: 34px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-
-  .product-wishlist:hover { background: #fff; transform: scale(1.1); }
-
-  .product-info { padding: 18px; }
-
-  .product-category {
-    font-family: 'Noto Sans Devanagari', sans-serif;
-    font-size: 10px;
-    color: var(--saffron);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .product-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.3;
-    margin-bottom: 10px;
-  }
-
-  .product-scent {
-    font-size: 13px;
-    color: var(--text-muted);
-    font-style: italic;
-    margin-bottom: 14px;
-  }
-
-  .product-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .product-price {
-    font-family: 'Cinzel', serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--maroon);
-  }
-
-  .product-price-sub {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 300;
-    font-style: italic;
-    display: block;
-  }
 
   .add-cart-btn {
     background: var(--maroon);
@@ -833,34 +564,8 @@
 
   .add-cart-btn:hover { background: var(--saffron); }
 
-  /* ─── TABS ─── */
-  .tab-bar {
-    display: flex;
-    justify-content: center;
-    gap: 0;
-    margin-bottom: 50px;
-    border-bottom: 2px solid rgba(201,151,42,0.2);
-    flex-wrap: wrap;
-  }
+/* Dead code removed: .tab-bar, .tab — no Tab component uses these classes */
 
-  .tab {
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 1.5px;
-    color: var(--text-muted);
-    padding: 14px 28px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    transition: all 0.2s;
-  }
-
-  .tab.active, .tab:hover {
-    color: var(--maroon);
-    border-bottom-color: var(--maroon);
-  }
 
   /* ─── FEATURED BANNER ─── */
   .featured-banner {
@@ -1153,12 +858,27 @@
   /* ─── REVIEWS ─── */
   .reviews-section { background: var(--cream); padding: 80px 60px; }
 
-  .reviews-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
+  .reviews-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
     max-width: 1400px;
     margin: 0 auto;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .instagram-embed {
+    flex: 1 1 350px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .reviews-grid {
+    flex: 2 1 600px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
   }
 
   .review-card {
@@ -1472,18 +1192,12 @@
   /* ─── MOBILE ─── */
   @media (max-width: 1024px) {
     .header-top { padding: 12px 30px; }
-    .nav-inner { padding: 0 20px; overflow-x: auto; }
-    .categories-grid { grid-template-columns: repeat(3, 1fr); padding: 0 30px; }
     .section { padding: 60px 30px; }
     .hero-content { padding: 50px 40px; }
-    .hero-image-area { opacity: 0.3; }
-    .products-grid { grid-template-columns: repeat(2, 1fr); }
     .combo-grid { grid-template-columns: 1fr 1fr; }
     .featured-inner { grid-template-columns: 1fr; }
     .story-inner { grid-template-columns: 1fr; }
     .story-visual { display: none; }
-    .footer-inner { grid-template-columns: 1fr 1fr; gap: 30px; }
-    .hero-stats { left: 40px; }
     .trust-bar { gap: 30px; padding: 18px 30px; }
     .route-cta { padding: 0 30px 70px; }
     .contact-section { padding: 30px 30px 80px; }
