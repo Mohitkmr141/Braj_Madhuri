@@ -7,6 +7,7 @@ import Newsletter from "../components/Newsletter.jsx";
 import Footer from "../components/Footer.jsx";
 import FloatingCart from "../components/FloatingCart.jsx";
 import { CartProvider } from "../context/CartContext.jsx";
+import { AuthProvider } from "../context/AuthContext.jsx";
 
 export default function SiteShell({ children }) {
   const pathname = usePathname();
@@ -73,15 +74,17 @@ export default function SiteShell({ children }) {
   }, [pathname]);
 
   return (
-    <CartProvider value={contextValue}>
-      <p className="visually-hidden" aria-live="polite">
-        {cartAnnouncement}
-      </p>
-      <Header cartCount={cartCount} cartTotal={cartTotal} />
-      {children}
-      <Newsletter />
-      <Footer />
-      <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider value={contextValue}>
+        <p className="visually-hidden" aria-live="polite">
+          {cartAnnouncement}
+        </p>
+        <Header cartCount={cartCount} cartTotal={cartTotal} />
+        {children}
+        <Newsletter />
+        <Footer />
+        <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
+      </CartProvider>
+    </AuthProvider>
   );
 }

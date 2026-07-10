@@ -247,3 +247,193 @@
   background: #fdf6ee;
   font-weight: 700;
 }
+
+/* ── Auth links (Sign In / Sign Up) in nav ─────────────── */
+.bm-auth-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.bm-auth-link {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-decoration: none;
+  padding: 7px 16px;
+  border-radius: 20px;
+  border: 1.5px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  color: rgba(255,255,255,0.88);
+  border-color: rgba(255,255,255,0.3);
+}
+
+.bm-auth-link:hover {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.5);
+  color: #fff;
+}
+
+.bm-auth-link--primary {
+  background: var(--clr-gold);
+  border-color: var(--clr-gold);
+  color: #fff;
+}
+
+.bm-auth-link--primary:hover {
+  background: #b8851f;
+  border-color: #b8851f;
+  color: #fff;
+}
+
+.bm-auth-link--sm {
+  font-size: 11px;
+  padding: 5px 12px;
+}
+
+/* ── Account button ────────────────────────────────────── */
+.bm-account-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.bm-account-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px 6px 8px;
+  border-radius: 24px;
+  transition: background 0.2s;
+  border: 1.5px solid rgba(255,255,255,0.25);
+}
+
+.bm-account-btn--user {
+  color: #fff;
+}
+
+.bm-account-btn--user:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.45);
+}
+
+.bm-account-btn--sm {
+  padding: 4px 8px;
+}
+
+.bm-account-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--clr-gold);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.bm-account-name {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.bm-account-caret {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+/* ── Account dropdown menu ─────────────────────────────── */
+.bm-account-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 210px;
+  background: #fff;
+  border: 1px solid rgba(201,151,42,0.22);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(44,26,14,0.18);
+  overflow: hidden;
+  z-index: 500;
+  animation: dropdownFade 0.18s ease;
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.bm-account-dropdown__header {
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid rgba(201,151,42,0.12);
+  background: #fdf8f0;
+}
+
+.bm-account-dropdown__name {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: #2c1a0e;
+}
+
+.bm-account-dropdown__email {
+  display: block;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 12px;
+  color: #7a5c40;
+  font-style: italic;
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+.bm-account-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #2c1a0e;
+  text-decoration: none;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.bm-account-dropdown__item:hover {
+  background: #fdf6ee;
+  color: var(--clr-primary);
+}
+
+.bm-account-dropdown__divider {
+  height: 1px;
+  background: rgba(201,151,42,0.12);
+  margin: 4px 0;
+}
+
+.bm-account-dropdown__item--logout {
+  color: #c0392b;
+  font-size: 12px;
+}
+
+.bm-account-dropdown__item--logout:hover {
+  background: #fdf0ef;
+  color: #c0392b;
+}

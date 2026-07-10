@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import heroBanner from "../../public/Brand-Logo.jpeg";
 import SearchBar from "./SearchBar.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 import "./Header.css";
 
 const NAV_ITEMS = [
@@ -17,11 +18,14 @@ const NAV_ITEMS = [
 
 const Header = ({ cartCount = 0, cartTotal = 0 }) => {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [navSticky, setNavSticky] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const [menuOpen, setMenuOpen]           = useState(false);
+  const [navSticky, setNavSticky]         = useState(false);
+  const [searchOpen, setSearchOpen]       = useState(false);
+  const [accountOpen, setAccountOpen]     = useState(false);
   const [suggestionQuery, setSuggestionQuery] = useState("");
-  const closeMenu = () => setMenuOpen(false);
+  const accountRef = useRef(null);
+  const closeMenu   = () => setMenuOpen(false);
   const closeSearch = () => { setSearchOpen(false); setSuggestionQuery(""); };
   const isActive = (to) => (to === "/" ? pathname === "/" : pathname === to);
 
@@ -65,6 +69,18 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
   }, [menuOpen]);
+
+  // Close account dropdown when clicking outside
+  useEffect(() => {
+    if (!accountOpen) return;
+    const handler = (e) => {
+      if (accountRef.current && !accountRef.current.contains(e.target)) {
+        setAccountOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [accountOpen]);
 
   return (
     <>
@@ -217,6 +233,52 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
             </svg>
             <span>Search</span>
           </button>
+
+          {/* Account button — desktop */}
+          {user ? (
+            <div className="bm-account-wrap" ref={accountRef}>
+              <button
+                type="button"
+                className="bm-account-btn bm-account-btn--user"
+                onClick={() => setAccountOpen((v) => !v)}
+                aria-haspopup="true"
+                aria-expanded={accountOpen}
+                aria-label="Account menu"
+              >
+                <span className="bm-account-avatar">{user.name.charAt(0).toUpperCase()}</span>
+                <span className="bm-account-name">{user.name.split(" ")[0]}</span>
+                <span className="bm-account-caret" aria-hidden="true">▾</span>
+              </button>
+              {accountOpen && (
+                <div className="bm-account-dropdown" role="menu">
+                  <div className="bm-account-dropdown__header">
+                    <span className="bm-account-dropdown__name">{user.name}</span>
+                    <span className="bm-account-dropdown__email">{user.email}</span>
+                  </div>
+                  <Link href="/" className="bm-account-dropdown__item" role="menuitem" onClick={() => setAccountOpen(false)}>
+                    🏠 Home
+                  </Link>
+                  <Link href="/shop" className="bm-account-dropdown__item" role="menuitem" onClick={() => setAccountOpen(false)}>
+                    🛍️ Shop
+                  </Link>
+                  <div className="bm-account-dropdown__divider" />
+                  <button
+                    type="button"
+                    className="bm-account-dropdown__item bm-account-dropdown__item--logout"
+                    role="menuitem"
+                    onClick={() => { logout(); setAccountOpen(false); }}
+                  >
+                    ← Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="bm-auth-links">
+              <Link href="/login" className="bm-auth-link">Sign In</Link>
+              <Link href="/signup" className="bm-auth-link bm-auth-link--primary">Sign Up</Link>
+            </div>
+          )}
         </div>
         <div className="bm-nav__mobile-bar">
           <Link className="bm-nav__mobile-title" href="/">
@@ -234,6 +296,21 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </button>
+            {/* Mobile account */}
+            {user ? (
+              <button
+                type="button"
+                className="bm-account-btn bm-account-btn--user bm-account-btn--sm"
+                onClick={() => { logout(); }}
+                aria-label="Sign out"
+              >
+                <span className="bm-account-avatar">{user.name.charAt(0).toUpperCase()}</span>
+              </button>
+            ) : (
+              <Link href="/login" className="bm-auth-link bm-auth-link--primary bm-auth-link--sm">
+                Sign In
+              </Link>
+            )}
             <button
               type="button"
               className={`bm-hamburger bm-hamburger-plain ${menuOpen ? "open" : ""}`}
