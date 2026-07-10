@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext.jsx";
 import "./Auth.css";
@@ -44,7 +45,9 @@ export default function LoginPage() {
     <div className="auth-page">
       {/* ── Left decorative panel ── */}
       <aside className="auth-panel" aria-hidden="true">
-        <div className="auth-panel__ornament">🪷</div>
+        <div className="auth-panel__ornament">
+          <Image src="/Logo.jpeg" alt="Braj Madhuri Logo" fill className="auth-panel__logo" />
+        </div>
         <h2 className="auth-panel__title">Welcome Back,<br />Devotee</h2>
         <div className="auth-panel__divider" />
         <p className="auth-panel__tagline">
@@ -88,38 +91,38 @@ export default function LoginPage() {
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
             {/* Email */}
             <div className="auth-field">
-              <label className="auth-label" htmlFor="login-email">Email Address</label>
               <div className="auth-input-wrapper">
                 <input
                   id="login-email"
                   name="email"
                   type="email"
                   className="auth-input"
-                  placeholder="you@example.com"
+                  placeholder=" "
                   value={form.email}
                   onChange={handleChange}
                   autoComplete="email"
                   autoFocus
                   required
                 />
+                <label className="auth-label" htmlFor="login-email">Email Address</label>
               </div>
             </div>
 
             {/* Password */}
             <div className="auth-field">
-              <label className="auth-label" htmlFor="login-password">Password</label>
               <div className="auth-input-wrapper">
                 <input
                   id="login-password"
                   name="password"
                   type={showPw ? "text" : "password"}
                   className="auth-input auth-input--with-toggle"
-                  placeholder="Your password…"
+                  placeholder=" "
                   value={form.password}
                   onChange={handleChange}
                   autoComplete="current-password"
                   required
                 />
+                <label className="auth-label" htmlFor="login-password">Password</label>
                 <button
                   type="button"
                   className="auth-toggle-pw"

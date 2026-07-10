@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import heroBanner from "../../public/Brand-Logo.jpeg";
+import heroBanner from "../../public/header-banner.jpg";
 import SearchBar from "./SearchBar.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import "./Header.css";
@@ -11,9 +11,8 @@ import "./Header.css";
 const NAV_ITEMS = [
   ["Home", "/"],
   ["Shop", "/shop"],
-  ["Combos", "/combos"],
   ["About Us", "/about"],
-  ["Contact", "/contact"],
+  ["Contact Us", "/contact"],
 ];
 
 const Header = ({ cartCount = 0, cartTotal = 0 }) => {
@@ -154,6 +153,22 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
               {item}
             </Link>
           ))}
+          <div style={{ height: "1px", background: "rgba(255,255,255,0.1)", margin: "16px 24px" }} />
+          {user ? (
+            <button
+              type="button"
+              className="bm-drawer__link"
+              onClick={() => { logout(); closeMenu(); }}
+              style={{ width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "inherit" }}
+            >
+              Sign Out
+            </button>
+          ) : (
+            <>
+              <Link href="/login" onClick={closeMenu} className="bm-drawer__link">Sign In</Link>
+              <Link href="/signup" onClick={closeMenu} className="bm-drawer__link" style={{ color: "#C9972A", fontWeight: "700" }}>Sign Up</Link>
+            </>
+          )}
         </nav>
       </aside>
 

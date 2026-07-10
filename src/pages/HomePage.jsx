@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import Hero from "../components/Hero.jsx";
+
 import TrustBar from "../components/TrustBar.jsx";
 import FeaturedBanner from "../components/FeaturedBanner.jsx";
 import ComboPacks from "../components/ComboPacks.jsx";
@@ -27,7 +27,7 @@ function HomePage() {
 
   return (
     <main>
-      <Hero />
+
       <TrustBar />
       <CategoryGrid activeCategory={null} onExplore={handleExploreCategory} />
       <CategoryGalleries addToCart={addToCart} />
@@ -40,3 +40,5 @@ function HomePage() {
 }
 
 export default HomePage;
+
+

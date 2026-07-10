@@ -1,4 +1,6 @@
 
+@import url('https://fonts.cdnfonts.com/css/google-sans');
+
   :root {
     --saffron: #E8721A;
     --saffron-light: #F4A250;
@@ -1261,6 +1263,67 @@
     .contact-section { padding: 24px 20px 70px; }
     .contact-card { padding: 22px; }
   }
+
+  /* ─── GOOGLE SANS GLOBAL OVERRIDES & REALIGNMENT ─── */
+  body, button, input, select, textarea,
+  h1, h2, h3, h4, h5, h6,
+  p, a, span, div, li, strong, em, label,
+  .section-title, .section-eyebrow,
+  .page-hero__title, .page-hero__body,
+  .offering-tag, .bm-cart, .float-cart,
+  .nav-link, .bm-drawer__link,
+  .about-card__title, .about-offerings__title {
+    font-family: 'Google Sans', 'Product Sans', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  }
+
+  /* Heading & Subheading Realignment & Spacing Polish */
+  h1, h2, h3, h4, h5, h6,
+  .section-title, .page-hero__title {
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.2 !important;
+  }
+
+  /* Center alignment layout for pages headers */
+  .section-header, .page-hero__content {
+    text-align: center !important;
+  }
+
+  .section-header h2, .section-title {
+    display: block;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+  }
+
+  .section-eyebrow {
+    font-weight: 600 !important;
+    letter-spacing: 0.15em !important;
+    text-transform: uppercase !important;
+    font-size: 13px !important;
+    display: block;
+    text-align: center !important;
+    margin-bottom: 12px !important;
+    color: var(--saffron) !important;
+  }
+
+  /* Reset italic serif em elements inside headings to match sans-serif */
+  h1 em, h2 em, h3 em, .section-title em, .page-hero__title em {
+    font-family: inherit !important;
+    font-style: italic !important;
+    font-weight: 500 !important;
+    color: var(--gold) !important;
+  }
+
+  /* Subheadings & body paragraphs styling */
+  .page-hero__body, .section-subtitle, .about-card__text {
+    font-size: 18px !important;
+    line-height: 1.65 !important;
+    font-weight: 400 !important;
+    letter-spacing: normal !important;
+    margin-top: 16px !important;
+  }
+
 
 
   

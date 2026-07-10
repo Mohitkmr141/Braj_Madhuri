@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext.jsx";
 import "./Auth.css";
@@ -62,18 +63,29 @@ export default function SignupPage() {
     <div className="auth-page">
       {/* ── Left decorative panel ── */}
       <aside className="auth-panel" aria-hidden="true">
-        <div className="auth-panel__ornament">🪷</div>
-        <h2 className="auth-panel__title">Join Our<br />Devotional Family</h2>
+        <div className="auth-panel__ornament">
+          <Image
+            src="/Logo.jpeg"
+            alt="Braj Madhuri Logo"
+            fill
+            className="auth-panel__logo"
+          />
+        </div>
+        <h2 className="auth-panel__title">
+          Welcome to<br />
+          The Braj Madhuri
+        </h2>
         <div className="auth-panel__divider" />
         <p className="auth-panel__tagline">
-          Create your account and be part of a community dedicated to sacred seva and divine devotion.
+          Experience authentic devotional products sourced from the sacred Dham.
+          Create your account to begin your seva journey with The Braj Madhuri.
         </p>
         <div className="auth-panel__values">
           {[
-            ["🛕", "Exclusive devotional collections"],
-            ["📦", "Order tracking and history"],
-            ["✨", "Early access to new arrivals"],
-            ["🎁", "Special offers for devotees"],
+            ["🛕", "100% Original Products from Braj Dham"],
+            ["🙏", "Made with Devotion"],
+            ["🛡️", "Authenticity You Can Trust"],
+            ["📦", "Fast & Secure Delivery Across India"],
           ].map(([icon, text]) => (
             <div className="auth-panel__value" key={text}>
               <span className="auth-panel__value-icon">{icon}</span>
@@ -90,7 +102,7 @@ export default function SignupPage() {
             <span className="auth-back__arrow">←</span> Back to Home
           </Link>
 
-          <span className="auth-card__eyebrow">Radhe Radhe 🪷</span>
+         
           <h1 className="auth-card__title">Create Account</h1>
           <p className="auth-card__subtitle">
             Begin your journey with The Braj Madhuri.
@@ -106,55 +118,61 @@ export default function SignupPage() {
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
             {/* Name */}
             <div className="auth-field">
-              <label className="auth-label" htmlFor="signup-name">Full Name</label>
               <div className="auth-input-wrapper">
                 <input
                   id="signup-name"
                   name="name"
                   type="text"
                   className={`auth-input${error && !form.name ? " auth-input--error" : ""}`}
-                  placeholder="Your name…"
+                  placeholder=" "
                   value={form.name}
                   onChange={handleChange}
                   autoComplete="name"
                   required
                 />
+                <label className="auth-label" htmlFor="signup-name">
+                  Full Name
+                </label>
               </div>
             </div>
 
             {/* Email */}
             <div className="auth-field">
-              <label className="auth-label" htmlFor="signup-email">Email Address</label>
               <div className="auth-input-wrapper">
                 <input
                   id="signup-email"
                   name="email"
                   type="email"
                   className="auth-input"
-                  placeholder="you@example.com"
+                  placeholder=" "
                   value={form.email}
                   onChange={handleChange}
                   autoComplete="email"
                   required
                 />
+                <label className="auth-label" htmlFor="signup-email">
+                  Email Address
+                </label>
               </div>
             </div>
 
             {/* Password */}
             <div className="auth-field">
-              <label className="auth-label" htmlFor="signup-password">Password</label>
               <div className="auth-input-wrapper">
                 <input
                   id="signup-password"
                   name="password"
                   type={showPw ? "text" : "password"}
                   className="auth-input auth-input--with-toggle"
-                  placeholder="Min. 6 characters…"
+                  placeholder=" "
                   value={form.password}
                   onChange={handleChange}
                   autoComplete="new-password"
                   required
                 />
+                <label className="auth-label" htmlFor="signup-password">
+                  Password
+                </label>
                 <button
                   type="button"
                   className="auth-toggle-pw"
@@ -185,19 +203,21 @@ export default function SignupPage() {
 
             {/* Confirm Password */}
             <div className="auth-field">
-              <label className="auth-label" htmlFor="signup-confirm">Confirm Password</label>
               <div className="auth-input-wrapper">
                 <input
                   id="signup-confirm"
                   name="confirm"
                   type={showPw ? "text" : "password"}
                   className={`auth-input${form.confirm && form.confirm !== form.password ? " auth-input--error" : ""}`}
-                  placeholder="Re-enter password…"
+                  placeholder=" "
                   value={form.confirm}
                   onChange={handleChange}
                   autoComplete="new-password"
                   required
                 />
+                <label className="auth-label" htmlFor="signup-confirm">
+                  Confirm Password
+                </label>
               </div>
             </div>
 
@@ -207,21 +227,24 @@ export default function SignupPage() {
               disabled={loading}
             >
               {loading ? (
-                <><span className="auth-spinner" />Creating Account…</>
+                <>
+                  <span className="auth-spinner" />
+                  Creating Account…
+                </>
               ) : (
                 "Create My Account →"
               )}
             </button>
 
             <p className="auth-terms">
-              By creating an account, you agree to receive updates about our devotional products and seva offerings.
+              By creating an account, you agree to receive updates about our
+              devotional products and seva offerings.
             </p>
           </form>
 
           <div className="auth-divider">or</div>
           <p className="auth-switch">
-            Already have an account?{" "}
-            <Link href="/login">Sign In</Link>
+            Already have an account? <Link href="/login">Sign In</Link>
           </p>
         </div>
       </div>

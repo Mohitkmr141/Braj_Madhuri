@@ -23,8 +23,8 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
   return (
     <section className="category-section" aria-label="Product categories">
       <div className="section-header">
-        <span className="section-eyebrow">Browse</span>
-        <h2 className="section-title">Featured Categories</h2>
+        
+        <h2 className="section-title">Product Categories</h2>
         <div className="section-divider" />
       </div>
 
