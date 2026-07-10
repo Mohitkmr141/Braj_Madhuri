@@ -1,5 +1,6 @@
 @import './SearchBar.css';
 
+
 :root {
   --clr-primary:   #8b1a1a;
   --clr-primary-d: #6b1212;
@@ -63,7 +64,17 @@
   transition: background var(--transition), transform var(--transition);
 }
 .bm-cart:hover { background: var(--clr-primary-d); transform: translateY(-1px); }
-.bm-cart__icon { font-size: 15px; }
+.bm-cart__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.bm-cart__icon-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
 .bm-cart__label { display: none; }
 @media (min-width: 420px) { .bm-cart__label { display: inline; } }
 .bm-cart__badge {

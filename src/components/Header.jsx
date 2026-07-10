@@ -185,7 +185,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
             aria-label={`View collection. Cart has ${cartCount} item${cartCount === 1 ? "" : "s"} worth INR ${cartTotal.toLocaleString("en-IN")}.`}
           >
             <span className="bm-cart__icon" aria-hidden="true">
-              Bag
+              <img src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" />
             </span>
             <span className="bm-cart__label">
               {cartCount > 0 ? `INR ${cartTotal.toLocaleString("en-IN")}` : "Cart"}
