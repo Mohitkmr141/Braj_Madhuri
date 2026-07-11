@@ -21,12 +21,26 @@ const CATEGORY_FOLDER_MAP = {};
 const CATEGORY_LABEL_MAP = {};
 CATEGORIES.forEach((cat) => {
   CATEGORY_LABEL_MAP[cat.id] = cat.label;
+
+  // Register top-level folderKeys
   cat.folderKeys.forEach((key) => {
     if (PRODUCT_MAP[key]) {
       if (!CATEGORY_FOLDER_MAP[cat.id]) CATEGORY_FOLDER_MAP[cat.id] = new Set();
       CATEGORY_FOLDER_MAP[cat.id].add(key);
     }
   });
+
+  // Also register all keys from subcategoryFolderMap so they are resolvable
+  if (cat.subcategoryFolderMap) {
+    Object.values(cat.subcategoryFolderMap).forEach((keys) => {
+      keys.forEach((key) => {
+        if (PRODUCT_MAP[key]) {
+          if (!CATEGORY_FOLDER_MAP[cat.id]) CATEGORY_FOLDER_MAP[cat.id] = new Set();
+          CATEGORY_FOLDER_MAP[cat.id].add(key);
+        }
+      });
+    });
+  }
 });
 
 const formatFolderName = (name) => name.replaceAll("-", " ");
@@ -64,9 +78,15 @@ function resolveFilter(filterFolder) {
   if (filterFolder.includes("::")) {
     const [catId, subName] = filterFolder.split("::", 2);
     const catLabel = CATEGORY_LABEL_MAP[catId] ?? catId;
-    const folders = CATEGORY_FOLDER_MAP[catId];
-    if (folders && folders.size > 0) {
-      const products = ALL_PRODUCTS.filter(([fn]) => folders.has(fn));
+
+    // Use subcategoryFolderMap if available
+    const cat = CATEGORIES.find((c) => c.id === catId);
+    const subFolderKeys =
+      cat?.subcategoryFolderMap?.[subName] ?? (CATEGORY_FOLDER_MAP[catId] ? [...CATEGORY_FOLDER_MAP[catId]] : []);
+
+    if (subFolderKeys.length > 0) {
+      const keySet = new Set(subFolderKeys);
+      const products = ALL_PRODUCTS.filter(([fn]) => keySet.has(fn));
       return {
         products,
         title: `${catLabel} — ${subName}`,

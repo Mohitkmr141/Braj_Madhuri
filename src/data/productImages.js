@@ -1,3 +1,23 @@
+// Shri Ang Itra
+import shriAngItra0 from "../assets/images/Itra & Fragnances/Shri Ang Itra/Kesar Chandan Itra.jpeg";
+import shriAngItra1 from "../assets/images/Itra & Fragnances/Shri Ang Itra/Kesar Itra.jpeg";
+import shriAngItra2 from "../assets/images/Itra & Fragnances/Shri Ang Itra/Kevda Itra.jpeg";
+import shriAngItra3 from "../assets/images/Itra & Fragnances/Shri Ang Itra/Khus Itra.jpeg";
+import shriAngItra4 from "../assets/images/Itra & Fragnances/Shri Ang Itra/Mitti Itra.jpeg";
+import shriAngItra5 from "../assets/images/Itra & Fragnances/Shri Ang Itra/Mogra Itra.jpeg";
+import shriAngItra6 from "../assets/images/Itra & Fragnances/Shri Ang Itra/Motiya Itra.jpeg";
+import shriAngItra7 from "../assets/images/Itra & Fragnances/Shri Ang Itra/Rose Itra.jpeg";
+
+// Vastra Itra
+import vastraItra0 from "../assets/images/Itra & Fragnances/Vastra Itra/1783758499389.png";
+import vastraItra1 from "../assets/images/Itra & Fragnances/Vastra Itra/1783758838378.png";
+import vastraItra2 from "../assets/images/Itra & Fragnances/Vastra Itra/1783759305700.png";
+import vastraItra3 from "../assets/images/Itra & Fragnances/Vastra Itra/1783759439356.png";
+import vastraItra4 from "../assets/images/Itra & Fragnances/Vastra Itra/1783759620154.png";
+import vastraItra5 from "../assets/images/Itra & Fragnances/Vastra Itra/1783760841515.png";
+import vastraItra6 from "../assets/images/Itra & Fragnances/Vastra Itra/1783761608897.png";
+import vastraItra7 from "../assets/images/Itra & Fragnances/Vastra Itra/1783761931738.png";
+
 // Aggarbaties
 import productImage0 from "../assets/images/Dhoop & Incense/Aggarbaties/1774885384670.png";
 import productImage1 from "../assets/images/Dhoop & Incense/Aggarbaties/1774885515568.png";
@@ -67,6 +87,30 @@ import productImage44 from "../assets/images/Dhoop & Incense/Dhoop Sticks & Dhoo
 
 // Tulsi Mala (mapped from Tulsi Kanthi Mala/Tulsi Designer Mala)
 import productImage45 from "../assets/images/Tulsi Kanthi Mala/Tulsi Designer Mala/Tulsi Designer Mala.png";
+
+// Shri Ang Itra entries
+const SHRI_ANG_ITRA_ENTRIES = [
+  { folderName: "Shri Ang Itra", fileName: "Kesar Chandan Itra", image: shriAngItra0 },
+  { folderName: "Shri Ang Itra", fileName: "Kesar Itra", image: shriAngItra1 },
+  { folderName: "Shri Ang Itra", fileName: "Kevda Itra", image: shriAngItra2 },
+  { folderName: "Shri Ang Itra", fileName: "Khus Itra", image: shriAngItra3 },
+  { folderName: "Shri Ang Itra", fileName: "Mitti Itra", image: shriAngItra4 },
+  { folderName: "Shri Ang Itra", fileName: "Mogra Itra", image: shriAngItra5 },
+  { folderName: "Shri Ang Itra", fileName: "Motiya Itra", image: shriAngItra6 },
+  { folderName: "Shri Ang Itra", fileName: "Rose Itra", image: shriAngItra7 },
+];
+
+// Vastra Itra entries
+const VASTRA_ITRA_ENTRIES = [
+  { folderName: "Vastra Itra", fileName: "1783758499389", image: vastraItra0 },
+  { folderName: "Vastra Itra", fileName: "1783758838378", image: vastraItra1 },
+  { folderName: "Vastra Itra", fileName: "1783759305700", image: vastraItra2 },
+  { folderName: "Vastra Itra", fileName: "1783759439356", image: vastraItra3 },
+  { folderName: "Vastra Itra", fileName: "1783759620154", image: vastraItra4 },
+  { folderName: "Vastra Itra", fileName: "1783760841515", image: vastraItra5 },
+  { folderName: "Vastra Itra", fileName: "1783761608897", image: vastraItra6 },
+  { folderName: "Vastra Itra", fileName: "1783761931738", image: vastraItra7 },
+];
 
 // Vastra
 import productImage46 from "../assets/images/Vastra/1774901988443.png";
@@ -170,7 +214,13 @@ const PRODUCT_IMAGE_ENTRIES = [
   { folderName: "Vedic Cups", fileName: "1775209180740", image: productImage56 },
 ];
 
-const PRODUCT_IMAGE_MAP = PRODUCT_IMAGE_ENTRIES.reduce((map, entry) => {
+const ALL_ENTRIES = [
+  ...PRODUCT_IMAGE_ENTRIES,
+  ...SHRI_ANG_ITRA_ENTRIES,
+  ...VASTRA_ITRA_ENTRIES,
+];
+
+const PRODUCT_IMAGE_MAP = ALL_ENTRIES.reduce((map, entry) => {
   const src = typeof entry.image === "string" ? entry.image : entry.image.src;
   if (!map[entry.folderName]) {
     map[entry.folderName] = [];

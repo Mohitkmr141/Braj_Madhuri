@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import CategoryGalleries from "../components/Categories.jsx";
 import CategoryGrid from "../components/CategoryGrid.jsx";
 import FeaturedBanner from "../components/FeaturedBanner.jsx";
+import SubcategoryPage from "../components/SubcategoryPage.jsx";
 import { useCart } from "../context/CartContext.jsx";
+import CATEGORIES from "../data/categoriesData.js";
 
 function ShopPage() {
   const router = useRouter();
@@ -13,26 +15,56 @@ function ShopPage() {
   const { addToCart } = useCart();
   const activeCategory = searchParams.get("category");
 
+  // Parse compound subcategory key "catId::SubName"
+  const isSubcategory = activeCategory?.includes("::");
+  const [catId, subName] = isSubcategory
+    ? activeCategory.split("::", 2)
+    : [null, null];
+  const catLabel =
+    CATEGORIES.find((c) => c.id === catId)?.label ?? catId ?? "";
+
   const handleExploreCategory = (folder) => {
     if (folder) {
       router.push(`/shop?category=${encodeURIComponent(folder)}`);
       return;
     }
-
     router.push("/shop");
   };
 
   useEffect(() => {
-    if (!activeCategory) {
-      return;
+    if (!activeCategory) return;
+    // Only scroll to collections grid for non-subcategory filters
+    if (!isSubcategory) {
+      document.getElementById("collections")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    } else {
+      // Scroll to top of page for product detail view
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  }, [activeCategory, isSubcategory]);
 
-    document.getElementById("collections")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  }, [activeCategory]);
+  // ── Subcategory product detail view ───────────────────────────────────────
+  if (isSubcategory) {
+    return (
+      <main className="page-shell">
+        <SubcategoryPage
+          catId={catId}
+          subName={subName}
+          catLabel={catLabel}
+          addToCart={addToCart}
+          onBack={() => router.push("/shop")}
+          onBackToCategory={() =>
+            router.push(`/shop?category=${encodeURIComponent(catId)}`)
+          }
+        />
+        <FeaturedBanner />
+      </main>
+    );
+  }
 
+  // ── Normal shop / category filter view ────────────────────────────────────
   return (
     <main className="page-shell">
       <section className="page-hero page-hero--shop">

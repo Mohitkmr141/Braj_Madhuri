@@ -318,6 +318,129 @@ const PRODUCT_DATA = {
     price: 499,
     originalPrice: 699,
   },
+
+  // ── Shri Ang Itra ─────────────────────────────────────────────────────────
+  "Shri Ang Itra": {
+    title: "Shri Ang Itra",
+    description:
+      "Pure, alcohol-free attars handcrafted for daily shringar and bhakti. Long-lasting devotional fragrance in roll-on bottles.",
+    price: 179,
+    originalPrice: 250,
+    sizes: ["3ml", "6ml", "12ml"],
+    items: {
+      "Kesar Chandan Itra": {
+        title: "Kesar Chandan Itra",
+        description:
+          "Warm kesar & chandan notes — a timeless devotional fragrance for daily shringar and mandir seva.",
+        price: 179,
+        originalPrice: 250,
+      },
+      "Kesar Itra": {
+        title: "Kesar Itra",
+        description:
+          "Luxurious saffron-based itra with a rich, sacred aroma loved in Braj bhakti.",
+        price: 179,
+        originalPrice: 250,
+      },
+      "Kevda Itra": {
+        title: "Kevda Itra",
+        description:
+          "Classic kevda fragrance — light, floral and refreshing for summer seva.",
+        price: 149,
+        originalPrice: 200,
+      },
+      "Khus Itra": {
+        title: "Khus Itra",
+        description:
+          "Earthy vetiver itra — cool, grounding and perfect for meditation and japa.",
+        price: 149,
+        originalPrice: 200,
+      },
+      "Mitti Itra": {
+        title: "Mitti Itra",
+        description:
+          "Rare mitti itra capturing the sacred scent of first rain on holy earth.",
+        price: 199,
+        originalPrice: 280,
+      },
+      "Mogra Itra": {
+        title: "Mogra Itra",
+        description:
+          "Sweet mogra (jasmine) itra — soft, floral and deeply devotional.",
+        price: 149,
+        originalPrice: 200,
+      },
+      "Motiya Itra": {
+        title: "Motiya Itra",
+        description:
+          "Delicate motiya itra with a fresh, jasmine-inspired heart for light, daily wear.",
+        price: 149,
+        originalPrice: 200,
+      },
+      "Rose Itra": {
+        title: "Rose Itra (Gulab)",
+        description:
+          "Classic gulab itra — the fragrance of devotion, offered in every mandir of Braj.",
+        price: 179,
+        originalPrice: 250,
+      },
+    },
+  },
+
+  // ── Vastra Itra ────────────────────────────────────────────────────────────
+  "Vastra Itra": {
+    title: "Vastra Itra",
+    description:
+      "Specially formulated attars for spraying on Thakur ji vastra (clothing) — long-lasting, fabric-safe and deeply aromatic.",
+    price: 249,
+    originalPrice: 350,
+    sizes: ["10ml", "25ml", "50ml"],
+    items: {
+      1783758499389: {
+        title: "Vastra Itra — Mogra",
+        description: "Mogra-based vastra itra for a soft floral fragrance on Thakur ji poshak.",
+        price: 249,
+      },
+      1783758838378: {
+        title: "Vastra Itra — Gulab",
+        description: "Rose-based vastra itra for a classic devotional fragrance on vastra.",
+        price: 249,
+      },
+      1783759305700: {
+        title: "Vastra Itra — Kesar",
+        description: "Saffron-infused vastra itra for a warm, royal fragrance.",
+        price: 299,
+        originalPrice: 380,
+      },
+      1783759439356: {
+        title: "Vastra Itra — Chandan",
+        description: "Sandalwood vastra itra — sacred and long-lasting.",
+        price: 299,
+        originalPrice: 380,
+      },
+      1783759620154: {
+        title: "Vastra Itra — Kevda",
+        description: "Kevda-based vastra itra with a light, summery fragrance.",
+        price: 249,
+      },
+      1783760841515: {
+        title: "Vastra Itra — Khus",
+        description: "Cooling khus vastra itra perfect for summer seva.",
+        price: 249,
+      },
+      1783761608897: {
+        title: "Vastra Itra — Motiya",
+        description: "Delicate motiya vastra itra for fresh, gentle fragrance on poshak.",
+        price: 249,
+      },
+      1783761931738: {
+        title: "Vastra Itra — Combo Set",
+        description: "Assorted vastra itra collection for all-season fragrance.",
+        price: 599,
+        originalPrice: 850,
+      },
+    },
+  },
 };
 
 export default PRODUCT_DATA;
