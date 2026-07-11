@@ -114,6 +114,7 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
                       className="subcategory-item subcategory-item--all"
                       type="button"
                       role="option"
+                      aria-selected={false}
                       onClick={(e) => {
                         e.stopPropagation();
                         onExplore?.(cat.id);
@@ -129,6 +130,7 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
                         className="subcategory-item"
                         type="button"
                         role="option"
+                        aria-selected={false}
                         onClick={(e) => handleSubcategoryClick(cat.id, sub, e)}
                       >
                         {sub}

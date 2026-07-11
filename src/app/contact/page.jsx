@@ -1,4 +1,4 @@
-import ContactPage from "../../pages/ContactPage.jsx";
+import ContactPage from "../../views/ContactPage.jsx";
 
 export const metadata = {
   title: "Contact",

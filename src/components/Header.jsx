@@ -173,6 +173,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
       </aside>
 
       <div className="bm-banner">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={heroBanner.src}
           alt="The Braj Madhuri"
@@ -200,6 +201,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
             aria-label={`View collection. Cart has ${cartCount} item${cartCount === 1 ? "" : "s"} worth INR ${cartTotal.toLocaleString("en-IN")}.`}
           >
             <span className="bm-cart__icon" aria-hidden="true">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" />
             </span>
             <span className="bm-cart__label">

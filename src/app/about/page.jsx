@@ -1,4 +1,4 @@
-import AboutPage from "../../pages/AboutPage.jsx";
+import AboutPage from "../../views/AboutPage.jsx";
 
 export const metadata = {
   title: "About Us",

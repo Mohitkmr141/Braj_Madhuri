@@ -60,9 +60,9 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
   // When a suggestion chip is clicked from the parent, update query + trigger search
   useEffect(() => {
     if (initialQuery) {
-      setQuery(initialQuery);
       // Use a tiny delay so the search function has been defined
       const t = setTimeout(() => {
+        setQuery(initialQuery);
         const trimmed = initialQuery.trim().toLowerCase();
         if (trimmed.length >= 2) {
           const matched = SEARCH_INDEX.filter(
@@ -166,6 +166,7 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
           ref={inputRef}
           id="search-input"
           type="search"
+          role="combobox"
           className="search-input"
           placeholder="Search agarbatti, mala, poshak…"
           value={query}

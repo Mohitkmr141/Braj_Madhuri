@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import ShopPage from "../../pages/ShopPage.jsx";
+import ShopPage from "../../views/ShopPage.jsx";
 
 export const metadata = {
   title: "Shop",

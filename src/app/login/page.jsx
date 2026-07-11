@@ -1,4 +1,4 @@
-import LoginPage from "../../pages/LoginPage.jsx";
+import LoginPage from "../../views/LoginPage.jsx";
 
 export const metadata = {
   title: "Sign In",

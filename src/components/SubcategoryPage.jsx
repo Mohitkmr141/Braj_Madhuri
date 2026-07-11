@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import "./SubcategoryPage.css";
 import PRODUCT_IMAGE_MAP from "../data/productImages.js";
@@ -42,6 +43,7 @@ function buildProductList(catId, subName) {
         image: img.image,
         title: itemData.title ?? categoryData.title ?? img.fileName,
         description: itemData.description ?? categoryData.description ?? "",
+        subheading: itemData.subheading ?? categoryData.subheading ?? "",
         price: itemData.price ?? categoryData.price,
         originalPrice: itemData.originalPrice ?? categoryData.originalPrice,
         sizes: itemData.sizes ?? categoryData.sizes ?? null,
@@ -69,6 +71,7 @@ function ProductDetailCard({ product, addToCart }) {
     product.sizes ? product.sizes[0] : null
   );
   const [flashing, flash] = useCartFlash();
+  const [isZoomed, setIsZoomed] = useState(false);
 
   const discount =
     product.originalPrice && product.price
@@ -83,7 +86,15 @@ function ProductDetailCard({ product, addToCart }) {
   return (
     <article className="subcat-product-card reveal">
       {/* ── Image panel ─────────────────────────────────────── */}
-      <div className="subcat-img-panel">
+      <div 
+        className="subcat-img-panel"
+        onClick={() => setIsZoomed(true)}
+        style={{ cursor: "zoom-in" }}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && setIsZoomed(true)}
+        aria-label={`Zoom image of ${product.title}`}
+      >
         <Image
           src={product.image}
           alt={product.title}
@@ -92,6 +103,38 @@ function ProductDetailCard({ product, addToCart }) {
           style={{ objectFit: "cover" }}
         />
       </div>
+
+      {isZoomed && typeof document !== "undefined" && createPortal(
+        <div 
+          className="subcat-img-zoom-overlay" 
+          onClick={() => setIsZoomed(false)}
+          style={{
+            position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+            backgroundColor: "rgba(0,0,0,0.85)", zIndex: 9999,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "zoom-out"
+          }}
+        >
+          <div style={{ position: "relative", width: "90%", height: "90%", maxWidth: "800px", maxHeight: "800px" }}>
+            <Image
+              src={product.image}
+              alt={product.title}
+              fill
+              sizes="100vw"
+              style={{ objectFit: "contain" }}
+            />
+          </div>
+          <button 
+            type="button" 
+            style={{ position: "absolute", top: "20px", right: "20px", background: "transparent", border: "none", color: "#fff", fontSize: "36px", cursor: "pointer", zIndex: 10000 }}
+            onClick={(e) => { e.stopPropagation(); setIsZoomed(false); }}
+            aria-label="Close zoom"
+          >
+            &times;
+          </button>
+        </div>,
+        document.body
+      )}
 
       {/* ── Info panel ──────────────────────────────────────── */}
       <div className="subcat-info-panel">
@@ -113,8 +156,15 @@ function ProductDetailCard({ product, addToCart }) {
         </div>
 
         {/* Description */}
-        {product.description && (
-          <p className="subcat-description">{product.description}</p>
+        {(product.description || product.subheading) && (
+          <p className="subcat-description">
+            {product.description && <span>{product.description}</span>}
+            {product.subheading && (
+              <span style={{ display: "block", marginTop: "4px", fontStyle: "italic", color: "#8a6b4e" }}>
+                {product.subheading}
+              </span>
+            )}
+          </p>
         )}
 
         {/* Sizes */}
@@ -137,25 +187,7 @@ function ProductDetailCard({ product, addToCart }) {
           </>
         )}
 
-        {/* Shipping badges */}
-        <div className="subcat-badges">
-          <span className="subcat-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-            </svg>
-            Nationwide Shipping
-          </span>
-          <span className="subcat-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="1" y="3" width="15" height="13" rx="1" />
-              <path d="M16 8h4l3 5v4h-7V8z" />
-              <circle cx="5.5" cy="18.5" r="2.5" />
-              <circle cx="18.5" cy="18.5" r="2.5" />
-            </svg>
-            Delivery: 7–10 days
-          </span>
-        </div>
+        {/* Shipping badges removed */}
 
         {/* Add to Cart */}
         <button
@@ -247,8 +279,8 @@ export default function SubcategoryPage({
         </div>
       ) : (
         <div className="subcat-empty">
-          <p className="subcat-empty__title">No products found for "{subName}"</p>
-          <p>We're stocking up — check back soon!</p>
+          <p className="subcat-empty__title">No products found for &quot;{subName}&quot;</p>
+          <p>We&apos;re stocking up — check back soon!</p>
           <button
             type="button"
             className="subcat-empty__back"

@@ -51,7 +51,7 @@ export default function LoginPage() {
         <h2 className="auth-panel__title">Welcome Back,<br />Devotee</h2>
         <div className="auth-panel__divider" />
         <p className="auth-panel__tagline">
-          Sign in to continue your journey with The Braj Madhuri's sacred collection of pooja essentials.
+          Sign in to continue your journey with The Braj Madhuri&apos;s sacred collection of pooja essentials.
         </p>
         <div className="auth-panel__values">
           {[

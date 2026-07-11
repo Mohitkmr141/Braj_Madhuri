@@ -1,4 +1,4 @@
-import SignupPage from "../../pages/SignupPage.jsx";
+import SignupPage from "../../views/SignupPage.jsx";
 
 export const metadata = {
   title: "Create Account",

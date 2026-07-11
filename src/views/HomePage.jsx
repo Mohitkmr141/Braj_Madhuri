@@ -7,6 +7,7 @@ import TrustBar from "../components/TrustBar.jsx";
 import FeaturedBanner from "../components/FeaturedBanner.jsx";
 import ComboPacks from "../components/ComboPacks.jsx";
 import Story from "../components/Story.jsx";
+import Reviews from "../components/Reviews.jsx";
 import CategoryGalleries from "../components/Categories.jsx";
 import CategoryGrid from "../components/CategoryGrid.jsx";
 import { useCart } from "../context/CartContext.jsx";
@@ -33,8 +34,11 @@ function HomePage() {
       <FeaturedBanner />
       <ComboPacks addToCart={addToCart} />
       <Story />
+      <Reviews />
     </main>
   );
 }
 
 export default HomePage;
+
+
