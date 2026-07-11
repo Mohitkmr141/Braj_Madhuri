@@ -5,12 +5,28 @@ import Image from "next/image";
 import "./CategoryGalleries.css";
 import PRODUCT_DATA from "../data/productData.js";
 import PRODUCT_IMAGE_MAP from "../data/productImages.js";
+import CATEGORIES from "../data/categoriesData.js";
 
 const PRODUCT_MAP = {};
-
 Object.entries(PRODUCT_IMAGE_MAP).forEach(([folderName, images]) => {
   if (!PRODUCT_MAP[folderName]) PRODUCT_MAP[folderName] = [];
   PRODUCT_MAP[folderName].push(...images);
+});
+
+/**
+ * Build a mapping: categoryId → array of [folderName, images] tuples.
+ * Also resolves the display label for a category id.
+ */
+const CATEGORY_FOLDER_MAP = {};
+const CATEGORY_LABEL_MAP = {};
+CATEGORIES.forEach((cat) => {
+  CATEGORY_LABEL_MAP[cat.id] = cat.label;
+  cat.folderKeys.forEach((key) => {
+    if (PRODUCT_MAP[key]) {
+      if (!CATEGORY_FOLDER_MAP[cat.id]) CATEGORY_FOLDER_MAP[cat.id] = new Set();
+      CATEGORY_FOLDER_MAP[cat.id].add(key);
+    }
+  });
 });
 
 const formatFolderName = (name) => name.replaceAll("-", " ");
@@ -21,41 +37,81 @@ const formatCurrency = (value) =>
     style: "currency",
   }).format(value);
 
-const PRODUCTS = Object.entries(PRODUCT_MAP)
+// All products sorted alphabetically by folder name
+const ALL_PRODUCTS = Object.entries(PRODUCT_MAP)
   .map(([folderName, images]) => [
     folderName,
-    [...images].sort((left, right) =>
-      left.fileName.localeCompare(right.fileName, "en", { numeric: true }),
+    [...images].sort((a, b) =>
+      a.fileName.localeCompare(b.fileName, "en", { numeric: true })
     ),
   ])
-  .sort(([left], [right]) =>
-    formatFolderName(left).localeCompare(formatFolderName(right), "en", {
-      numeric: true,
-    }),
+  .sort(([a], [b]) =>
+    formatFolderName(a).localeCompare(formatFolderName(b), "en", { numeric: true })
   );
+
+/**
+ * Given a filterFolder value (which may be a category id like "dhoop-incense"
+ * or a legacy folder name like "Aggarbaties", or a subcategory compound key
+ * like "dhoop-incense::Dhoop Sticks"), return the list of [folderName, images]
+ * tuples to display along with a human-readable title for the section.
+ */
+function resolveFilter(filterFolder) {
+  if (!filterFolder) {
+    return { products: ALL_PRODUCTS, title: "Devotional Essentials", isAll: true };
+  }
+
+  // Subcategory compound key: "categoryId::SubcategoryName"
+  if (filterFolder.includes("::")) {
+    const [catId, subName] = filterFolder.split("::", 2);
+    const catLabel = CATEGORY_LABEL_MAP[catId] ?? catId;
+    const folders = CATEGORY_FOLDER_MAP[catId];
+    if (folders && folders.size > 0) {
+      const products = ALL_PRODUCTS.filter(([fn]) => folders.has(fn));
+      return {
+        products,
+        title: `${catLabel} — ${subName}`,
+        isAll: false,
+      };
+    }
+  }
+
+  // New category id (e.g. "dhoop-incense")
+  if (CATEGORY_FOLDER_MAP[filterFolder]) {
+    const folders = CATEGORY_FOLDER_MAP[filterFolder];
+    const products = ALL_PRODUCTS.filter(([fn]) => folders.has(fn));
+    return {
+      products,
+      title: CATEGORY_LABEL_MAP[filterFolder] ?? filterFolder,
+      isAll: false,
+    };
+  }
+
+  // Legacy: direct folder name match (e.g. "Aggarbaties")
+  const products = ALL_PRODUCTS.filter(([fn]) => fn === filterFolder);
+  return {
+    products,
+    title: formatFolderName(filterFolder),
+    isAll: false,
+  };
+}
 
 export default function CategoryGalleries({
   filterFolder,
   addToCart,
   onClearFilter,
 }) {
-  const visibleProducts = useMemo(
-    () =>
-      filterFolder
-        ? PRODUCTS.filter(([folderName]) => folderName === filterFolder)
-        : PRODUCTS,
-    [filterFolder],
+  const { products: visibleProducts, title, isAll } = useMemo(
+    () => resolveFilter(filterFolder),
+    [filterFolder]
   );
 
   return (
     <section className="galleries-wrapper" id="collections">
       <div className="section-header">
         <span className="section-eyebrow">
-          {filterFolder ? "Selected Category" : "Shop By Collection"}
+          {isAll ? "Shop By Collection" : "Selected Category"}
         </span>
-        <h2 className="section-title">
-          {filterFolder ? formatFolderName(filterFolder) : "Devotional Essentials"}
-        </h2>
+        <h2 className="section-title">{title}</h2>
         <div className="section-divider" />
       </div>
 
