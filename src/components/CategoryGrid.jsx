@@ -76,6 +76,7 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
                       decoding="async"
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                      style={{ objectFit: "cover" }}
                     />
                   ) : (
                     <span className="category-emoji-fallback" aria-hidden="true">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Header from "../components/Header.jsx";
 import Newsletter from "../components/Newsletter.jsx";
 import Footer from "../components/Footer.jsx";
@@ -11,6 +11,7 @@ import { AuthProvider } from "../context/AuthContext.jsx";
 
 export default function SiteShell({ children }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [cartCount, setCartCount] = useState(0);
   const [cartTotal, setCartTotal] = useState(0);
 
@@ -71,7 +72,7 @@ export default function SiteShell({ children }) {
       observer.disconnect();
       timers.forEach((timer) => window.clearTimeout(timer));
     };
-  }, [pathname]);
+  }, [pathname, searchParams]);
 
   return (
     <AuthProvider>

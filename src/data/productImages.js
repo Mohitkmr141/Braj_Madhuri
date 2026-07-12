@@ -25,8 +25,6 @@ import productImage2 from "../assets/images/Dhoop & Incense/Aggarbaties/17748857
 import productImage3 from "../assets/images/Dhoop & Incense/Aggarbaties/1774886252840.png";
 
 // Categories (mapped from Pooja Essentials)
-import productImage4 from "../assets/images/Pooja Essentials/1774794760226.png";
-import productImage5 from "../assets/images/Pooja Essentials/1775053687998.png";
 import productImage6 from "../assets/images/Pooja Essentials/1776194201892.png";
 
 // Divine Tilak Essentials
@@ -51,10 +49,10 @@ import productImage20 from "../assets/images/Itra & Fragnances/Temple & Home Fra
 import productImage21 from "../assets/images/Itra & Fragnances/Temple & Home Fragnance Spray/1775071622285.png";
 
 // Premium-Chandan-Tilak
-import productImage22 from "../assets/images/Premium-Chandan-Tilak/1774794812185.png";
+import productImage22 from "../assets/images/Laddu Gopal Essentials/Premium-Chandan-Tilak/1774794812185.png";
 
 // Shank-for-Thakur-ji-Snan
-import productImage23 from "../assets/images/Shank-for-Thakur-ji-Snan/1776193020835.png";
+import productImage23 from "../assets/images/Laddu Gopal Essentials/Shank-for-Thakur-ji-Snan/1776193020835.png";
 
 // Signature Fragrance Collection
 import productImage24 from "../assets/images/Dhoop & Incense/Dhoop Sticks & Dhoop Cones/Signature Fragrance Collection/1780909839067.png";
@@ -67,16 +65,16 @@ import productImage28 from "../assets/images/Spritual Accessories/1783431047765.
 import productImage29 from "../assets/images/Spritual Accessories/1783431102078.png";
 
 // Thakur-ji-Shriang
-import productImage30 from "../assets/images/Thakur-ji-Shriang/1774903070024.png";
-import productImage31 from "../assets/images/Thakur-ji-Shriang/1774956758812.png";
-import productImage32 from "../assets/images/Thakur-ji-Shriang/1774956958880.png";
-import productImage33 from "../assets/images/Thakur-ji-Shriang/1774957560959.png";
-import productImage34 from "../assets/images/Thakur-ji-Shriang/1774957975655.png";
-import productImage35 from "../assets/images/Thakur-ji-Shriang/1774958380180.png";
-import productImage36 from "../assets/images/Thakur-ji-Shriang/1774958691018.png";
-import productImage37 from "../assets/images/Thakur-ji-Shriang/1774959035013.png";
-import productImage38 from "../assets/images/Thakur-ji-Shriang/1774959371786.png";
-import productImage39 from "../assets/images/Thakur-ji-Shriang/1774959860815.png";
+import productImage30 from "../assets/images/Laddu Gopal Essentials/Thakur-ji-Shriang/1774903070024.png";
+import productImage31 from "../assets/images/Laddu Gopal Essentials/Thakur-ji-Shriang/1774956758812.png";
+import productImage32 from "../assets/images/Laddu Gopal Essentials/Thakur-ji-Shriang/1774956958880.png";
+import productImage33 from "../assets/images/Laddu Gopal Essentials/Thakur-ji-Shriang/1774957560959.png";
+import productImage34 from "../assets/images/Laddu Gopal Essentials/Thakur-ji-Shriang/1774957975655.png";
+import productImage35 from "../assets/images/Laddu Gopal Essentials/Thakur-ji-Shriang/1774958380180.png";
+import productImage36 from "../assets/images/Laddu Gopal Essentials/Thakur-ji-Shriang/1774958691018.png";
+import productImage37 from "../assets/images/Laddu Gopal Essentials/Thakur-ji-Shriang/1774959035013.png";
+import productImage38 from "../assets/images/Laddu Gopal Essentials/Thakur-ji-Shriang/1774959371786.png";
+import productImage39 from "../assets/images/Laddu Gopal Essentials/Thakur-ji-Shriang/1774959860815.png";
 
 // Traditional Dhoop Sticks
 import productImage40 from "../assets/images/Dhoop & Incense/Dhoop Sticks & Dhoop Cones/Traditional Dhoop Sticks/1780911061120.png";
@@ -113,14 +111,14 @@ const VASTRA_ITRA_ENTRIES = [
 ];
 
 // Vastra
-import productImage46 from "../assets/images/Vastra/1774901988443.png";
-import productImage47 from "../assets/images/Vastra/1774902605954.png";
-import productImage48 from "../assets/images/Vastra/1774956293033.png";
-import productImage49 from "../assets/images/Vastra/1774960850189.png";
-import productImage50 from "../assets/images/Vastra/1775153838526.png";
-import productImage51 from "../assets/images/Vastra/1775159225477.png";
-import productImage52 from "../assets/images/Vastra/1775159443917.png";
-import productImage53 from "../assets/images/Vastra/1775191774292.png";
+import productImage46 from "../assets/images/Laddu Gopal Essentials/Vastra/1774901988443.png";
+import productImage47 from "../assets/images/Laddu Gopal Essentials/Vastra/1774902605954.png";
+import productImage48 from "../assets/images/Laddu Gopal Essentials/Vastra/1774956293033.png";
+import productImage49 from "../assets/images/Laddu Gopal Essentials/Vastra/1774960850189.png";
+import productImage50 from "../assets/images/Laddu Gopal Essentials/Vastra/1775153838526.png";
+import productImage51 from "../assets/images/Laddu Gopal Essentials/Vastra/1775159225477.png";
+import productImage52 from "../assets/images/Laddu Gopal Essentials/Vastra/1775159443917.png";
+import productImage53 from "../assets/images/Laddu Gopal Essentials/Vastra/1775191774292.png";
 
 // Vedic Cups (mapped from Dhoop & Incense/Vedic Havan Cups)
 import productImage54 from "../assets/images/Dhoop & Incense/Vedic Havan Cups/1775208737555.png";
@@ -135,8 +133,6 @@ const PRODUCT_IMAGE_ENTRIES = [
   { folderName: "Aggarbaties", fileName: "1774886252840", image: productImage3 },
 
   // Categories (uses Pooja Essentials images)
-  { folderName: "Categories", fileName: "1774794760226", image: productImage4 },
-  { folderName: "Categories", fileName: "1775053687998", image: productImage5 },
   { folderName: "Categories", fileName: "1776194201892", image: productImage6 },
 
   // Divine Tilak Essentials

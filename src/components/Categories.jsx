@@ -200,6 +200,7 @@ function ProductCard({ folderName, images, data, addToCart }) {
           decoding="async"
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          style={{ objectFit: "cover" }}
         />
 
         {total > 1 && (

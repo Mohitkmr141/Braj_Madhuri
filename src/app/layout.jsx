@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import SiteShell from "./SiteShell.jsx";
 import "../App.css";
 
@@ -17,7 +18,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en-IN">
       <body>
-        <SiteShell>{children}</SiteShell>
+        <Suspense fallback={null}>
+          <SiteShell>{children}</SiteShell>
+        </Suspense>
       </body>
     </html>
   );
