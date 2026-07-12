@@ -106,7 +106,7 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
   };
 
   const goToResult = (result) => {
-    router.push(`/shop?category=${encodeURIComponent(result.folder)}`);
+    router.push(`/shop?search=${encodeURIComponent(result.title)}`);
     setQuery("");
     setResults([]);
     setIsOpen(false);
@@ -117,8 +117,12 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
     e.preventDefault();
     if (activeIndex >= 0 && results[activeIndex]) {
       goToResult(results[activeIndex]);
-    } else if (results.length > 0) {
-      goToResult(results[0]);
+    } else if (query.trim()) {
+      router.push(`/shop?search=${encodeURIComponent(query.trim())}`);
+      setQuery("");
+      setResults([]);
+      setIsOpen(false);
+      onClose?.();
     }
   };
 

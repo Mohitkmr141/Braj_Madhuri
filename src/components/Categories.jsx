@@ -43,7 +43,10 @@ CATEGORIES.forEach((cat) => {
   }
 });
 
-const formatFolderName = (name) => name.replaceAll("-", " ");
+const formatFolderName = (name) => {
+  const parts = name.split("/");
+  return parts[parts.length - 1].replaceAll("-", " ");
+};
 const formatCurrency = (value) =>
   new Intl.NumberFormat("en-IN", {
     currency: "INR",
@@ -69,60 +72,81 @@ const ALL_PRODUCTS = Object.entries(PRODUCT_MAP)
  * like "dhoop-incense::Dhoop Sticks"), return the list of [folderName, images]
  * tuples to display along with a human-readable title for the section.
  */
-function resolveFilter(filterFolder) {
-  if (!filterFolder) {
-    return { products: ALL_PRODUCTS, title: "Devotional Essentials", isAll: true };
-  }
+function resolveFilter(filterFolder, searchQuery = "") {
+  let products = ALL_PRODUCTS;
+  let title = "Devotional Essentials";
+  let isAll = true;
 
-  // Subcategory compound key: "categoryId::SubcategoryName"
-  if (filterFolder.includes("::")) {
-    const [catId, subName] = filterFolder.split("::", 2);
-    const catLabel = CATEGORY_LABEL_MAP[catId] ?? catId;
-
-    // Use subcategoryFolderMap if available
-    const cat = CATEGORIES.find((c) => c.id === catId);
-    const subFolderKeys =
-      cat?.subcategoryFolderMap?.[subName] ?? (CATEGORY_FOLDER_MAP[catId] ? [...CATEGORY_FOLDER_MAP[catId]] : []);
-
-    if (subFolderKeys.length > 0) {
-      const keySet = new Set(subFolderKeys);
-      const products = ALL_PRODUCTS.filter(([fn]) => keySet.has(fn));
-      return {
-        products,
-        title: `${catLabel} — ${subName}`,
-        isAll: false,
-      };
+  if (filterFolder) {
+    // Subcategory compound key: "categoryId::SubcategoryName"
+    if (filterFolder.includes("::")) {
+      const [catId, subName] = filterFolder.split("::", 2);
+      const catLabel = CATEGORY_LABEL_MAP[catId] ?? catId;
+      const cat = CATEGORIES.find((c) => c.id === catId);
+      const subFolderKeys = cat?.subcategoryFolderMap?.[subName] ?? (CATEGORY_FOLDER_MAP[catId] ? [...CATEGORY_FOLDER_MAP[catId]] : []);
+      
+      if (subFolderKeys.length > 0) {
+        const keySet = new Set(subFolderKeys);
+        products = ALL_PRODUCTS.filter(([fn]) => keySet.has(fn));
+        title = `${catLabel} — ${subName}`;
+        isAll = false;
+      }
+    }
+    // New category id (e.g. "dhoop-incense")
+    else if (CATEGORY_FOLDER_MAP[filterFolder]) {
+      const folders = CATEGORY_FOLDER_MAP[filterFolder];
+      products = ALL_PRODUCTS.filter(([fn]) => folders.has(fn));
+      title = CATEGORY_LABEL_MAP[filterFolder] ?? filterFolder;
+      isAll = false;
+    }
+    // Legacy: direct folder name match (e.g. "Aggarbaties")
+    else {
+      products = ALL_PRODUCTS.filter(([fn]) => fn === filterFolder);
+      title = formatFolderName(filterFolder);
+      isAll = false;
     }
   }
 
-  // New category id (e.g. "dhoop-incense")
-  if (CATEGORY_FOLDER_MAP[filterFolder]) {
-    const folders = CATEGORY_FOLDER_MAP[filterFolder];
-    const products = ALL_PRODUCTS.filter(([fn]) => folders.has(fn));
+  if (searchQuery) {
+    const query = searchQuery.trim().toLowerCase();
+    
+    // Filter products array, and inside each product, filter the images
+    const filteredProducts = [];
+    products.forEach(([folderName, images]) => {
+      const folderData = PRODUCT_DATA[folderName] || {};
+      
+      const matchingImages = images.filter((img) => {
+        const itemData = folderData.items?.[img.fileName] || {};
+        const imgTitle = (itemData.title ?? folderData.title ?? formatFolderName(folderName)).toLowerCase();
+        const imgDesc = (itemData.description ?? folderData.description ?? formatFolderName(folderName)).toLowerCase();
+        
+        return imgTitle.includes(query) || imgDesc.includes(query);
+      });
+
+      if (matchingImages.length > 0) {
+        filteredProducts.push([folderName, matchingImages]);
+      }
+    });
+
     return {
-      products,
-      title: CATEGORY_LABEL_MAP[filterFolder] ?? filterFolder,
+      products: filteredProducts,
+      title: filterFolder && !isAll ? title : `Search Results for "${searchQuery}"`,
       isAll: false,
     };
   }
 
-  // Legacy: direct folder name match (e.g. "Aggarbaties")
-  const products = ALL_PRODUCTS.filter(([fn]) => fn === filterFolder);
-  return {
-    products,
-    title: formatFolderName(filterFolder),
-    isAll: false,
-  };
+  return { products, title, isAll };
 }
 
 export default function CategoryGalleries({
   filterFolder,
+  searchQuery,
   addToCart,
   onClearFilter,
 }) {
   const { products: visibleProducts, title, isAll } = useMemo(
-    () => resolveFilter(filterFolder),
-    [filterFolder]
+    () => resolveFilter(filterFolder, searchQuery),
+    [filterFolder, searchQuery]
   );
 
   return (

@@ -14,6 +14,7 @@ function ShopPage() {
   const searchParams = useSearchParams();
   const { addToCart } = useCart();
   const activeCategory = searchParams.get("category");
+  const searchQuery = searchParams.get("search");
 
   // Parse compound subcategory key "catId::SubName"
   const isSubcategory = activeCategory?.includes("::");
@@ -86,6 +87,7 @@ function ShopPage() {
       <CategoryGalleries
         addToCart={addToCart}
         filterFolder={activeCategory}
+        searchQuery={searchQuery}
         onClearFilter={() => handleExploreCategory(null)}
       />
       <FeaturedBanner />

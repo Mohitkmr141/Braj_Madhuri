@@ -1,5 +1,5 @@
 const PRODUCT_DATA = {
-  Aggarbaties: {
+  "Dhoop & Incense/Aggarbaties": {
     title: "Premium Agarbatti Collection",
     description:
       "Hand-rolled devotional agarbatti for daily pooja and mandir fragrance.",
@@ -63,7 +63,7 @@ const PRODUCT_DATA = {
       },
     },
   },
-  "Floral-Scent": {
+  "Itra & Fragnances/Temple & Home Fragnance Spray": {
     title: "Floral Scent Sprays",
     description:
       "Floral room and mandir sprays inspired by Vrindavan fragrances.",
@@ -222,7 +222,7 @@ const PRODUCT_DATA = {
       },
     },
   },
-  "Ubtan-for-Thakur-Ji": {
+  "Laddu Gopal Essentials/Ubtan for Snan": {
     title: "Ubtan for Thakur Ji",
     description: "Natural ubtan prepared for Thakur ji snan and gentle seva.",
     price: 300,
@@ -238,7 +238,7 @@ const PRODUCT_DATA = {
       },
     },
   },
-  Vastra: {
+  "Laddu Gopal Essentials/Vastra": {
     title: "Vastra and Fragrance Collection",
     description: "Selected vastra, attars, and perfumes for mandir seva.",
     price: 250,
@@ -320,7 +320,7 @@ const PRODUCT_DATA = {
   },
 
   // ── Shri Ang Itra ─────────────────────────────────────────────────────────
-  "Shri Ang Itra": {
+  "Itra & Fragnances/Shri Ang Itra": {
     title: "Shri Ang Itra",
     description:
       "Pure, alcohol-free attars handcrafted for daily shringar and bhakti. Long-lasting devotional fragrance in roll-on bottles.",
@@ -388,7 +388,7 @@ const PRODUCT_DATA = {
   },
 
   // ── Vastra Itra ────────────────────────────────────────────────────────────
-  "Vastra Itra": {
+  "Itra & Fragnances/Vastra Itra": {
     title: "Vastra Itra",
     description:
       "Specially formulated attars for spraying on Thakur ji vastra (clothing) — long-lasting, fabric-safe and deeply aromatic.",
