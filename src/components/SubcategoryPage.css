@@ -2,12 +2,12 @@
    SubcategoryPage.css  –  Premium product detail layout
    ────────────────────────────────────────────────────────────────────────── */
 
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap");
+/* Google fonts are imported in App.css */
 
 /* ── Page wrapper ─────────────────────────────────────────────────────────── */
 .subcat-page {
   min-height: 60vh;
-  background: #faf7f2;
+  background: #fdfbf7;
   padding: 0 0 64px;
 }
 

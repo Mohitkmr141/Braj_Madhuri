@@ -162,15 +162,17 @@ export default function CategoryGalleries({
 
       <div className="image-grid">
         {visibleProducts.length > 0 ? (
-          visibleProducts.map(([folderName, images]) => (
-            <ProductCard
-              key={folderName}
-              addToCart={addToCart}
-              data={PRODUCT_DATA[folderName] ?? {}}
-              folderName={folderName}
-              images={images}
-            />
-          ))
+          visibleProducts.flatMap(([folderName, images]) =>
+            images.map((image) => (
+              <ProductCard
+                key={`${folderName}_${image.fileName}`}
+                addToCart={addToCart}
+                data={PRODUCT_DATA[folderName] ?? {}}
+                folderName={folderName}
+                image={image}
+              />
+            ))
+          )
         ) : (
           <div className="empty-state">
             <p className="empty-state__title">No products found for this category.</p>
@@ -191,24 +193,17 @@ export default function CategoryGalleries({
   );
 }
 
-function ProductCard({ folderName, images, data, addToCart }) {
-  const [current, setCurrent] = useState(0);
+function ProductCard({ folderName, image, data, addToCart }) {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
-  const safeImages = images ?? [];
-  const total = safeImages.length;
-  const activeImage = safeImages[current] ?? safeImages[0];
 
-  if (!activeImage) {
+  if (!image) {
     return null;
   }
 
   const activeData = {
     ...data,
-    ...(data.items?.[activeImage.fileName] ?? {}),
+    ...(data.items?.[image.fileName] ?? {}),
   };
-
-  const prev = () => setCurrent((c) => (c - 1 + total) % total);
-  const next = () => setCurrent((c) => (c + 1) % total);
 
   const discount =
     activeData.originalPrice && activeData.price
@@ -221,7 +216,7 @@ function ProductCard({ folderName, images, data, addToCart }) {
         {discount && <span className="discount-badge">{discount}% OFF</span>}
 
         <Image
-          src={activeImage.image}
+          src={image.image}
           alt={activeData.title ?? activeData.description ?? formatFolderName(folderName)}
           decoding="async"
           fill
@@ -229,42 +224,6 @@ function ProductCard({ folderName, images, data, addToCart }) {
           style={{ objectFit: "cover" }}
         />
 
-        {total > 1 && (
-          <>
-            <button
-              className="slide-btn slide-btn--prev"
-              type="button"
-              onClick={(e) => { e.stopPropagation(); prev(); }}
-              aria-label="Previous image"
-            >
-              &#8249;
-            </button>
-            <button
-              className="slide-btn slide-btn--next"
-              type="button"
-              onClick={(e) => { e.stopPropagation(); next(); }}
-              aria-label="Next image"
-            >
-              &#8250;
-            </button>
-
-            <div className="slide-dots">
-              {safeImages.map((image, i) => (
-                <button
-                  key={image.fileName}
-                  className={`slide-dot${i === current ? " slide-dot--active" : ""}`}
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
-                  aria-label={`Show image ${i + 1}`}
-                />
-              ))}
-            </div>
-
-            <span className="slide-counter">
-              {current + 1} / {total}
-            </span>
-          </>
-        )}
       </div>
 
       <div className="image-card-info">
@@ -302,7 +261,7 @@ function ProductCard({ folderName, images, data, addToCart }) {
             <div className="quick-view-image-panel">
               <div style={{ position: "relative", width: "100%", height: "100%", minHeight: "300px" }}>
                 <Image
-                  src={activeImage.image}
+                  src={image.image}
                   alt={activeData.title ?? activeData.description ?? formatFolderName(folderName)}
                   fill
                   sizes="(max-width: 900px) 100vw, 50vw"

@@ -1,21 +1,20 @@
-
-@import url('https://fonts.cdnfonts.com/css/google-sans');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
   :root {
-    --saffron: #E8721A;
-    --saffron-light: #F4A250;
-    --saffron-pale: #FDF0E0;
+    --saffron: #D4AF37;
+    --saffron-light: #E8C96B;
+    --saffron-pale: #FDFBF7;
     --gold: #C9972A;
     --gold-light: #E8C96B;
-    --maroon: #7B1B2A;
-    --maroon-light: #A8243A;
-    --cream: #FAF5EC;
-    --ivory: #F5EDD8;
-    --brown: #4A2C1A;
-    --text: #2A1A0E;
-    --text-muted: #7A5C40;
+    --maroon: #4A1521;
+    --maroon-light: #6A1E2F;
+    --cream: #FDFBF7;
+    --ivory: #FFFFFF;
+    --brown: #2D1A11;
+    --text: #1F1A17;
+    --text-muted: #6B5B53;
     --white: #FFFFFF;
-    --shadow: rgba(74,44,26,0.12);
+    --shadow: rgba(0, 0, 0, 0.05);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,11 +22,13 @@
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Inter', sans-serif;
     background: var(--cream);
     color: var(--text);
     overflow-x: hidden;
     min-width: 320px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   .visually-hidden {
@@ -103,10 +104,11 @@
 }
 
 .logo-name {
-  font-family: 'Cinzel', serif;
-  font-size: 20px;
-  color: var(--gold-light);
-  letter-spacing: 1.5px;
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--maroon);
+  letter-spacing: 1px;
   line-height: 1.1;
 }
 
@@ -144,8 +146,9 @@
     background: none;
     border: none;
     color: var(--brown);
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 11px;
+    font-weight: 500;
     letter-spacing: 0.5px;
     transition: color 0.2s;
     text-decoration: none;
@@ -257,9 +260,9 @@
   }
 
   .hero-title {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif;
     font-size: 68px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--gold-light);
     line-height: 1.05;
     margin-bottom: 8px;
@@ -289,19 +292,20 @@
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, var(--saffron), var(--gold));
-    color: var(--white);
-    padding: 15px 36px;
+    background: var(--maroon);
+    color: var(--ivory);
+    padding: 16px 40px;
     border: none;
-    font-family: 'Cinzel', serif;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
     font-size: 13px;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     cursor: pointer;
-    border-radius: 2px;
-    transition: all 0.3s;
+    border-radius: 4px;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     text-decoration: none;
     display: inline-block;
-    box-shadow: 0 4px 20px rgba(232,114,26,0.4);
+    box-shadow: 0 10px 30px -10px rgba(74, 21, 33, 0.4);
   }
 
   .btn-primary:hover {
@@ -311,15 +315,16 @@
 
   .btn-outline {
     background: transparent;
-    color: var(--gold-light);
-    padding: 14px 36px;
-    border: 1px solid rgba(201,151,42,0.5);
-    font-family: 'Cinzel', serif;
+    color: var(--ivory);
+    padding: 15px 40px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
     font-size: 13px;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     cursor: pointer;
-    border-radius: 2px;
-    transition: all 0.3s;
+    border-radius: 4px;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     text-decoration: none;
     display: inline-block;
   }
@@ -375,9 +380,9 @@
   }
 
   .section-title {
-    font-family: 'Cinzel', serif;
-    font-size: 40px;
-    font-weight: 600;
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 700;
     color: var(--maroon);
     line-height: 1.2;
   }
@@ -555,13 +560,14 @@
     background: var(--maroon);
     color: var(--ivory);
     border: none;
-    padding: 8px 16px;
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 1.5px;
+    padding: 10px 20px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 1px;
     cursor: pointer;
-    border-radius: 2px;
-    transition: all 0.2s;
+    border-radius: 6px;
+    transition: background 0.3s, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .add-cart-btn:hover { background: var(--saffron); }
@@ -630,8 +636,9 @@
   }
 
   .featured-prod-price {
-    font-family: 'Cinzel', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
+    font-weight: 600;
     color: var(--gold-light);
   }
 
@@ -666,9 +673,10 @@
   .combo-icons { font-size: 40px; margin-bottom: 8px; }
 
   .combo-header h3 {
-    font-family: 'Cinzel', serif;
-    font-size: 14px;
-    letter-spacing: 1.5px;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
     color: var(--ivory);
   }
 
@@ -699,9 +707,9 @@
   }
 
   .combo-price {
-    font-family: 'Cinzel', serif;
-    font-size: 20px;
-    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
     color: var(--maroon);
   }
 

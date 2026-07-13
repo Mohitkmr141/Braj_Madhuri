@@ -216,11 +216,6 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
         </div>
       </div>
 
-      <div
-        className={`bm-nav-spacer ${navSticky ? "active" : ""}`}
-        aria-hidden="true"
-      />
-
       <nav
         className={`bm-nav-bar ${navSticky ? "sticky" : ""}`}
         aria-label="Main navigation"
