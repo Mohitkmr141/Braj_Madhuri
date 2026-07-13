@@ -84,17 +84,9 @@ function ProductDetailCard({ product, addToCart }) {
   };
 
   return (
-    <article className="subcat-product-card reveal">
+    <article className="subcat-product-card reveal" onClick={() => setIsZoomed(true)} style={{ cursor: 'pointer' }}>
       {/* ── Image panel ─────────────────────────────────────── */}
-      <div 
-        className="subcat-img-panel"
-        onClick={() => setIsZoomed(true)}
-        style={{ cursor: "zoom-in" }}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === "Enter" && setIsZoomed(true)}
-        aria-label={`Zoom image of ${product.title}`}
-      >
+      <div className="subcat-img-panel">
         <Image
           src={product.image}
           alt={product.title}
@@ -105,33 +97,79 @@ function ProductDetailCard({ product, addToCart }) {
       </div>
 
       {isZoomed && typeof document !== "undefined" && createPortal(
-        <div 
-          className="subcat-img-zoom-overlay" 
-          onClick={() => setIsZoomed(false)}
-          style={{
-            position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.85)", zIndex: 9999,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "zoom-out"
-          }}
-        >
-          <div style={{ position: "relative", width: "90%", height: "90%", maxWidth: "800px", maxHeight: "800px" }}>
-            <Image
-              src={product.image}
-              alt={product.title}
-              fill
-              sizes="100vw"
-              style={{ objectFit: "contain" }}
-            />
+        <div className="quick-view-overlay" onClick={() => setIsZoomed(false)}>
+          <div className="quick-view-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="quick-view-close" type="button" onClick={() => setIsZoomed(false)} aria-label="Close zoom">
+              &times;
+            </button>
+            <div className="quick-view-image-panel">
+              <div style={{ position: "relative", width: "100%", height: "100%", minHeight: "300px" }}>
+                <Image
+                  src={product.image}
+                  alt={product.title}
+                  fill
+                  sizes="(max-width: 900px) 100vw, 50vw"
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
+            </div>
+            <div className="quick-view-info-panel">
+              <h3 className="quick-view-title">{product.title}</h3>
+              
+              <div className="quick-view-price-row">
+                {product.price !== undefined && (
+                  <span className="quick-view-price">{formatCurrency(product.price)}</span>
+                )}
+                {product.originalPrice && (
+                  <span className="quick-view-original-price">
+                    {formatCurrency(product.originalPrice)}
+                  </span>
+                )}
+                {discount && (
+                  <span className="quick-view-discount">{discount}% OFF</span>
+                )}
+              </div>
+
+              <p className="quick-view-description">
+                {product.description && <span>{product.description}</span>}
+                {product.subheading && (
+                  <span style={{ display: "block", marginTop: "4px", fontStyle: "italic", color: "#8a6b4e" }}>
+                    {product.subheading}
+                  </span>
+                )}
+              </p>
+
+              {product.sizes && product.sizes.length > 0 && (
+                <>
+                  <p className="subcat-sizes-label" style={{ marginTop: 'auto' }}>Available Sizes</p>
+                  <div className="subcat-sizes">
+                    {product.sizes.map((size) => (
+                      <button
+                        key={size}
+                        type="button"
+                        className={`subcat-size-btn${selectedSize === size ? " subcat-size-btn--active" : ""}`}
+                        onClick={(e) => { e.stopPropagation(); setSelectedSize(size); }}
+                        aria-pressed={selectedSize === size}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              <button
+                className="add-cart-btn gallery-cart-btn quick-view-atc"
+                type="button"
+                onClick={() => {
+                  handleAddToCart();
+                  setIsZoomed(false);
+                }}
+              >
+                Add To Cart
+              </button>
+            </div>
           </div>
-          <button 
-            type="button" 
-            style={{ position: "absolute", top: "20px", right: "20px", background: "transparent", border: "none", color: "#fff", fontSize: "36px", cursor: "pointer", zIndex: 10000 }}
-            onClick={(e) => { e.stopPropagation(); setIsZoomed(false); }}
-            aria-label="Close zoom"
-          >
-            &times;
-          </button>
         </div>,
         document.body
       )}
@@ -193,7 +231,7 @@ function ProductDetailCard({ product, addToCart }) {
         <button
           type="button"
           className={`subcat-atc-btn${flashing === "btn" ? " subcat-atc-btn--added" : ""}`}
-          onClick={handleAddToCart}
+          onClick={(e) => { e.stopPropagation(); handleAddToCart(); }}
           aria-label={`Add ${product.title} to cart`}
         >
           {flashing === "btn" ? (

@@ -1,61 +1,13 @@
+// AUTO-GENERATED FILE - DO NOT EDIT MANUALLY
+// Run `node src/data/generateCategories.mjs` to regenerate this file.
+
 const CATEGORIES = [
   {
-    "id": "laddu-gopal-essentials",
-    "label": "Laddu Gopal Essentials",
-    "emoji": "🛏️",
+    "id": "bhakti-combos",
+    "label": "Bhakti Combos",
+    "emoji": "🎁",
     "folderKeys": [
-      "Laddu Gopal Essentials/Aasans",
-      "Laddu Gopal Essentials/Premium-Chandan-Tilak",
-      "Laddu Gopal Essentials/Shank-for-Thakur-ji-Snan",
-      "Laddu Gopal Essentials/Thakur-ji-Shriang",
-      "Laddu Gopal Essentials/Ubtan for Snan",
-      "Laddu Gopal Essentials/Vastra"
-    ],
-    "subcategoryFolderMap": {
-      "Aasans": [
-        "Laddu Gopal Essentials/Aasans"
-      ],
-      "Premium-Chandan-Tilak": [
-        "Laddu Gopal Essentials/Premium-Chandan-Tilak"
-      ],
-      "Shank-for-Thakur-ji-Snan": [
-        "Laddu Gopal Essentials/Shank-for-Thakur-ji-Snan"
-      ],
-      "Thakur-ji-Shriang": [
-        "Laddu Gopal Essentials/Thakur-ji-Shriang"
-      ],
-      "Ubtan for Snan": [
-        "Laddu Gopal Essentials/Ubtan for Snan"
-      ],
-      "Vastra": [
-        "Laddu Gopal Essentials/Vastra"
-      ]
-    },
-    "subcategories": [
-      "Aasans",
-      "Premium-Chandan-Tilak",
-      "Shank-for-Thakur-ji-Snan",
-      "Thakur-ji-Shriang",
-      "Ubtan for Snan",
-      "Vastra"
-    ]
-  },
-  {
-    "id": "pooja-essentials",
-    "label": "Pooja Essentials",
-    "emoji": "🪔",
-    "folderKeys": [
-      "Pooja Essentials"
-    ],
-    "subcategoryFolderMap": {},
-    "subcategories": []
-  },
-  {
-    "id": "spritual-accessories",
-    "label": "Spritual Accessories",
-    "emoji": "🏛️",
-    "folderKeys": [
-      "Spritual Accessories"
+      "Bhakti Combos"
     ],
     "subcategoryFolderMap": {},
     "subcategories": []
@@ -65,134 +17,33 @@ const CATEGORIES = [
     "label": "Dhoop & Incense",
     "emoji": "🕯️",
     "folderKeys": [
-      "Dhoop & Incense/Aggarbaties",
-      "Dhoop & Incense/Dhoop Sticks & Dhoop Cones/Dhoop Cones",
-      "Dhoop & Incense/Dhoop Sticks & Dhoop Cones/Everyday Aroma Dhoop Sticks",
-      "Dhoop & Incense/Dhoop Sticks & Dhoop Cones/Signature Fragrance Collection",
-      "Dhoop & Incense/Dhoop Sticks & Dhoop Cones/Traditional Dhoop Sticks",
+      "Dhoop & Incense/Bamboo less Dhoop Sticks & Dhoop Cones",
+      "Dhoop & Incense/Incense Stick",
       "Dhoop & Incense/Vedic Havan Cups"
     ],
     "subcategoryFolderMap": {
-      "Aggarbaties": [
-        "Dhoop & Incense/Aggarbaties"
+      "Bamboo less Dhoop Sticks & Dhoop Cones": [
+        "Dhoop & Incense/Bamboo less Dhoop Sticks & Dhoop Cones"
       ],
-      "Dhoop Sticks & Dhoop Cones": [
-        "Dhoop & Incense/Dhoop Sticks & Dhoop Cones/Dhoop Cones",
-        "Dhoop & Incense/Dhoop Sticks & Dhoop Cones/Everyday Aroma Dhoop Sticks",
-        "Dhoop & Incense/Dhoop Sticks & Dhoop Cones/Signature Fragrance Collection",
-        "Dhoop & Incense/Dhoop Sticks & Dhoop Cones/Traditional Dhoop Sticks"
+      "Incense Stick": [
+        "Dhoop & Incense/Incense Stick"
       ],
       "Vedic Havan Cups": [
         "Dhoop & Incense/Vedic Havan Cups"
       ]
     },
     "subcategories": [
-      "Aggarbaties",
-      "Dhoop Sticks & Dhoop Cones",
+      "Bamboo less Dhoop Sticks & Dhoop Cones",
+      "Incense Stick",
       "Vedic Havan Cups"
     ]
   },
   {
-    "id": "thakur-ji-shringar",
-    "label": "Thakur Ji Shringar",
-    "emoji": "👑",
+    "id": "divine-tilak-essentials",
+    "label": "Divine Tilak Essentials",
+    "emoji": "✨",
     "folderKeys": [
-      "Thakur Ji Shringar/Jewellery/Long Mala(4.5 inches)",
-      "Thakur Ji Shringar/Jewellery/New folder",
-      "Thakur Ji Shringar/Jewellery/New folder/Slideshow",
-      "Thakur Ji Shringar/Jewellery/Pearl Kundan Mala",
-      "Thakur Ji Shringar/Mukut"
-    ],
-    "subcategoryFolderMap": {
-      "Jewellery": [
-        "Thakur Ji Shringar/Jewellery/Long Mala(4.5 inches)",
-        "Thakur Ji Shringar/Jewellery/New folder",
-        "Thakur Ji Shringar/Jewellery/New folder/Slideshow",
-        "Thakur Ji Shringar/Jewellery/Pearl Kundan Mala"
-      ],
-      "Mukut": [
-        "Thakur Ji Shringar/Mukut"
-      ]
-    },
-    "subcategories": [
-      "Jewellery",
-      "Mukut"
-    ]
-  },
-  {
-    "id": "tulsi-kanthi-mala",
-    "label": "Tulsi Kanthi Mala",
-    "emoji": "📿",
-    "folderKeys": [
-      "Tulsi Kanthi Mala/Kanthi Mala Regular",
-      "Tulsi Kanthi Mala/Kathi Mala Fine Beads",
-      "Tulsi Kanthi Mala/Tulsi Designer Mala",
-      "Tulsi Kanthi Mala/Tulsi Mala Single Round"
-    ],
-    "subcategoryFolderMap": {
-      "Kanthi Mala Regular": [
-        "Tulsi Kanthi Mala/Kanthi Mala Regular"
-      ],
-      "Kathi Mala Fine Beads": [
-        "Tulsi Kanthi Mala/Kathi Mala Fine Beads"
-      ],
-      "Tulsi Designer Mala": [
-        "Tulsi Kanthi Mala/Tulsi Designer Mala"
-      ],
-      "Tulsi Mala Single Round": [
-        "Tulsi Kanthi Mala/Tulsi Mala Single Round"
-      ]
-    },
-    "subcategories": [
-      "Kanthi Mala Regular",
-      "Kathi Mala Fine Beads",
-      "Tulsi Designer Mala",
-      "Tulsi Mala Single Round"
-    ]
-  },
-  {
-    "id": "jewellery",
-    "label": "Jewellery",
-    "emoji": "💍",
-    "folderKeys": [
-      "Jewellery/Najariya for Ladduu Gopal (Size 4,5,6)"
-    ],
-    "subcategoryFolderMap": {
-      "Najariya for Ladduu Gopal (Size 4,5,6)": [
-        "Jewellery/Najariya for Ladduu Gopal (Size 4,5,6)"
-      ]
-    },
-    "subcategories": [
-      "Najariya for Ladduu Gopal (Size 4,5,6)"
-    ]
-  },
-  {
-    "id": "bhakti-combos",
-    "label": "Bhakti Combos",
-    "emoji": "🎁",
-    "folderKeys": [
-      "Bhakti Combos/Braj Bhakti Kit",
-      "Bhakti Combos/Nitya Seva Kits"
-    ],
-    "subcategoryFolderMap": {
-      "Braj Bhakti Kit": [
-        "Bhakti Combos/Braj Bhakti Kit"
-      ],
-      "Nitya Seva Kits": [
-        "Bhakti Combos/Nitya Seva Kits"
-      ]
-    },
-    "subcategories": [
-      "Braj Bhakti Kit",
-      "Nitya Seva Kits"
-    ]
-  },
-  {
-    "id": "poshak",
-    "label": "Poshak",
-    "emoji": "🥻",
-    "folderKeys": [
-      "Poshak"
+      "Divine Tilak Essentials"
     ],
     "subcategoryFolderMap": {},
     "subcategories": []
@@ -224,24 +75,127 @@ const CATEGORIES = [
     ]
   },
   {
-    "id": "divine-tilak-essentials",
-    "label": "Divine Tilak Essentials",
-    "emoji": "✨",
+    "id": "jaap-essentials",
+    "label": "Jaap Essentials",
+    "emoji": "🙏",
     "folderKeys": [
-      "Divine Tilak Essentials"
+      "Jaap Essentials"
     ],
     "subcategoryFolderMap": {},
     "subcategories": []
   },
   {
-    "id": "pooja-samagri",
-    "label": "Pooja Samagri",
-    "emoji": "🥥",
+    "id": "jewellery-collection",
+    "label": "Jewellery Collection",
+    "emoji": "👑",
     "folderKeys": [
-      "Pooja Samagri"
+      "Jewellery Collection/Jewellery",
+      "Jewellery Collection/Jewellery/Long Mala(4.5 inches)",
+      "Jewellery Collection/Jewellery/Najariya for Ladduu Gopal (Size 4,5,6)",
+      "Jewellery Collection/Jewellery/Pearl Kundan Mala",
+      "Jewellery Collection/Jewellery/Slideshow",
+      "Jewellery Collection/Mukut"
+    ],
+    "subcategoryFolderMap": {
+      "Jewellery": [
+        "Jewellery Collection/Jewellery",
+        "Jewellery Collection/Jewellery/Long Mala(4.5 inches)",
+        "Jewellery Collection/Jewellery/Najariya for Ladduu Gopal (Size 4,5,6)",
+        "Jewellery Collection/Jewellery/Pearl Kundan Mala",
+        "Jewellery Collection/Jewellery/Slideshow"
+      ],
+      "Mukut": [
+        "Jewellery Collection/Mukut"
+      ]
+    },
+    "subcategories": [
+      "Jewellery",
+      "Mukut"
+    ]
+  },
+  {
+    "id": "laddu-gopal-essentials",
+    "label": "Laddu Gopal Essentials",
+    "emoji": "🛏️",
+    "folderKeys": [
+      "Laddu Gopal Essentials/Aasans",
+      "Laddu Gopal Essentials/Nitya Sewa Collection"
+    ],
+    "subcategoryFolderMap": {
+      "Aasans": [
+        "Laddu Gopal Essentials/Aasans"
+      ],
+      "Nitya Sewa Collection": [
+        "Laddu Gopal Essentials/Nitya Sewa Collection"
+      ]
+    },
+    "subcategories": [
+      "Aasans",
+      "Nitya Sewa Collection"
+    ]
+  },
+  {
+    "id": "pooja-essentials",
+    "label": "Pooja Essentials",
+    "emoji": "🪔",
+    "folderKeys": [
+      "Pooja Essentials"
     ],
     "subcategoryFolderMap": {},
     "subcategories": []
+  },
+  {
+    "id": "spritual-accessories",
+    "label": "Spritual Accessories",
+    "emoji": "🏛️",
+    "folderKeys": [
+      "Spritual Accessories",
+      "Spritual Accessories/Key Chain"
+    ],
+    "subcategoryFolderMap": {
+      "Key Chain": [
+        "Spritual Accessories/Key Chain"
+      ]
+    },
+    "subcategories": [
+      "Key Chain"
+    ]
+  },
+  {
+    "id": "tulsi-kanthi-mala",
+    "label": "Tulsi Kanthi Mala",
+    "emoji": "📿",
+    "folderKeys": [
+      "Tulsi Kanthi Mala/Kanthi Mala Regular",
+      "Tulsi Kanthi Mala/Kathi Mala Fine Beads",
+      "Tulsi Kanthi Mala/Original Tusli Jaap Mala",
+      "Tulsi Kanthi Mala/Tulsi Designer Mala",
+      "Tulsi Kanthi Mala/Tulsi Mala Single Round"
+    ],
+    "subcategoryFolderMap": {
+      "Kanthi Mala Regular": [
+        "Tulsi Kanthi Mala/Kanthi Mala Regular"
+      ],
+      "Kathi Mala Fine Beads": [
+        "Tulsi Kanthi Mala/Kathi Mala Fine Beads"
+      ],
+      "Original Tusli Jaap Mala": [
+        "Tulsi Kanthi Mala/Original Tusli Jaap Mala"
+      ],
+      "Tulsi Designer Mala": [
+        "Tulsi Kanthi Mala/Tulsi Designer Mala"
+      ],
+      "Tulsi Mala Single Round": [
+        "Tulsi Kanthi Mala/Tulsi Mala Single Round"
+      ]
+    },
+    "subcategories": [
+      "Kanthi Mala Regular",
+      "Kathi Mala Fine Beads",
+      "Original Tusli Jaap Mala",
+      "Tulsi Designer Mala",
+      "Tulsi Mala Single Round"
+    ]
   }
 ];
 

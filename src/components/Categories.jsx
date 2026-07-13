@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import "./CategoryGalleries.css";
 import PRODUCT_DATA from "../data/productData.js";
@@ -192,6 +193,7 @@ export default function CategoryGalleries({
 
 function ProductCard({ folderName, images, data, addToCart }) {
   const [current, setCurrent] = useState(0);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const safeImages = images ?? [];
   const total = safeImages.length;
   const activeImage = safeImages[current] ?? safeImages[0];
@@ -214,7 +216,7 @@ function ProductCard({ folderName, images, data, addToCart }) {
       : null;
 
   return (
-    <article className="image-card reveal">
+    <article className="image-card reveal" onClick={() => setIsQuickViewOpen(true)} style={{ cursor: 'pointer' }}>
       <div className="image-card-img-wrapper">
         {discount && <span className="discount-badge">{discount}% OFF</span>}
 
@@ -232,7 +234,7 @@ function ProductCard({ folderName, images, data, addToCart }) {
             <button
               className="slide-btn slide-btn--prev"
               type="button"
-              onClick={prev}
+              onClick={(e) => { e.stopPropagation(); prev(); }}
               aria-label="Previous image"
             >
               &#8249;
@@ -240,7 +242,7 @@ function ProductCard({ folderName, images, data, addToCart }) {
             <button
               className="slide-btn slide-btn--next"
               type="button"
-              onClick={next}
+              onClick={(e) => { e.stopPropagation(); next(); }}
               aria-label="Next image"
             >
               &#8250;
@@ -252,7 +254,7 @@ function ProductCard({ folderName, images, data, addToCart }) {
                   key={image.fileName}
                   className={`slide-dot${i === current ? " slide-dot--active" : ""}`}
                   type="button"
-                  onClick={() => setCurrent(i)}
+                  onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
                   aria-label={`Show image ${i + 1}`}
                 />
               ))}
@@ -285,11 +287,65 @@ function ProductCard({ folderName, images, data, addToCart }) {
         <button
           className="add-cart-btn gallery-cart-btn"
           type="button"
-          onClick={() => addToCart?.(activeData.price ?? 250)}
+          onClick={(e) => { e.stopPropagation(); addToCart?.(activeData.price ?? 250); }}
         >
           Add To Cart
         </button>
       </div>
+
+      {isQuickViewOpen && typeof document !== "undefined" && createPortal(
+        <div className="quick-view-overlay" onClick={() => setIsQuickViewOpen(false)}>
+          <div className="quick-view-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="quick-view-close" type="button" onClick={() => setIsQuickViewOpen(false)} aria-label="Close">
+              &times;
+            </button>
+            <div className="quick-view-image-panel">
+              <div style={{ position: "relative", width: "100%", height: "100%", minHeight: "300px" }}>
+                <Image
+                  src={activeImage.image}
+                  alt={activeData.title ?? activeData.description ?? formatFolderName(folderName)}
+                  fill
+                  sizes="(max-width: 900px) 100vw, 50vw"
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
+            </div>
+            <div className="quick-view-info-panel">
+              <h3 className="quick-view-title">{activeData.title ?? formatFolderName(folderName)}</h3>
+              
+              <div className="quick-view-price-row">
+                {activeData.price !== undefined && (
+                  <span className="quick-view-price">{formatCurrency(activeData.price)}</span>
+                )}
+                {activeData.originalPrice && (
+                  <span className="quick-view-original-price">
+                    {formatCurrency(activeData.originalPrice)}
+                  </span>
+                )}
+                {discount && (
+                  <span className="quick-view-discount">{discount}% OFF</span>
+                )}
+              </div>
+
+              <p className="quick-view-description">
+                {activeData.description ?? formatFolderName(folderName)}
+              </p>
+
+              <button
+                className="add-cart-btn gallery-cart-btn quick-view-atc"
+                type="button"
+                onClick={() => {
+                  addToCart?.(activeData.price ?? 250);
+                  setIsQuickViewOpen(false);
+                }}
+              >
+                Add To Cart
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </article>
   );
 }
