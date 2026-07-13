@@ -12,13 +12,43 @@ import { AuthProvider } from "../context/AuthContext.jsx";
 export default function SiteShell({ children }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [cartCount, setCartCount] = useState(0);
-  const [cartTotal, setCartTotal] = useState(0);
+  const [cartItems, setCartItems] = useState([]);
 
-  const addToCart = useCallback((price = 250) => {
-    setCartCount((previous) => previous + 1);
-    setCartTotal((previous) => previous + price);
+  const addToCart = useCallback((product) => {
+    setCartItems((prev) => {
+      // Fallback if price is somehow passed instead of object (e.g. from an old component we missed)
+      if (typeof product === 'number') {
+        product = { id: `legacy-${Date.now()}`, title: 'Item', price: product, image: '', originalPrice: null };
+      }
+      
+      const existing = prev.find((item) => item.id === product.id && item.size === product.size);
+      if (existing) {
+        return prev.map((item) =>
+          item.id === product.id && item.size === product.size
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
   }, []);
+
+  const updateQuantity = useCallback((id, size, quantity) => {
+    setCartItems((prev) =>
+      quantity < 1
+        ? prev.filter((item) => !(item.id === id && item.size === size))
+        : prev.map((item) =>
+            item.id === id && item.size === size ? { ...item, quantity } : item
+          )
+    );
+  }, []);
+
+  const removeFromCart = useCallback((id, size) => {
+    setCartItems((prev) => prev.filter((item) => !(item.id === id && item.size === size)));
+  }, []);
+
+  const cartCount = useMemo(() => cartItems.reduce((acc, item) => acc + item.quantity, 0), [cartItems]);
+  const cartTotal = useMemo(() => cartItems.reduce((acc, item) => acc + ((item.price || 250) * item.quantity), 0), [cartItems]);
 
   const cartAnnouncement = useMemo(() => {
     if (cartCount === 0) {
@@ -30,11 +60,14 @@ export default function SiteShell({ children }) {
 
   const contextValue = useMemo(
     () => ({
-      addToCart,
+      cartItems,
       cartCount,
       cartTotal,
+      addToCart,
+      updateQuantity,
+      removeFromCart,
     }),
-    [addToCart, cartCount, cartTotal],
+    [cartItems, cartCount, cartTotal, addToCart, updateQuantity, removeFromCart]
   );
 
   useEffect(() => {

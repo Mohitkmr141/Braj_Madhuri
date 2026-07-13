@@ -246,7 +246,17 @@ function ProductCard({ folderName, image, data, addToCart }) {
         <button
           className="add-cart-btn gallery-cart-btn"
           type="button"
-          onClick={(e) => { e.stopPropagation(); addToCart?.(activeData.price ?? 250); }}
+          onClick={(e) => { 
+            e.stopPropagation(); 
+            addToCart?.({
+              id: `${folderName}_${image.fileName}`,
+              title: activeData.title ?? formatFolderName(folderName),
+              image: image.image,
+              price: activeData.price ?? 250,
+              originalPrice: activeData.originalPrice,
+              size: null
+            }); 
+          }}
         >
           Add To Cart
         </button>
@@ -294,7 +304,14 @@ function ProductCard({ folderName, image, data, addToCart }) {
                 className="add-cart-btn gallery-cart-btn quick-view-atc"
                 type="button"
                 onClick={() => {
-                  addToCart?.(activeData.price ?? 250);
+                  addToCart?.({
+                    id: `${folderName}_${image.fileName}`,
+                    title: activeData.title ?? formatFolderName(folderName),
+                    image: image.image,
+                    price: activeData.price ?? 250,
+                    originalPrice: activeData.originalPrice,
+                    size: null
+                  });
                   setIsQuickViewOpen(false);
                 }}
               >

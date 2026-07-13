@@ -5,7 +5,7 @@ const FloatingCart = ({ cartCount = 0, cartTotal = 0 }) => {
   return (
     <Link
       className="float-cart"
-      href="/shop"
+      href="/cart"
       title="View cart"
       aria-label={
         cartCount > 0

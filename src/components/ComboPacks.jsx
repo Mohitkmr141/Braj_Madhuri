@@ -55,7 +55,14 @@ function ComboPacks({ addToCart }) {
                 <button
                   className="add-cart-btn"
                   type="button"
-                  onClick={() => addToCart?.(combo.price)}
+                  onClick={() => addToCart?.({
+                    id: `combo-${combo.title.replace(/\s+/g, '-').toLowerCase()}`,
+                    title: combo.title,
+                    image: '/header-banner.jpg', // Placeholder for combos since they don't have images in data
+                    price: combo.price,
+                    originalPrice: null,
+                    size: null
+                  })}
                 >
                   Add
                 </button>

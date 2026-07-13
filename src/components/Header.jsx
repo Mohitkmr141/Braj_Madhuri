@@ -196,7 +196,7 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
 
         <div className="bm-banner__cart">
           <Link
-            href="/shop"
+            href="/cart"
             className="bm-cart"
             aria-label={`View collection. Cart has ${cartCount} item${cartCount === 1 ? "" : "s"} worth INR ${cartTotal.toLocaleString("en-IN")}.`}
           >

@@ -79,7 +79,14 @@ function ProductDetailCard({ product, addToCart }) {
       : null;
 
   const handleAddToCart = () => {
-    addToCart?.(product.price ?? 250);
+    addToCart?.({
+      id: `${product.folderName}_${product.fileName}`,
+      title: product.title,
+      image: product.image,
+      price: product.price ?? 250,
+      originalPrice: product.originalPrice,
+      size: selectedSize
+    });
     flash("btn");
   };
 
