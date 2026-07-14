@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import "./SubcategoryPage.css";
-import PRODUCT_IMAGE_MAP from "../data/productImages.js";
-import PRODUCT_DATA from "../data/productData.js";
 import CATEGORIES from "../data/categoriesData.js";
 
 // ── helpers ─────────────────────────────────────────────────────────────────
@@ -25,33 +23,11 @@ function resolveFolderKeys(catId, subName) {
   return map[subName] ?? cat.folderKeys ?? [];
 }
 
-/** Build flat list of { folderName, fileName, image, data } for a subcategory */
-function buildProductList(catId, subName) {
+/** Build list of matching products for a subcategory from the DB products array */
+function resolveSubcategoryProducts(catId, subName, dbProducts) {
   const folderKeys = resolveFolderKeys(catId, subName);
-  const result = [];
-
-  for (const key of folderKeys) {
-    const images = PRODUCT_IMAGE_MAP[key];
-    if (!images || images.length === 0) continue;
-    const categoryData = PRODUCT_DATA[key] ?? {};
-
-    for (const img of images) {
-      const itemData = categoryData.items?.[img.fileName] ?? {};
-      result.push({
-        folderName: key,
-        fileName: img.fileName,
-        image: img.image,
-        title: itemData.title ?? categoryData.title ?? img.fileName,
-        description: itemData.description ?? categoryData.description ?? "",
-        subheading: itemData.subheading ?? categoryData.subheading ?? "",
-        price: itemData.price ?? categoryData.price,
-        originalPrice: itemData.originalPrice ?? categoryData.originalPrice,
-        sizes: itemData.sizes ?? categoryData.sizes ?? null,
-      });
-    }
-  }
-
-  return result;
+  const keySet = new Set(folderKeys);
+  return dbProducts.filter(p => keySet.has(p.folderName));
 }
 
 // ── Cart flash hook ──────────────────────────────────────────────────────────
@@ -80,9 +56,9 @@ function ProductDetailCard({ product, addToCart }) {
 
   const handleAddToCart = () => {
     addToCart?.({
-      id: `${product.folderName}_${product.fileName}`,
-      title: product.title,
-      image: product.image,
+      id: product.id,
+      title: product.title || product.folderName,
+      image: product.imageUrl,
       price: product.price ?? 250,
       originalPrice: product.originalPrice,
       size: selectedSize
@@ -90,13 +66,15 @@ function ProductDetailCard({ product, addToCart }) {
     flash("btn");
   };
 
+  const displayTitle = product.title || product.folderName;
+
   return (
     <article className="subcat-product-card reveal" onClick={() => setIsZoomed(true)} style={{ cursor: 'pointer' }}>
       {/* ── Image panel ─────────────────────────────────────── */}
       <div className="subcat-img-panel">
         <Image
-          src={product.image}
-          alt={product.title}
+          src={product.imageUrl}
+          alt={displayTitle}
           fill
           sizes="(max-width: 700px) 100vw, 340px"
           style={{ objectFit: "cover" }}
@@ -112,8 +90,8 @@ function ProductDetailCard({ product, addToCart }) {
             <div className="quick-view-image-panel">
               <div style={{ position: "relative", width: "100%", height: "100%", minHeight: "300px" }}>
                 <Image
-                  src={product.image}
-                  alt={product.title}
+                  src={product.imageUrl}
+                  alt={displayTitle}
                   fill
                   sizes="(max-width: 900px) 100vw, 50vw"
                   style={{ objectFit: "contain" }}
@@ -121,7 +99,7 @@ function ProductDetailCard({ product, addToCart }) {
               </div>
             </div>
             <div className="quick-view-info-panel">
-              <h3 className="quick-view-title">{product.title}</h3>
+              <h3 className="quick-view-title">{displayTitle}</h3>
               
               <div className="quick-view-price-row">
                 {product.price !== undefined && (
@@ -144,6 +122,7 @@ function ProductDetailCard({ product, addToCart }) {
                     {product.subheading}
                   </span>
                 )}
+                {!product.description && product.categoryDesc && <span>{product.categoryDesc}</span>}
               </p>
 
               {product.sizes && product.sizes.length > 0 && (
@@ -183,7 +162,7 @@ function ProductDetailCard({ product, addToCart }) {
 
       {/* ── Info panel ──────────────────────────────────────── */}
       <div className="subcat-info-panel">
-        <h3 className="subcat-product-title">{product.title}</h3>
+        <h3 className="subcat-product-title">{displayTitle}</h3>
 
         {/* Pricing */}
         <div className="subcat-pricing">
@@ -201,7 +180,7 @@ function ProductDetailCard({ product, addToCart }) {
         </div>
 
         {/* Description */}
-        {(product.description || product.subheading) && (
+        {(product.description || product.subheading || product.categoryDesc) && (
           <p className="subcat-description">
             {product.description && <span>{product.description}</span>}
             {product.subheading && (
@@ -209,6 +188,7 @@ function ProductDetailCard({ product, addToCart }) {
                 {product.subheading}
               </span>
             )}
+            {!product.description && product.categoryDesc && <span>{product.categoryDesc}</span>}
           </p>
         )}
 
@@ -239,7 +219,7 @@ function ProductDetailCard({ product, addToCart }) {
           type="button"
           className={`subcat-atc-btn${flashing === "btn" ? " subcat-atc-btn--added" : ""}`}
           onClick={(e) => { e.stopPropagation(); handleAddToCart(); }}
-          aria-label={`Add ${product.title} to cart`}
+          aria-label={`Add ${displayTitle} to cart`}
         >
           {flashing === "btn" ? (
             <>
@@ -273,10 +253,40 @@ export default function SubcategoryPage({
   onBack,
   onBackToCategory,
 }) {
+  const [dbProducts, setDbProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.categories) {
+          // Flatten categories to products
+          const flatProducts = data.categories.flatMap(c => 
+            c.products.map(p => ({
+              ...p,
+              categoryTitle: c.title,
+              categoryDesc: c.description
+            }))
+          );
+          setDbProducts(flatProducts);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
+
   const products = useMemo(
-    () => buildProductList(catId, subName),
-    [catId, subName]
+    () => resolveSubcategoryProducts(catId, subName, dbProducts),
+    [catId, subName, dbProducts]
   );
+
+  if (loading) {
+    return <section className="subcat-page"><div className="subcat-section-header"><h2 className="subcat-section-title">Loading...</h2></div></section>;
+  }
 
   return (
     <section className="subcat-page">
@@ -316,7 +326,7 @@ export default function SubcategoryPage({
         <div className="subcat-products-grid">
           {products.map((product) => (
             <ProductDetailCard
-              key={`${product.folderName}__${product.fileName}`}
+              key={product.id}
               product={product}
               addToCart={addToCart}
             />

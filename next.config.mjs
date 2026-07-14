@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Use a wildcard to allow access from any local IP address or host in development
-  allowedDevOrigins: ["*"],
+
+  allowedDevOrigins: ['192.168.1.20'],
+
 };
 
 export default nextConfig;

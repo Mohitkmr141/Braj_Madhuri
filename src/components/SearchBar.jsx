@@ -3,41 +3,18 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import PRODUCT_DATA from "../data/productData.js";
 import "./SearchBar.css";
 
-// Build a flat searchable list from product data
-const SEARCH_INDEX = Object.entries(PRODUCT_DATA).flatMap(([folder, data]) => {
-  const results = [];
-
-  // Add the folder-level product
-  if (data.title) {
-    results.push({
-      id: folder,
-      folder,
-      title: data.title,
-      description: data.description ?? "",
-      price: data.price,
-    });
-  }
-
-  // Add individual variant items
-  if (data.items) {
-    Object.entries(data.items).forEach(([, item]) => {
-      if (item.title) {
-        results.push({
-          id: `${folder}-${item.title}`,
-          folder,
-          title: item.title,
-          description: item.description ?? "",
-          price: data.price,
-        });
-      }
-    });
-  }
-
-  return results;
-});
+// Build a flat searchable list from the DB products
+function buildSearchIndex(dbProducts) {
+  return dbProducts.map(product => ({
+    id: product.id,
+    folder: product.folderName,
+    title: product.title || product.folderName,
+    description: product.description || product.categoryDesc || "",
+    price: product.price,
+  }));
+}
 
 function highlight(text, query) {
   if (!query) return text;
@@ -50,12 +27,32 @@ function highlight(text, query) {
 
 export default function SearchBar({ onClose, initialQuery = "" }) {
   const router = useRouter();
+  const [searchIndex, setSearchIndex] = useState([]);
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState([]);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [isOpen, setIsOpen] = useState(false);
   const inputRef = useRef(null);
   const containerRef = useRef(null);
+
+  // Fetch search index data on mount
+  useEffect(() => {
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.categories) {
+          const flatProducts = data.categories.flatMap(c => 
+            c.products.map(p => ({
+              ...p,
+              categoryTitle: c.title,
+              categoryDesc: c.description
+            }))
+          );
+          setSearchIndex(buildSearchIndex(flatProducts));
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   // When a suggestion chip is clicked from the parent, update query + trigger search
   useEffect(() => {
@@ -64,8 +61,8 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
       const t = setTimeout(() => {
         setQuery(initialQuery);
         const trimmed = initialQuery.trim().toLowerCase();
-        if (trimmed.length >= 2) {
-          const matched = SEARCH_INDEX.filter(
+        if (trimmed.length >= 2 && searchIndex.length > 0) {
+          const matched = searchIndex.filter(
             (item) =>
               item.title.toLowerCase().includes(trimmed) ||
               item.description.toLowerCase().includes(trimmed)
@@ -88,7 +85,7 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
       return;
     }
 
-    const matched = SEARCH_INDEX.filter(
+    const matched = searchIndex.filter(
       (item) =>
         item.title.toLowerCase().includes(trimmed) ||
         item.description.toLowerCase().includes(trimmed)
@@ -97,7 +94,7 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
     setResults(matched);
     setIsOpen(matched.length > 0);
     setActiveIndex(-1);
-  }, []);
+  }, [searchIndex]);
 
   const handleChange = (e) => {
     const val = e.target.value;

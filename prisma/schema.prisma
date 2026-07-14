@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Category {
+  id            String    @id
+  title         String
+  description   String?
+  basePrice     Float?
+  originalPrice Float?
+  size          String?
+  sizes         String[]  @default([])
+  products      Product[]
+}
+
+model Product {
+  id            String    @id @default(cuid())
+  categoryId    String
+  folderName    String    
+  fileName      String    
+  imageUrl      String?   
+  title         String
+  description   String?
+  subheading    String?
+  price         Float?
+  originalPrice Float?
+  size          String?
+
+  category      Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
