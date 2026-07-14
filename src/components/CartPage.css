@@ -27,8 +27,8 @@
 .cart-items-section {
   flex: 1;
   background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 24px -8px rgba(0,0,0,0.06);
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
   overflow: hidden;
   width: 100%;
 }
@@ -183,8 +183,8 @@
 .cart-summary-section {
   width: 380px;
   background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 24px -8px rgba(0,0,0,0.06);
+  border-radius: 12px;
+  box-shadow: var(--shadow-soft);
   position: sticky;
   top: 100px;
   flex-shrink: 0;
@@ -248,21 +248,21 @@
   background: var(--gold);
   color: #ffffff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-family: 'Inter', sans-serif;
   font-size: 16px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: var(--transition-bounce);
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
 }
 
 .place-order-btn:hover {
   background: #c9972a;
-  box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-4px);
 }
 
 .cart-savings-msg {
@@ -303,10 +303,13 @@
   color: #fff;
   text-decoration: none;
   font-weight: 600;
-  border-radius: 4px;
-  transition: background 0.3s;
+  border-radius: 8px;
+  transition: var(--transition-bounce);
+  box-shadow: 0 8px 24px rgba(74, 21, 33, 0.25);
 }
 
 .cart-empty-btn:hover {
-  background: #3a111a;
+  background: var(--maroon-light);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
 }

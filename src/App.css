@@ -14,7 +14,34 @@
     --text: #1F1A17;
     --text-muted: #6B5B53;
     --white: #FFFFFF;
-    --shadow: rgba(0, 0, 0, 0.05);
+    
+    /* Modern Aesthetic Additions */
+    --shadow-soft: 0 4px 24px rgba(74, 21, 33, 0.06);
+    --shadow-hover: 0 16px 40px rgba(74, 21, 33, 0.12);
+    --shadow-glow: 0 8px 30px rgba(212, 175, 55, 0.3);
+    
+    --glass-bg: rgba(253, 251, 247, 0.85);
+    --glass-bg-dark: rgba(74, 21, 33, 0.92);
+    --glass-blur: blur(16px);
+    
+    --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+    70% { box-shadow: 0 0 0 12px rgba(212, 175, 55, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+  }
+  
+  @keyframes floatHover {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -301,37 +328,57 @@
     font-size: 13px;
     letter-spacing: 1px;
     cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    border-radius: 8px; /* Modern rounded corners */
+    transition: var(--transition-bounce);
     text-decoration: none;
     display: inline-block;
-    box-shadow: 0 10px 30px -10px rgba(74, 21, 33, 0.4);
+    box-shadow: 0 8px 24px rgba(74, 21, 33, 0.25);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
+    transform: skewX(-20deg);
+    transition: 0.5s;
   }
 
   .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(232,114,26,0.5);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(74, 21, 33, 0.45);
+    background: linear-gradient(135deg, var(--maroon), var(--maroon-light));
+  }
+
+  .btn-primary:hover::after {
+    left: 150%;
   }
 
   .btn-outline {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     color: var(--ivory);
     padding: 15px 40px;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     font-family: 'Inter', sans-serif;
     font-weight: 600;
     font-size: 13px;
     letter-spacing: 1px;
     cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    border-radius: 8px;
+    transition: var(--transition-bounce);
     text-decoration: none;
     display: inline-block;
   }
 
   .btn-outline:hover {
-    background: rgba(201,151,42,0.1);
-    border-color: var(--gold-light);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--ivory);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.1);
   }
 
 /* Dead code removed: .hero-image-area, .hero-image-placeholder, .hero-bottle-svg, .hero-stats were for old Hero — elements no longer exist in component */
@@ -430,6 +477,7 @@
       radial-gradient(circle at top right, rgba(201,151,42,0.18), transparent 28%),
       radial-gradient(circle at 15% 20%, rgba(123,27,42,0.1), transparent 30%);
     pointer-events: none;
+    animation: pulseGlow 10s infinite alternate;
   }
 
   .page-hero__content {
@@ -438,6 +486,7 @@
     max-width: 820px;
     margin: 0 auto;
     text-align: center;
+    animation: fadeInUp 0.8s ease backwards;
   }
 
   .page-hero__title {
@@ -495,10 +544,17 @@
 
   .contact-card {
     background: var(--white);
-    border: 1px solid rgba(201,151,42,0.2);
-    border-radius: 4px;
+    border: 1px solid rgba(201,151,42,0.15);
+    border-radius: 12px;
     padding: 28px;
-    box-shadow: 0 18px 48px rgba(74,44,26,0.08);
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-bounce);
+  }
+  
+  .contact-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(201,151,42,0.35);
   }
 
   .contact-card h3 {
@@ -651,17 +707,18 @@
 
   .combo-card {
     background: linear-gradient(135deg, var(--ivory), var(--cream));
-    border: 1px solid rgba(201,151,42,0.25);
-    border-radius: 4px;
+    border: 1px solid rgba(201,151,42,0.2);
+    border-radius: 12px;
     overflow: hidden;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: var(--transition-bounce);
+    box-shadow: var(--shadow-soft);
   }
 
   .combo-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 14px 50px var(--shadow);
-    border-color: var(--gold);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(201,151,42,0.4);
   }
 
   .combo-header {

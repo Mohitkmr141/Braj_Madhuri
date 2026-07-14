@@ -68,14 +68,14 @@
   background: #fff;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(90, 60, 20, 0.08);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  box-shadow: var(--shadow-soft);
+  transition: var(--transition-bounce);
   position: relative;
 }
 
 .subcat-product-card:hover {
-  box-shadow: 0 12px 40px rgba(90, 60, 20, 0.15);
-  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-8px);
 }
 
 /* ── Image panel ─────────────────────────────────────────────────────────── */
@@ -304,7 +304,7 @@
   gap: 8px;
   width: 100%;
   padding: 12px 20px;
-  background: #1e2d40;
+  background: var(--maroon);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -313,13 +313,14 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease;
+  transition: var(--transition-bounce);
   margin-top: auto;
 }
 
 .subcat-atc-btn:hover {
-  background: #162233;
-  transform: translateY(-1px);
+  background: var(--maroon-light);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
 }
 
 .subcat-atc-btn:active {

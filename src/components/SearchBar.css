@@ -9,18 +9,19 @@
   display: flex;
   align-items: center;
   background: #fff;
-  border: 3px solid rgba(201, 151, 42, 0.55);
+  border: 2px solid rgba(212, 175, 55, 0.4);
   border-radius: 60px;
   padding: 0 10px 0 28px;
   gap: 12px;
   height: 72px;
-  transition: border-color 0.2s, box-shadow 0.25s;
-  box-shadow: 0 6px 32px rgba(74, 44, 26, 0.14);
+  transition: var(--transition-bounce);
+  box-shadow: var(--shadow-soft);
 }
 
 .search-form:focus-within {
-  border-color: #c9973a;
-  box-shadow: 0 8px 40px rgba(201, 151, 42, 0.28);
+  border-color: rgba(212, 175, 55, 0.8);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
 }
 
 .search-icon {
@@ -62,7 +63,7 @@
 /* Big submit button inside the bar */
 .search-submit-btn {
   flex-shrink: 0;
-  background: linear-gradient(135deg, #8b1a1a, #b22222);
+  background: linear-gradient(135deg, var(--maroon), var(--maroon-light));
   color: #fff;
   border: none;
   border-radius: 50px;
@@ -73,7 +74,7 @@
   font-weight: 600;
   letter-spacing: 1px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.15s;
+  transition: var(--transition-bounce);
   white-space: nowrap;
   display: flex;
   align-items: center;
@@ -81,8 +82,9 @@
 }
 
 .search-submit-btn:hover {
-  background: linear-gradient(135deg, #a01f1f, #c9973a);
-  transform: scale(1.02);
+  background: linear-gradient(135deg, var(--maroon-light), var(--maroon));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(74, 21, 33, 0.3);
 }
 
 .search-submit-btn svg {
