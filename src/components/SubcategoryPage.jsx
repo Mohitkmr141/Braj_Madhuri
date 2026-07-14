@@ -266,7 +266,8 @@ export default function SubcategoryPage({
             c.products.map(p => ({
               ...p,
               categoryTitle: c.title,
-              categoryDesc: c.description
+              categoryDesc: c.description,
+              sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null
             }))
           );
           setDbProducts(flatProducts);

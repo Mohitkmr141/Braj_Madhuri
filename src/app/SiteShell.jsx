@@ -71,19 +71,11 @@ export default function SiteShell({ children }) {
   );
 
   useEffect(() => {
-    const revealTargets = [...document.querySelectorAll(".reveal")];
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    if (prefersReducedMotion) {
-      revealTargets.forEach((element) => element.classList.add("visible"));
-      return undefined;
-    }
-
-    revealTargets.forEach((element) => element.classList.remove("visible"));
-
-    const timers = [];
+    const timers = new Set();
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry, index) => {
@@ -91,7 +83,7 @@ export default function SiteShell({ children }) {
             const timer = window.setTimeout(() => {
               entry.target.classList.add("visible");
             }, index * 80);
-            timers.push(timer);
+            timers.add(timer);
             observer.unobserve(entry.target);
           }
         });
@@ -99,10 +91,38 @@ export default function SiteShell({ children }) {
       { threshold: 0.12 },
     );
 
-    revealTargets.forEach((element) => observer.observe(element));
+    const observeElement = (el) => {
+      if (prefersReducedMotion) {
+        el.classList.add("visible");
+      } else if (!el.classList.contains("visible")) {
+        observer.observe(el);
+      }
+    };
+
+    // Initial observation
+    document.querySelectorAll(".reveal").forEach(observeElement);
+
+    // Watch for dynamic additions
+    const mutationObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) { // ELEMENT_NODE
+            if (node.classList.contains("reveal")) {
+              observeElement(node);
+            }
+            // Find nested .reveal elements
+            const nestedReveals = node.querySelectorAll(".reveal");
+            nestedReveals.forEach(observeElement);
+          }
+        });
+      });
+    });
+
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
 
     return () => {
       observer.disconnect();
+      mutationObserver.disconnect();
       timers.forEach((timer) => window.clearTimeout(timer));
     };
   }, [pathname, searchParams]);

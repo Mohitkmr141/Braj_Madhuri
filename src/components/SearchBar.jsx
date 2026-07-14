@@ -45,7 +45,8 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
             c.products.map(p => ({
               ...p,
               categoryTitle: c.title,
-              categoryDesc: c.description
+              categoryDesc: c.description,
+              sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null
             }))
           );
           setSearchIndex(buildSearchIndex(flatProducts));
@@ -56,12 +57,12 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
 
   // When a suggestion chip is clicked from the parent, update query + trigger search
   useEffect(() => {
-    if (initialQuery) {
+    if (initialQuery && searchIndex.length > 0) {
       // Use a tiny delay so the search function has been defined
       const t = setTimeout(() => {
         setQuery(initialQuery);
         const trimmed = initialQuery.trim().toLowerCase();
-        if (trimmed.length >= 2 && searchIndex.length > 0) {
+        if (trimmed.length >= 2) {
           const matched = searchIndex.filter(
             (item) =>
               item.title.toLowerCase().includes(trimmed) ||
@@ -75,7 +76,7 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
       }, 0);
       return () => clearTimeout(t);
     }
-  }, [initialQuery]);
+  }, [initialQuery, searchIndex]);
 
   const search = useCallback((q) => {
     const trimmed = q.trim().toLowerCase();
