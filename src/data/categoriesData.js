@@ -196,6 +196,36 @@ const CATEGORIES = [
       "Tulsi Designer Mala",
       "Tulsi Mala Single Round"
     ]
+  },
+  {
+    "id": "incense-dhoop-sticks",
+    "label": "Incense & Dhoop Sticks",
+    "emoji": "✨",
+    "folderKeys": [
+      "Incense & Dhoop Sticks"
+    ],
+    "subcategoryFolderMap": {},
+    "subcategories": []
+  },
+  {
+    "id": "japa-essentials",
+    "label": "Japa Essentials",
+    "emoji": "✨",
+    "folderKeys": [
+      "Japa Essentials"
+    ],
+    "subcategoryFolderMap": {},
+    "subcategories": []
+  },
+  {
+    "id": "products",
+    "label": "products",
+    "emoji": "✨",
+    "folderKeys": [
+      "products"
+    ],
+    "subcategoryFolderMap": {},
+    "subcategories": []
   }
 ];
 

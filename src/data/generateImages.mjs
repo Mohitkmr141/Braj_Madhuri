@@ -29,7 +29,8 @@ walkDir(imagesDir, (filePath) => {
     
     // The folder name is the relative directory (e.g. "Dhoop & Incense/Aggarbaties")
     const dirName = path.dirname(relativePath);
-    const folderName = dirName === '.' ? '' : dirName.split(path.sep).join('/');
+    let folderName = dirName === '.' ? '' : dirName.split(path.sep).join('/');
+    folderName = folderName.replace(/^(images|products)\//, '');
     const fileName = path.basename(relativePath, ext);
     
     // Create static URL path
