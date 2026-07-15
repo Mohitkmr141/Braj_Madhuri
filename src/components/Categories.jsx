@@ -189,6 +189,7 @@ export default function CategoryGalleries({
 
 function ProductCard({ product, addToCart, autoOpen }) {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(autoOpen || false);
+  const [selectedColor, setSelectedColor] = useState("Pink");
 
   // If the autoOpen prop changes (e.g. user navigates), update the state
   useEffect(() => {
@@ -260,7 +261,8 @@ function ProductCard({ product, addToCart, autoOpen }) {
               image: product.imageUrl,
               price: product.price ?? 250,
               originalPrice: product.originalPrice,
-              size: product.size
+              size: product.size,
+              color: displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" ? selectedColor : undefined
             }); 
           }}
         >
@@ -308,6 +310,22 @@ function ProductCard({ product, addToCart, autoOpen }) {
                 {displayDesc}
               </p>
 
+              {displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" && (
+                <div style={{ marginBottom: "15px" }}>
+                  <label htmlFor="color-select" style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
+                  <select 
+                    id="color-select" 
+                    value={selectedColor} 
+                    onChange={(e) => setSelectedColor(e.target.value)}
+                    style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
+                  >
+                    <option value="Pink">Pink</option>
+                    <option value="Blue">Blue</option>
+                    <option value="Magenta">Magenta</option>
+                  </select>
+                </div>
+              )}
+
               <button
                 className="add-cart-btn gallery-cart-btn quick-view-atc"
                 type="button"
@@ -321,7 +339,8 @@ function ProductCard({ product, addToCart, autoOpen }) {
                     image: product.imageUrl,
                     price: product.price ?? 250,
                     originalPrice: product.originalPrice,
-                    size: product.size
+                    size: product.size,
+                    color: displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" ? selectedColor : undefined
                   });
                   setIsQuickViewOpen(false);
                 }}

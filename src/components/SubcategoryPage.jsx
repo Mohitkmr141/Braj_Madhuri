@@ -43,11 +43,10 @@ function useCartFlash() {
 // ── ProductDetailCard ────────────────────────────────────────────────────────
 
 function ProductDetailCard({ product, addToCart }) {
-  const [selectedSize, setSelectedSize] = useState(
-    product.sizes ? product.sizes[0] : null
-  );
+  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "");
   const [flashing, flash] = useCartFlash();
   const [isZoomed, setIsZoomed] = useState(false);
+  const [selectedColor, setSelectedColor] = useState("Pink");
 
   const discount =
     product.originalPrice && product.price
@@ -55,13 +54,14 @@ function ProductDetailCard({ product, addToCart }) {
       : null;
 
   const handleAddToCart = () => {
-    addToCart?.({
+    addToCart({
       id: product.id,
       title: product.title || product.folderName,
       image: product.imageUrl,
       price: product.price ?? 250,
       originalPrice: product.originalPrice,
-      size: selectedSize
+      size: selectedSize,
+      color: (product.title || product.folderName) === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" ? selectedColor : undefined
     });
     flash("btn");
   };
@@ -144,6 +144,22 @@ function ProductDetailCard({ product, addToCart }) {
                 </>
               )}
 
+              {displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" && (
+                <div style={{ marginBottom: "15px" }}>
+                  <label htmlFor={`color-select-zoom-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
+                  <select 
+                    id={`color-select-zoom-${product.id}`}
+                    value={selectedColor} 
+                    onChange={(e) => setSelectedColor(e.target.value)}
+                    style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
+                  >
+                    <option value="Pink">Pink</option>
+                    <option value="Blue">Blue</option>
+                    <option value="Magenta">Magenta</option>
+                  </select>
+                </div>
+              )}
+
               <button
                 className="add-cart-btn gallery-cart-btn quick-view-atc"
                 type="button"
@@ -190,6 +206,22 @@ function ProductDetailCard({ product, addToCart }) {
             )}
             {!product.description && product.categoryDesc && <span>{product.categoryDesc}</span>}
           </p>
+        )}
+
+        {displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" && (
+          <div style={{ margin: "15px 0" }}>
+            <label htmlFor={`color-select-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
+            <select 
+              id={`color-select-${product.id}`}
+              value={selectedColor} 
+              onChange={(e) => setSelectedColor(e.target.value)}
+              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
+            >
+              <option value="Pink">Pink</option>
+              <option value="Blue">Blue</option>
+              <option value="Magenta">Magenta</option>
+            </select>
+          </div>
         )}
 
         {/* Sizes */}

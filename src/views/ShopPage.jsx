@@ -72,11 +72,11 @@ function ShopPage() {
       <section className="page-hero page-hero--shop">
         <div className="page-hero__content reveal">
           <span className="section-eyebrow">Shop</span>
-          <h1 className="page-hero__title">Browse devotional essentials with ease.</h1>
+          <h1 className="page-hero__title">Discover Pure Devotional Essentials</h1>
           <p className="page-hero__body">
-            Explore curated collections for pooja, gifting, japa, fragrance,
-            and daily seva. Use the category filter to move quickly through the
-            catalog.
+            Explore authentic collections from Braj Dham for daily seva, japa, pooja, 
+            Thakur Ji shringar, fragrances, and thoughtful gifting. Use the category filter 
+            to find exactly what you need
           </p>
         </div>
       </section>
