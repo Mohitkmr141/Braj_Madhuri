@@ -1,17 +1,15 @@
+import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { sendOrderEmail } from '../../../lib/mailer.js';
 
 let prisma;
-async function getPrisma() {
-  if (!prisma) {
-    const { PrismaClient } = await import('@prisma/client');
-    prisma = new PrismaClient();
-  }
+function getPrisma() {
+  if (!prisma) prisma = new PrismaClient();
   return prisma;
 }
 
 export async function POST(request) {
-  const prisma = await getPrisma();
+  const prisma = getPrisma();
   try {
     const body = await request.json();
     const { formData, cartItems, cartTotal, paymentMethod } = body;
