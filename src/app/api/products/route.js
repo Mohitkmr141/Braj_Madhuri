@@ -1,10 +1,16 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-const prisma = new PrismaClient();
 
 export const dynamic = 'force-dynamic';
 
+let prisma;
+function getPrisma() {
+  if (!prisma) prisma = new PrismaClient();
+  return prisma;
+}
+
 export async function GET() {
+  const prisma = getPrisma();
   try {
     const categories = await prisma.category.findMany({
       include: {
