@@ -1,16 +1,18 @@
-import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
 let prisma;
-function getPrisma() {
-  if (!prisma) prisma = new PrismaClient();
+async function getPrisma() {
+  if (!prisma) {
+    const { PrismaClient } = await import('@prisma/client');
+    prisma = new PrismaClient();
+  }
   return prisma;
 }
 
 export async function GET() {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   try {
     const orders = await prisma.order.findMany({
       orderBy: {
