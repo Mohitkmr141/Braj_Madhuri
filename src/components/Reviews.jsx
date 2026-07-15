@@ -2,22 +2,11 @@ import React from "react";
 
 const STAR_RATING = "\u2605\u2605\u2605\u2605\u2605";
 
-const reviews = [
-  {
-    text: "Very pure dhoop fragrance. It feels perfect for morning pooja.",
-    name: "Radhika Sharma",
-    location: "Mathura",
-  },
-  {
-    text: "The poshak quality is beautiful and the colors look premium.",
-    name: "Kunal Gupta",
-    location: "Delhi",
-  },
-  {
-    text: "Fast delivery and careful packing. Radhe Radhe.",
-    name: "Meera Joshi",
-    location: "Jaipur",
-  },
+// We can accept an array of Instagram post IDs
+const INSTAGRAM_POSTS = [
+  "DX2FinLiVQ0", // the one they provided
+  "DX2FinLiVQ0", // placeholder for 2nd post
+  "DX2FinLiVQ0", // placeholder for 3rd post
 ];
 
 function Reviews() {
@@ -28,52 +17,44 @@ function Reviews() {
         <div className="rating-stars-big" aria-label="5 star rating">
           {STAR_RATING}
         </div>
-        <p className="rating-desc">
-          Loved by devotees for purity, packing, and fragrance.
+        <p className="rating-desc" style={{ fontSize: '1.2rem', marginTop: '8px' }}>
+          Real Reviews from our Instagram Family
         </p>
       </div>
 
-      <div className="reviews-layout">
-        <div className="instagram-embed">
-          <iframe
-            src="https://www.instagram.com/p/DX2FinLiVQ0/embed"
-            width="400"
-            height="480"
-            frameBorder="0"
-            allow="encrypted-media"
-            title="Instagram Reviews"
-            style={{
-              background: "white",
-              border: "1px solid #dbdbdb",
-              borderRadius: "8px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-              display: "block",
-              margin: "0 auto",
-              maxWidth: "100%",
-              minWidth: "326px",
-              padding: "0",
-              overflow: "hidden",
-            }}
-          />
-        </div>
-
-        <div className="reviews-grid">
-          {reviews.map((review) => (
-            <article className="review-card reveal" key={review.name}>
-              <div className="review-quote">&quot;</div>
-              <p className="review-text">{review.text}</p>
-              <div className="review-author">
-                <div className="review-avatar" aria-hidden="true">
-                  {review.name.charAt(0)}
-                </div>
-                <div>
-                  <div className="review-name">{review.name}</div>
-                  <div className="review-location">{review.location}</div>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+      <div 
+        className="reviews-layout" 
+        style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+          gap: '32px', 
+          maxWidth: '1200px',
+          margin: '0 auto',
+          alignItems: 'center'
+        }}
+      >
+        {INSTAGRAM_POSTS.map((postId, index) => (
+          <div className="instagram-embed" key={index} style={{ width: '100%', margin: '0' }}>
+            <iframe
+              src={`https://www.instagram.com/p/${postId}/embed`}
+              width="100%"
+              height="480"
+              frameBorder="0"
+              allow="encrypted-media"
+              title={`Instagram Review ${index + 1}`}
+              style={{
+                background: "white",
+                border: "1px solid #dbdbdb",
+                borderRadius: "12px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                display: "block",
+                maxWidth: "100%",
+                padding: "0",
+                overflow: "hidden",
+              }}
+            />
+          </div>
+        ))}
       </div>
     </section>
   );

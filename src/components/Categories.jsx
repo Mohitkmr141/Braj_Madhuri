@@ -97,6 +97,7 @@ function resolveFilter(filterFolder, searchQuery, allProducts) {
 export default function CategoryGalleries({
   filterFolder,
   searchQuery,
+  activeProductId,
   addToCart,
   onClearFilter,
 }) {
@@ -140,9 +141,19 @@ export default function CategoryGalleries({
     <section className="galleries-wrapper" id="collections">
       <div className="section-header">
         <span className="section-eyebrow">
-          {isAll ? "Shop By Collection" : "Selected Category"}
+          {isAll ? "Shop By Collection" : filterFolder ? "Selected Category" : "Search Results"}
         </span>
         <h2 className="section-title">{title}</h2>
+        {searchQuery && (
+          <button 
+            type="button" 
+            className="explore-btn" 
+            style={{ marginTop: '1rem', padding: '0.5rem 1.5rem', fontSize: '0.9rem' }}
+            onClick={onClearFilter}
+          >
+            Clear Search
+          </button>
+        )}
         <div className="section-divider" />
       </div>
 
@@ -153,6 +164,7 @@ export default function CategoryGalleries({
               key={product.id}
               addToCart={addToCart}
               product={product}
+              autoOpen={product.id === activeProductId}
             />
           ))
         ) : (
@@ -175,8 +187,13 @@ export default function CategoryGalleries({
   );
 }
 
-function ProductCard({ product, addToCart }) {
-  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+function ProductCard({ product, addToCart, autoOpen }) {
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(autoOpen || false);
+
+  // If the autoOpen prop changes (e.g. user navigates), update the state
+  useEffect(() => {
+    if (autoOpen) setIsQuickViewOpen(true);
+  }, [autoOpen]);
 
   if (!product || !product.imageUrl) {
     return null;

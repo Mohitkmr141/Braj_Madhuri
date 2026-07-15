@@ -10,7 +10,7 @@ export const metadata = {
   description:
     "Devotional essentials, pooja fragrances, poshak, mala, dhoop, and seva products from The Braj Madhuri.",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/Logo.jpeg",
   },
 };
 

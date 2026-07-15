@@ -21,6 +21,12 @@ const contactMethods = [
     actionLabel: "Mon – Sun | 10:00 AM – 8:00 PM (IST)",
     href: null, // No link needed for hours
   },
+  {
+    title: "Instagram",
+    description: "Follow us for new arrivals, divine offers, and spiritual insights.",
+    actionLabel: "@brajmadhuri.official",
+    href: "https://www.instagram.com/brajmadhuri.official",
+  },
 ];
 
 function ContactPage() {

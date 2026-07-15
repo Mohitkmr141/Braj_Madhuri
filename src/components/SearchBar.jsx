@@ -104,7 +104,7 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
   };
 
   const goToResult = (result) => {
-    router.push(`/shop?search=${encodeURIComponent(result.title)}`);
+    router.push(`/shop?product=${result.id}`);
     setQuery("");
     setResults([]);
     setIsOpen(false);

@@ -19,14 +19,8 @@ const Story = () => {
             </div>
             <div className="story-big-label">Braj Madhuri</div>
           </div>
-          <div className="story-float-card top-right">
-            <span className="float-num">4.9</span>
-            <span className="float-label">Customer Rating</span>
-          </div>
-          <div className="story-float-card bottom-left">
-            <span className="float-num">10,000+</span>
-            <span className="float-label">Devotees Served</span>
-          </div>
+
+
         </div>
         <div className="story-text reveal">
           <span className="section-eyebrow">Who We Are</span>

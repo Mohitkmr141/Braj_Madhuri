@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Header from "../components/Header.jsx";
-import Newsletter from "../components/Newsletter.jsx";
 import Footer from "../components/Footer.jsx";
 import FloatingCart from "../components/FloatingCart.jsx";
 import { CartProvider } from "../context/CartContext.jsx";
@@ -157,7 +156,6 @@ export default function SiteShell({ children }) {
         </p>
         <Header cartCount={cartCount} cartTotal={cartTotal} />
         {children}
-        <Newsletter />
         <Footer />
         <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
       </CartProvider>
