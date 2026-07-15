@@ -15,6 +15,7 @@ export default function SiteShell({ children }) {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsClient(true);
     try {
       const stored = localStorage.getItem("bm_cart_items");

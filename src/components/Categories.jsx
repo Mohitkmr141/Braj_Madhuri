@@ -192,6 +192,7 @@ function ProductCard({ product, addToCart, autoOpen }) {
 
   // If the autoOpen prop changes (e.g. user navigates), update the state
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (autoOpen) setIsQuickViewOpen(true);
   }, [autoOpen]);
 
@@ -206,11 +207,16 @@ function ProductCard({ product, addToCart, autoOpen }) {
 
   const displayTitle = product.title || formatFolderName(product.folderName);
   const displayDesc = product.description || product.categoryDesc || formatFolderName(product.folderName);
+  const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0;
 
   return (
     <article className="image-card reveal" onClick={() => setIsQuickViewOpen(true)} style={{ cursor: 'pointer' }}>
       <div className="image-card-img-wrapper">
-        {discount && <span className="discount-badge">{discount}% OFF</span>}
+        {isOutOfStock ? (
+          <span className="discount-badge" style={{ background: '#d32f2f', color: '#fff' }}>OUT OF STOCK</span>
+        ) : discount ? (
+          <span className="discount-badge">{discount}% OFF</span>
+        ) : null}
 
         <Image
           src={product.imageUrl}
@@ -243,8 +249,11 @@ function ProductCard({ product, addToCart, autoOpen }) {
         <button
           className="add-cart-btn gallery-cart-btn"
           type="button"
+          disabled={isOutOfStock}
+          style={isOutOfStock ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
           onClick={(e) => { 
-            e.stopPropagation(); 
+            e.stopPropagation();
+            if (isOutOfStock) return;
             addToCart?.({
               id: product.id,
               title: displayTitle,
@@ -255,7 +264,7 @@ function ProductCard({ product, addToCart, autoOpen }) {
             }); 
           }}
         >
-          Add To Cart
+          {isOutOfStock ? "Out of Stock" : "Add To Cart"}
         </button>
       </div>
 
@@ -288,9 +297,11 @@ function ProductCard({ product, addToCart, autoOpen }) {
                     {formatCurrency(product.originalPrice)}
                   </span>
                 )}
-                {discount && (
+                {isOutOfStock ? (
+                  <span className="quick-view-discount" style={{ background: '#d32f2f', color: '#fff' }}>OUT OF STOCK</span>
+                ) : discount ? (
                   <span className="quick-view-discount">{discount}% OFF</span>
-                )}
+                ) : null}
               </div>
 
               <p className="quick-view-description">
@@ -300,7 +311,10 @@ function ProductCard({ product, addToCart, autoOpen }) {
               <button
                 className="add-cart-btn gallery-cart-btn quick-view-atc"
                 type="button"
+                disabled={isOutOfStock}
+                style={isOutOfStock ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
                 onClick={() => {
+                  if (isOutOfStock) return;
                   addToCart?.({
                     id: product.id,
                     title: displayTitle,
@@ -312,7 +326,7 @@ function ProductCard({ product, addToCart, autoOpen }) {
                   setIsQuickViewOpen(false);
                 }}
               >
-                Add To Cart
+                {isOutOfStock ? "Out of Stock" : "Add To Cart"}
               </button>
             </div>
           </div>

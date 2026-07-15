@@ -11,6 +11,7 @@ function SuccessContent() {
   useEffect(() => {
     const idFromUrl = searchParams?.get("orderId");
     if (idFromUrl) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOrderId(idFromUrl);
     } else {
       const randomId = Math.floor(Math.random() * 900000) + 100000;

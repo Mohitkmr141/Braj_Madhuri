@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "../components/Checkout.css";
 
 const formatCurrency = (value) =>
@@ -22,8 +22,11 @@ export default function AdminOrdersPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [orders, setOrders] = useState([]);
+  const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("orders");
+  const [updatingStock, setUpdatingStock] = useState(null);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -53,6 +56,56 @@ export default function AdminOrdersPage() {
     }
   };
 
+  const fetchInventory = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/inventory");
+      const data = await res.json();
+      if (data.success) {
+        setInventory(data.products);
+      } else {
+        setError(data.error || "Failed to fetch inventory.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateStock = async (id, newStock) => {
+    const parsedStock = parseInt(newStock, 10);
+    if (isNaN(parsedStock) || parsedStock < 0) return;
+    
+    setUpdatingStock(id);
+    try {
+      const res = await fetch("/api/admin/inventory", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, stock: parsedStock })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setInventory(prev => prev.map(p => p.id === id ? data.product : p));
+      } else {
+        alert("Failed to update stock: " + data.error);
+      }
+    } catch (err) {
+      alert("Error updating stock.");
+    } finally {
+      setUpdatingStock(null);
+    }
+  };
+
+  // Re-fetch when switching tabs
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      if (activeTab === "orders") fetchOrders();
+      else fetchInventory();
+    }
+  }, [activeTab, isAuthenticated]);
+
   if (!isAuthenticated) {
     return (
       <div style={{ minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--cream)" }}>
@@ -81,25 +134,58 @@ export default function AdminOrdersPage() {
     <div style={{ background: "var(--cream)", minHeight: "100vh", padding: "40px 24px", fontFamily: "'Inter', sans-serif" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
         
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "32px" }}>
-          <h1 style={{ fontFamily: "'Playfair Display', serif", color: "var(--maroon)", fontSize: "32px", margin: 0 }}>
-            Orders Dashboard
-          </h1>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: "20px", marginBottom: "32px" }}>
+          <div style={{ flex: "1 1 min-content" }}>
+            <h1 style={{ fontFamily: "'Playfair Display', serif", color: "var(--maroon)", fontSize: "clamp(24px, 5vw, 32px)", margin: 0, lineHeight: 1.2 }}>
+              Admin Dashboard
+            </h1>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginTop: "16px" }}>
+              <button 
+                onClick={() => setActiveTab("orders")}
+                style={{ 
+                  background: activeTab === "orders" ? "var(--maroon)" : "transparent",
+                  color: activeTab === "orders" ? "#fff" : "var(--maroon)",
+                  border: "1px solid var(--maroon)",
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontWeight: "600"
+                }}
+              >
+                Orders
+              </button>
+              <button 
+                onClick={() => setActiveTab("inventory")}
+                style={{ 
+                  background: activeTab === "inventory" ? "var(--maroon)" : "transparent",
+                  color: activeTab === "inventory" ? "#fff" : "var(--maroon)",
+                  border: "1px solid var(--maroon)",
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontWeight: "600"
+                }}
+              >
+                Inventory
+              </button>
+            </div>
+          </div>
           <button onClick={() => { setIsAuthenticated(false); setPassword(""); }} style={{ background: "transparent", border: "1px solid var(--maroon)", color: "var(--maroon)", padding: "8px 16px", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}>
             Logout
           </button>
         </div>
 
         {loading ? (
-          <div style={{ textAlign: "center", padding: "40px" }}>Loading orders...</div>
-        ) : orders.length === 0 ? (
-          <div style={{ background: "#fff", padding: "40px", borderRadius: "12px", textAlign: "center", border: "1px dashed rgba(201, 151, 42, 0.5)" }}>
-            No orders found.
-          </div>
-        ) : (
+          <div style={{ textAlign: "center", padding: "40px" }}>Loading...</div>
+        ) : activeTab === "orders" ? (
+          orders.length === 0 ? (
+            <div style={{ background: "#fff", padding: "40px", borderRadius: "12px", textAlign: "center", border: "1px dashed rgba(201, 151, 42, 0.5)" }}>
+              No orders found.
+            </div>
+          ) : (
           <div style={{ background: "#fff", borderRadius: "12px", boxShadow: "0 12px 32px rgba(0,0,0,0.04)", overflow: "hidden", border: "1px solid rgba(0,0,0,0.05)" }}>
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+            <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", minWidth: "800px" }}>
                 <thead>
                   <tr style={{ background: "var(--surface-warm, #fcfaf5)", borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
                     <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Order ID</th>
@@ -159,6 +245,68 @@ export default function AdminOrdersPage() {
                       </tr>
                     );
                   })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )) : (
+          <div style={{ background: "#fff", borderRadius: "12px", boxShadow: "0 12px 32px rgba(0,0,0,0.04)", overflow: "hidden", border: "1px solid rgba(0,0,0,0.05)" }}>
+            <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", minWidth: "800px" }}>
+                <thead>
+                  <tr style={{ background: "var(--surface-warm, #fcfaf5)", borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
+                    <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Product ID</th>
+                    <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Name</th>
+                    <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Price</th>
+                    <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Current Stock</th>
+                    <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inventory.map((product) => (
+                    <tr key={product.id} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
+                      <td style={{ padding: "16px", fontSize: "13px", color: "#555" }}>
+                        {product.id}
+                      </td>
+                      <td style={{ padding: "16px", fontSize: "14px", fontWeight: "500", color: "var(--maroon)" }}>
+                        {product.title}
+                        {product.size && <span style={{ fontSize: "12px", color: "#666", marginLeft: "8px" }}>({product.size})</span>}
+                      </td>
+                      <td style={{ padding: "16px", fontSize: "14px" }}>
+                        {formatCurrency(product.price)}
+                      </td>
+                      <td style={{ padding: "16px", fontSize: "14px", fontWeight: "600" }}>
+                        <span style={{ color: product.stock > 0 ? '#2e7d32' : '#d32f2f' }}>
+                          {product.stock}
+                        </span>
+                      </td>
+                      <td style={{ padding: "16px" }}>
+                        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                          <input 
+                            type="number" 
+                            defaultValue={product.stock}
+                            min="0"
+                            id={`stock-${product.id}`}
+                            style={{ width: "60px", padding: "4px 8px", border: "1px solid #ddd", borderRadius: "4px" }}
+                          />
+                          <button
+                            disabled={updatingStock === product.id}
+                            onClick={() => {
+                              const input = document.getElementById(`stock-${product.id}`);
+                              handleUpdateStock(product.id, input.value);
+                            }}
+                            style={{ 
+                              background: "var(--maroon)", color: "#fff", border: "none", 
+                              padding: "6px 12px", borderRadius: "4px", cursor: "pointer", fontSize: "12px",
+                              opacity: updatingStock === product.id ? 0.6 : 1
+                            }}
+                          >
+                            {updatingStock === product.id ? "Saving..." : "Update"}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

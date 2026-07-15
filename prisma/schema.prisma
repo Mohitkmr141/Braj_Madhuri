@@ -31,6 +31,7 @@ model Product {
   price         Float?
   originalPrice Float?
   size          String?
+  stock         Int       @default(10)
 
   category      Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 }
