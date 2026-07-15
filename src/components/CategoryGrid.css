@@ -54,7 +54,7 @@
 }
 
 .category-cell:hover {
-  transform: translateY(-8px);
+  transform: translateY(-10px) scale(1.05);
 }
 
 .category-cell--active {
@@ -136,9 +136,9 @@
   box-shadow:
     0 0 0 3px rgba(212, 175, 55, 0.9),
     0 0 0 5.5px rgba(255, 255, 255, 0.95),
-    0 0 0 8px rgba(212, 175, 55, 0.4),
-    0 0 30px 8px rgba(212, 175, 55, 0.35),
-    0 16px 40px rgba(120, 70, 10, 0.25);
+    0 0 0 8px rgba(212, 175, 55, 0.5),
+    0 0 40px 12px rgba(212, 175, 55, 0.45),
+    0 20px 50px rgba(120, 70, 10, 0.35);
 }
 
 .category-cell:hover .category-img-wrapper::before {

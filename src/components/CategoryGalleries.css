@@ -174,9 +174,9 @@
 
 .image-card:hover,
 .image-card:focus-within {
-  border-color: rgba(212, 175, 55, 0.5);
-  box-shadow: 0 24px 48px -12px rgba(74, 21, 33, 0.15), 0 0 0 1px rgba(212, 175, 55, 0.25);
-  transform: translateY(-10px);
+  border-color: rgba(212, 175, 55, 0.6);
+  box-shadow: 0 30px 60px -15px rgba(74, 21, 33, 0.25), 0 0 0 1px rgba(212, 175, 55, 0.35);
+  transform: translateY(-12px) scale(1.02);
 }
 
 .image-card:hover::before,

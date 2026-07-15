@@ -13,6 +13,23 @@ export default function SiteShell({ children }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [cartItems, setCartItems] = useState([]);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    try {
+      const stored = localStorage.getItem("bm_cart_items");
+      if (stored) setCartItems(JSON.parse(stored));
+    } catch (e) {
+      console.error("Failed to load cart", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      localStorage.setItem("bm_cart_items", JSON.stringify(cartItems));
+    }
+  }, [cartItems, isClient]);
 
   const addToCart = useCallback((product) => {
     setCartItems((prev) => {
@@ -47,6 +64,10 @@ export default function SiteShell({ children }) {
     setCartItems((prev) => prev.filter((item) => !(item.id === id && item.size === size)));
   }, []);
 
+  const emptyCart = useCallback(() => {
+    setCartItems([]);
+  }, []);
+
   const cartCount = useMemo(() => cartItems.reduce((acc, item) => acc + item.quantity, 0), [cartItems]);
   const cartTotal = useMemo(() => cartItems.reduce((acc, item) => acc + ((item.price || 250) * item.quantity), 0), [cartItems]);
 
@@ -66,8 +87,9 @@ export default function SiteShell({ children }) {
       addToCart,
       updateQuantity,
       removeFromCart,
+      emptyCart,
     }),
-    [cartItems, cartCount, cartTotal, addToCart, updateQuantity, removeFromCart]
+    [cartItems, cartCount, cartTotal, addToCart, updateQuantity, removeFromCart, emptyCart]
   );
 
   useEffect(() => {

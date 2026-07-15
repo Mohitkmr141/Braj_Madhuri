@@ -143,9 +143,9 @@ export default function CartPage() {
               <span>{formatCurrency(cartTotal)}</span>
             </div>
             
-            <button className="place-order-btn" onClick={() => alert("Checkout flow coming soon!")}>
+            <Link href="/checkout" className="place-order-btn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
               Place Order
-            </button>
+            </Link>
           </div>
           {totalDiscount > 0 && (
             <div className="cart-savings-msg">
