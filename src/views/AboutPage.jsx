@@ -1,7 +1,6 @@
 import React from "react";
 import Image from "next/image";
 import TrustBar from "../components/TrustBar.jsx";
-import Story from "../components/Story.jsx";
 import Reviews from "../components/Reviews.jsx";
 import "./AboutPage.css";
 
@@ -93,7 +92,6 @@ function AboutPage() {
       </section>
 
       <TrustBar />
-      <Story />
       <Reviews />
     </main>
   );
