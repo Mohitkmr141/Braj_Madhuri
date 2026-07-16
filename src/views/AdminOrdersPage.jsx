@@ -92,6 +92,7 @@ export default function AdminOrdersPage() {
         alert("Failed to update stock: " + data.error);
       }
     } catch (err) {
+      console.error(err);
       alert("Error updating stock.");
     } finally {
       setUpdatingStock(null);
@@ -228,7 +229,7 @@ export default function AdminOrdersPage() {
                         <td style={{ padding: "16px", fontSize: "14px", fontWeight: "600", color: "#2e7d32" }}>
                           {formatCurrency(order.totalAmount)}
                           <div style={{ fontSize: "11px", color: "var(--text-muted)", fontWeight: "400", marginTop: "2px" }}>
-                            {order.paymentMethod === 'cod' ? 'COD' : 'Online'}
+                            Online
                           </div>
                         </td>
                         <td style={{ padding: "16px", fontSize: "13px" }}>

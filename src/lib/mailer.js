@@ -36,7 +36,7 @@ export const sendOrderEmail = async (order) => {
         <h3 style="color: #C9972A;">Order Details:</h3>
         <p><strong>Order ID:</strong> ${order.orderNumber}</p>
         <p><strong>Total Amount:</strong> ₹${order.totalAmount}</p>
-        <p><strong>Payment Method:</strong> ${order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online'}</p>
+        <p><strong>Payment Method:</strong> Online</p>
         
         <h3 style="color: #C9972A;">Customer Info:</h3>
         <p><strong>Name:</strong> ${order.customerName}</p>

@@ -28,7 +28,7 @@ export default function CheckoutPage() {
     pincode: "",
   });
   
-  const [paymentMethod, setPaymentMethod] = useState("online");
+  const [paymentMethod] = useState("online");
   const [shippingCost, setShippingCost] = useState(0);
   const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
   const [error, setError] = useState("");
@@ -70,6 +70,7 @@ export default function CheckoutPage() {
         setShippingCost(0);
       }
     } catch (err) {
+      console.error(err);
       setError("An error occurred while calculating shipping.");
       setShippingCost(0);
     } finally {
