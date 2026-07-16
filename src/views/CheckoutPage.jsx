@@ -28,7 +28,9 @@ export default function CheckoutPage() {
     pincode: "",
   });
   
-  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [paymentMethod, setPaymentMethod] = useState("online");
+  const [shippingCost, setShippingCost] = useState(0);
+  const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -40,10 +42,39 @@ export default function CheckoutPage() {
   }, [cartItems]);
 
   const totalDiscount = totalOriginalPrice - cartTotal;
+  const finalTotalAmount = cartTotal + shippingCost;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const calculateShippingRates = async () => {
+    if (!formData.pincode || formData.pincode.length < 6) {
+      setError("Please enter a valid 6-digit Pincode to calculate shipping.");
+      return;
+    }
+    setIsCalculatingShipping(true);
+    setError("");
+    try {
+      const res = await fetch("/api/shipping/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pincode: formData.pincode }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShippingCost(data.shippingCost);
+      } else {
+        setError(data.error || "Failed to calculate shipping.");
+        setShippingCost(0);
+      }
+    } catch (err) {
+      setError("An error occurred while calculating shipping.");
+      setShippingCost(0);
+    } finally {
+      setIsCalculatingShipping(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -66,7 +97,8 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           formData,
           cartItems,
-          cartTotal,
+          cartTotal: finalTotalAmount,
+          shippingCost,
           paymentMethod,
         }),
       });
@@ -158,9 +190,19 @@ export default function CheckoutPage() {
                   <option value="Other">Other</option>
                 </select>
               </div>
-              <div className="form-group">
+              <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>
                 <label htmlFor="pincode">Pincode *</label>
-                <input type="text" id="pincode" name="pincode" value={formData.pincode} onChange={handleInputChange} required />
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <input type="text" id="pincode" name="pincode" value={formData.pincode} onChange={handleInputChange} required style={{ flex: 1 }} />
+                  <button 
+                    type="button" 
+                    onClick={calculateShippingRates} 
+                    disabled={isCalculatingShipping}
+                    style={{ padding: '0 15px', background: 'var(--gold)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    {isCalculatingShipping ? "..." : "Calc Shipping"}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -169,30 +211,16 @@ export default function CheckoutPage() {
           <div className="checkout-section">
             <h2>Payment Method</h2>
             <div className="payment-options">
-              <label className={`payment-option ${paymentMethod === 'cod' ? 'selected' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="paymentMethod" 
-                  value="cod" 
-                  checked={paymentMethod === 'cod'} 
-                  onChange={() => setPaymentMethod('cod')} 
-                />
-                <div>
-                  <span className="payment-option-label">Cash on Delivery (COD)</span>
-                  <span className="payment-option-desc">Pay when your order is delivered to your doorstep.</span>
-                </div>
-              </label>
-              
               <label className={`payment-option ${paymentMethod === 'online' ? 'selected' : ''}`}>
                 <input 
                   type="radio" 
                   name="paymentMethod" 
                   value="online" 
                   checked={paymentMethod === 'online'} 
-                  onChange={() => setPaymentMethod('online')} 
+                  readOnly 
                 />
                 <div>
-                  <span className="payment-option-label">Online Payment (Mock)</span>
+                  <span className="payment-option-label">Online Payment</span>
                   <span className="payment-option-desc">Pay securely using UPI, Credit/Debit Card, or Netbanking.</span>
                 </div>
               </label>
@@ -216,14 +244,14 @@ export default function CheckoutPage() {
               </div>
               <div className="summary-row summary-row--green" style={{ color: '#2e7d32', display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
                 <span>Delivery Charges</span>
-                <span>Free</span>
+                <span>{shippingCost > 0 ? formatCurrency(shippingCost) : 'Free'}</span>
               </div>
               
               <div style={{ height: '1px', background: 'rgba(0,0,0,0.1)', margin: '16px 0' }} />
               
               <div className="summary-total" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '700', fontSize: '18px', color: 'var(--maroon)' }}>
                 <span>Total Amount</span>
-                <span>{formatCurrency(cartTotal)}</span>
+                <span>{formatCurrency(finalTotalAmount)}</span>
               </div>
               
               <button 

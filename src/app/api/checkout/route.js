@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { sendOrderEmail } from '../../../lib/mailer.js';
+import { createShiprocketOrder } from '../../../lib/shiprocket.js';
 
 let prisma;
 function getPrisma() {
@@ -12,7 +13,7 @@ export async function POST(request) {
   const prisma = getPrisma();
   try {
     const body = await request.json();
-    const { formData, cartItems, cartTotal, paymentMethod } = body;
+    const { formData, cartItems, cartTotal, shippingCost, paymentMethod } = body;
 
     const result = await prisma.$transaction(async (tx) => {
       // 1. Check stock for all items
@@ -52,6 +53,7 @@ export async function POST(request) {
           pincode: formData.pincode,
           totalAmount: cartTotal,
           paymentMethod: paymentMethod,
+          shippingCost: shippingCost || 0,
           cartItems: cartItems, // JSON field
         },
       });
@@ -63,6 +65,19 @@ export async function POST(request) {
     sendOrderEmail(result.newOrder).catch((err) => {
       console.error("Failed to send background email:", err);
     });
+
+    // 6. Trigger Shiprocket Order Creation
+    try {
+      const srResult = await createShiprocketOrder(result.newOrder);
+      if (srResult && srResult.order_id) {
+        await prisma.order.update({
+          where: { id: result.newOrder.id },
+          data: { shiprocketOrderId: srResult.order_id }
+        });
+      }
+    } catch (err) {
+      console.error("Failed to create Shiprocket order:", err);
+    }
 
     return NextResponse.json({ success: true, orderNumber: result.orderNumber });
   } catch (error) {

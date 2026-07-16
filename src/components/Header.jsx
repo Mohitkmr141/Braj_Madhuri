@@ -172,49 +172,30 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
         </nav>
       </aside>
 
-      <div className="bm-banner">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={heroBanner.src}
-          alt="The Braj Madhuri"
-          className="bm-banner__img"
-        />
+      {pathname === "/" && (
+        <div className="bm-banner">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroBanner.src}
+            alt="The Braj Madhuri"
+            className="bm-banner__img"
+          />
 
-        <div className="bm-banner__ham">
-          <button
-            type="button"
-            className={`bm-hamburger ${menuOpen ? "open" : ""}`}
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+          <div className="bm-banner__ham">
+            <button
+              type="button"
+              className={`bm-hamburger ${menuOpen ? "open" : ""}`}
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </div>
         </div>
-
-        <div className="bm-banner__cart">
-          <Link
-            href="/cart"
-            className="bm-cart"
-            aria-label={`View collection. Cart has ${cartCount} item${cartCount === 1 ? "" : "s"} worth INR ${cartTotal.toLocaleString("en-IN")}.`}
-          >
-            <span className="bm-cart__icon" aria-hidden="true">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" />
-            </span>
-            <span className="bm-cart__label">
-              {cartCount > 0 ? `INR ${cartTotal.toLocaleString("en-IN")}` : "Cart"}
-            </span>
-            {cartCount > 0 && (
-              <span className="bm-cart__badge">
-                {cartCount > 99 ? "99+" : cartCount}
-              </span>
-            )}
-          </Link>
-        </div>
-      </div>
+      )}
 
       <nav
         className={`bm-nav-bar ${navSticky ? "sticky" : ""}`}
@@ -245,6 +226,27 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
             </svg>
             <span>Search</span>
           </button>
+
+          {/* Cart button */}
+          <Link
+            href="/cart"
+            className="bm-cart"
+            style={{ marginLeft: "16px", marginRight: "16px" }}
+            aria-label={`View collection. Cart has ${cartCount} item${cartCount === 1 ? "" : "s"} worth INR ${cartTotal.toLocaleString("en-IN")}.`}
+          >
+            <span className="bm-cart__icon" aria-hidden="true">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" />
+            </span>
+            <span className="bm-cart__label">
+              {cartCount > 0 ? `INR ${cartTotal.toLocaleString("en-IN")}` : "Cart"}
+            </span>
+            {cartCount > 0 && (
+              <span className="bm-cart__badge">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
+          </Link>
 
           {/* Account button — desktop */}
           {user ? (
@@ -308,6 +310,23 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </button>
+            {/* Cart Mobile */}
+            <Link
+              href="/cart"
+              className="bm-cart"
+              style={{ padding: "4px 8px", minHeight: "auto", marginLeft: "4px", marginRight: "4px" }}
+              aria-label={`Cart has ${cartCount} items`}
+            >
+              <span className="bm-cart__icon" aria-hidden="true">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" style={{ width: "16px", height: "16px" }} />
+              </span>
+              {cartCount > 0 && (
+                <span className="bm-cart__badge" style={{ top: "-5px", right: "-5px", width: "16px", height: "16px", fontSize: "9px" }}>
+                  {cartCount > 99 ? "99+" : cartCount}
+                </span>
+              )}
+            </Link>
             {/* Mobile account */}
             {user ? (
               <button
