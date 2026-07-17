@@ -6,20 +6,20 @@ const PRODUCT_DATA = {
     price: 179,
     originalPrice: 200,
     items: {
-      1774885384670: {
+      "Mogra Agarbatti": {
         title: "Mogra Agarbatti",
         description: "Soft mogra fragrance for peaceful daily pooja.",
       },
-      1774885515568: {
+      "Kesar Chandan Agarbatti": {
         title: "Kesar Chandan Agarbatti",
         description: "Warm kesar and chandan notes for mandir ambience.",
       },
-      1774885796278: {
+      "Lavender Agarbatti": {
         title: "Lavender Agarbatti",
         description:
           "Calming lavender fragrance for meditation and evening aarti.",
       },
-      1774886252840: {
+      "Sandalwood Agarbatti": {
         title: "Sandalwood Agarbatti",
         description: "Classic sandalwood aroma for traditional seva.",
       },
@@ -32,32 +32,32 @@ const PRODUCT_DATA = {
     price: 250,
     originalPrice: 300,
     items: {
-      1774794760226: {
+      "Premium Chandan Tilak": {
         title: "Premium Chandan Tilak",
         description: "Ready-to-apply chandan tilak for daily pooja and seva.",
       },
-      1775053687998: {
+      "Shuddh Chandan Powder": {
         title: "Shuddh Chandan Powder",
         description: "Pure chandan powder for tilak, snan, and devotional use.",
       },
-      1775577458275: {
+      "Thakur Ji Singhasan": {
         title: "Thakur Ji Singhasan",
         description: "Decorative singhasan for Laddu Gopal and Thakur ji seva.",
       },
-      1775577629268: {
+      "Thakur Ji Singhasan": {
         title: "Thakur Ji Singhasan",
         description:
           "Traditional singhasan setup for home mandir presentation.",
       },
-      1775577639100: {
+      "Thakur Ji Singhasan": {
         title: "Thakur Ji Singhasan",
         description: "Elegant singhasan for festive and daily shringar.",
       },
-      1775578182924: {
+      "Thakur Ji Shringar Set": {
         title: "Thakur Ji Shringar Set",
         description: "Coordinated ornaments and accessories for Thakur ji.",
       },
-      1776194201892: {
+      "Pooja Tissue Roll": {
         title: "Pooja Tissue Roll",
         description: "Useful pooja room essential for clean and careful seva.",
       },
@@ -70,34 +70,34 @@ const PRODUCT_DATA = {
     price: 250,
     originalPrice: 300,
     items: {
-      1775071046573: {
+      "Mogra Floral Spray": {
         title: "Mogra Floral Spray",
         description:
           "Fresh mogra fragrance for home, mandir, and altar spaces.",
       },
-      1775071160642: {
+      "Gulab Floral Spray": {
         title: "Gulab Floral Spray",
         description:
           "Rose fragrance for pooja, festivals, and daily freshness.",
       },
-      1775071297000: {
+      "Jasmine Floral Spray": {
         title: "Jasmine Floral Spray",
         description: "Gentle jasmine fragrance with a clean floral finish.",
       },
-      1775071481623: {
+      "Shyam Darbar Floral Spray": {
         title: "Shyam Darbar Floral Spray",
         description: "Temple-inspired fragrance for devotional spaces.",
       },
-      1775071560862: {
+      "Ashtagandh Floral Spray": {
         title: "Ashtagandh Floral Spray",
         description: "Sacred ashtagandh-inspired aroma for pooja ambience.",
       },
-      1775071622285: {
+      "Bela Floral Spray": {
         title: "Bela Floral Spray",
         description:
           "Sweet bela fragrance for calm and refreshing surroundings.",
       },
-      1776147314503: {
+      "Floral Spray Combo": {
         title: "Floral Spray Combo",
         description: "Assorted floral sprays for mandir and home fragrance.",
       },
@@ -110,15 +110,15 @@ const PRODUCT_DATA = {
     price: 180,
     originalPrice: 240,
     items: {
-      1775208737555: {
+      "Hawan Cups Box": {
         title: "Hawan Cups Box",
         description: "Box pack of ready-to-use hawan cups for ritual use.",
       },
-      1775208891851: {
+      "Hawan Cups": {
         title: "Hawan Cups",
         description: "Easy-light hawan cups made for clean devotional rituals.",
       },
-      1775209180740: {
+      "Premium Hawan Cups": {
         title: "Premium Hawan Cups",
         description: "Traditional hawan cups for mandir and home pooja.",
       },
@@ -130,23 +130,23 @@ const PRODUCT_DATA = {
     price: 120,
     originalPrice: 180,
     items: {
-      1774797127114: {
+      "Kesar Chandan Dhoop": {
         title: "Kesar Chandan Dhoop",
         description: "Kesar chandan fragrance for warm, sacred pooja ambience.",
       },
-      1774797573623: {
+      "Gulab Dhoop Sticks": {
         title: "Gulab Dhoop Sticks",
         description: "Rose-scented dhoop sticks for daily mandir fragrance.",
       },
-      1774883666825: {
+      "Mogra Dhoop Sticks": {
         title: "Mogra Dhoop Sticks",
         description: "Mogra fragrance dhoop sticks with a soft floral aroma.",
       },
-      1774884266024: {
+      "Sandalwood Dhoop Sticks": {
         title: "Sandalwood Dhoop Sticks",
         description: "Classic sandalwood fragrance for pooja and meditation.",
       },
-      1774884531210: {
+      "Panchratan Dhoop": {
         title: "Panchratan Dhoop",
         description: "Traditional panchratan dhoop blend for devotional use.",
       },
@@ -170,51 +170,51 @@ const PRODUCT_DATA = {
     price: 249,
     originalPrice: 349,
     items: {
-      1774903070024: {
+      "Shringar Attar Collection": {
         title: "Shringar Attar Collection",
         description: "Assorted devotional attars for Thakur ji shringar.",
       },
-      1774956758812: {
+      "Shyam Ras Attar": {
         title: "Shyam Ras Attar",
         description: "The fragrance of pure bhakti in a compact attar bottle.",
         price: 230,
       },
-      1774956958880: {
+      "Panchamrit Attar": {
         title: "Panchamrit Attar",
         description: "Milk, honey, and rose inspired fragrance loved in seva.",
         price: 230,
       },
-      1774957560959: {
+      "Phool Bangla Attar": {
         title: "Phool Bangla Attar",
         description: "Floral attar inspired by Shri Bankey Bihari Mandir.",
         price: 230,
       },
-      1774957975655: {
+      "Parmanand Attar": {
         title: "Parmanand Attar",
         description: "Sweet devotional attar for Thakur ji shringar.",
         price: 230,
       },
-      1774958380180: {
+      "Chameli Attar": {
         title: "Chameli Attar",
         description: "Jasmine-led attar for soft floral shringar fragrance.",
         price: 230,
       },
-      1774958691018: {
+      "Mogra Attar": {
         title: "Mogra Attar",
         description: "Mogra attar for fresh, traditional devotional fragrance.",
         price: 230,
       },
-      1774959035013: {
+      "Marigold Attar": {
         title: "Marigold Attar",
         description: "Festive floral attar with marigold-inspired notes.",
         price: 230,
       },
-      1774959371786: {
+      "Gulab Attar": {
         title: "Gulab Attar",
         description: "Rose attar for a classic pooja and shringar fragrance.",
         price: 230,
       },
-      1774959860815: {
+      "Divine Attars Combo": {
         title: "Divine Attars Combo",
         description: "Assorted attar set for daily and festive seva.",
         price: 920,
@@ -228,11 +228,11 @@ const PRODUCT_DATA = {
     price: 300,
     originalPrice: 350,
     items: {
-      1774794081487: {
+      "Special Ubtan": {
         title: "Special Ubtan",
         description: "Natural ayurvedic ubtan for Thakur ji snan seva.",
       },
-      1774794181636: {
+      "Special Ubtan": {
         title: "Special Ubtan",
         description: "Herbal ubtan blend for devotional bathing rituals.",
       },
@@ -244,43 +244,43 @@ const PRODUCT_DATA = {
     price: 250,
     originalPrice: 300,
     items: {
-      1774901988443: {
+      "Divine Attar Lineup": {
         title: "Divine Attar Lineup",
         description:
           "Assorted attars for seva, gifting, and personal devotion.",
         price: 230,
       },
-      1774902605954: {
+      "Vrindavan Attar Collection": {
         title: "Vrindavan Attar Collection",
         description: "Temple-inspired attar set with floral devotional notes.",
         price: 230,
       },
-      1774956293033: {
+      "Divine Attar Collection": {
         title: "Divine Attar Collection",
         description: "Assorted devotional attars in compact roll-on bottles.",
         price: 230,
       },
-      1774960850189: {
+      "Brij Raj Attar Collection": {
         title: "Brij Raj Attar Collection",
         description: "Warm, earthy attar collection inspired by Braj.",
         price: 230,
       },
-      1775153838526: {
+      "Hit Harivansh Perfume Set": {
         title: "Hit Harivansh Perfume Set",
         description: "Floral musk amber perfumes for lasting fragrance.",
         price: 250,
       },
-      1775159225477: {
+      "Divine Perfume Set": {
         title: "Divine Perfume Set",
         description: "Assorted premium perfume sprays for devotional use.",
         price: 300,
       },
-      1775159443917: {
+      "Attar and Perfume Collection": {
         title: "Attar and Perfume Collection",
         description: "Mixed fragrance range with attars and spray perfumes.",
         price: 250,
       },
-      1775191774292: {
+      "Mandir Perfume Collection": {
         title: "Mandir Perfume Collection",
         description: "Spray perfume collection inspired by temple florals.",
         price: 300,
@@ -396,44 +396,44 @@ const PRODUCT_DATA = {
     originalPrice: 350,
     sizes: ["10ml", "25ml", "50ml"],
     items: {
-      1783758499389: {
+      "Vastra Itra — Mogra": {
         title: "Vastra Itra — Mogra",
         description: "Mogra-based vastra itra for a soft floral fragrance on Thakur ji poshak.",
         price: 249,
       },
-      1783758838378: {
+      "Vastra Itra — Gulab": {
         title: "Vastra Itra — Gulab",
         description: "Rose-based vastra itra for a classic devotional fragrance on vastra.",
         price: 249,
       },
-      1783759305700: {
+      "Vastra Itra — Kesar": {
         title: "Vastra Itra — Kesar",
         description: "Saffron-infused vastra itra for a warm, royal fragrance.",
         price: 299,
         originalPrice: 380,
       },
-      1783759439356: {
+      "Vastra Itra — Chandan": {
         title: "Vastra Itra — Chandan",
         description: "Sandalwood vastra itra — sacred and long-lasting.",
         price: 299,
         originalPrice: 380,
       },
-      1783759620154: {
+      "Vastra Itra — Kevda": {
         title: "Vastra Itra — Kevda",
         description: "Kevda-based vastra itra with a light, summery fragrance.",
         price: 249,
       },
-      1783760841515: {
+      "Vastra Itra — Khus": {
         title: "Vastra Itra — Khus",
         description: "Cooling khus vastra itra perfect for summer seva.",
         price: 249,
       },
-      1783761608897: {
+      "Vastra Itra — Motiya": {
         title: "Vastra Itra — Motiya",
         description: "Delicate motiya vastra itra for fresh, gentle fragrance on poshak.",
         price: 249,
       },
-      1783761931738: {
+      "Vastra Itra — Combo Set": {
         title: "Vastra Itra — Combo Set",
         description: "Assorted vastra itra collection for all-season fragrance.",
         price: 599,
