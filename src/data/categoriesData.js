@@ -149,17 +149,10 @@ const CATEGORIES = [
     "label": "Spritual Accessories",
     "emoji": "🏛️",
     "folderKeys": [
-      "Spritual Accessories",
-      "Spritual Accessories/Key Chain"
+      "Spritual Accessories"
     ],
-    "subcategoryFolderMap": {
-      "Key Chain": [
-        "Spritual Accessories/Key Chain"
-      ]
-    },
-    "subcategories": [
-      "Key Chain"
-    ]
+    "subcategoryFolderMap": {},
+    "subcategories": []
   },
   {
     "id": "tulsi-kanthi-mala",
