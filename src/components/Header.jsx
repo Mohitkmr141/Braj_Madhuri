@@ -172,9 +172,6 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
         </nav>
       </aside>
 
-      <div className="announcement">
-        <span>Notice:</span> Please review our <Link href="/shipping-policy" style={{ color: "var(--white)", textDecoration: "underline" }}>Shipping Policy</Link> and <Link href="/return-and-refund-policy" style={{ color: "var(--white)", textDecoration: "underline" }}>Return & Refund Policy</Link>.
-      </div>
 
       {pathname === "/" && (
         <div className="bm-banner">
@@ -234,17 +231,18 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
           {/* Cart button */}
           <Link
             href="/cart"
-            className="bm-cart"
-            style={{ marginLeft: "16px", marginRight: "16px" }}
+            style={{ position: 'relative', display: 'inline-block', marginLeft: "16px", marginRight: "16px" }}
             aria-label={`View collection. Cart has ${cartCount} item${cartCount === 1 ? "" : "s"} worth INR ${cartTotal.toLocaleString("en-IN")}.`}
           >
-            <span className="bm-cart__icon" aria-hidden="true">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" />
-            </span>
-            <span className="bm-cart__label">
-              {cartCount > 0 ? `INR ${cartTotal.toLocaleString("en-IN")}` : "Cart"}
-            </span>
+            <div className="bm-cart">
+              <span className="bm-cart__icon" aria-hidden="true">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" />
+              </span>
+              <span className="bm-cart__label">
+                {cartCount > 0 ? `INR ${cartTotal.toLocaleString("en-IN")}` : "Cart"}
+              </span>
+            </div>
             {cartCount > 0 && (
               <span className="bm-cart__badge">
                 {cartCount > 99 ? "99+" : cartCount}
@@ -317,14 +315,15 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
             {/* Cart Mobile */}
             <Link
               href="/cart"
-              className="bm-cart"
-              style={{ padding: "4px 8px", minHeight: "auto", marginLeft: "4px", marginRight: "4px" }}
+              style={{ position: 'relative', display: 'inline-block', marginLeft: "4px", marginRight: "4px" }}
               aria-label={`Cart has ${cartCount} items`}
             >
-              <span className="bm-cart__icon" aria-hidden="true">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" style={{ width: "16px", height: "16px" }} />
-              </span>
+              <div className="bm-cart" style={{ padding: "4px 8px", minHeight: "auto" }}>
+                <span className="bm-cart__icon" aria-hidden="true">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" style={{ width: "16px", height: "16px" }} />
+                </span>
+              </div>
               {cartCount > 0 && (
                 <span className="bm-cart__badge" style={{ top: "-5px", right: "-5px", width: "16px", height: "16px", fontSize: "9px" }}>
                   {cartCount > 99 ? "99+" : cartCount}

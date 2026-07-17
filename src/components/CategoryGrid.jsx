@@ -80,7 +80,7 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
                     />
                   ) : (
                     <span className="category-emoji-fallback" aria-hidden="true">
-                      {cat.emoji}
+                      
                     </span>
                   )}
 
@@ -97,7 +97,6 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
 
                 {/* Label below circle */}
                 <p className="category-name">
-                  <span className="category-emoji" aria-hidden="true">{cat.emoji}</span>
                   {cat.label}
                 </p>
               </button>

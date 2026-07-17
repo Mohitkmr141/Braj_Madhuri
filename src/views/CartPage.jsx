@@ -131,9 +131,9 @@ export default function CartPage() {
               <span>Discount</span>
               <span>− {formatCurrency(totalDiscount)}</span>
             </div>
-            <div className="summary-row summary-row--green">
+            <div className="summary-row" style={{ fontSize: '14px' }}>
               <span>Delivery Charges</span>
-              <span>Free</span>
+              <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Calculated at checkout</span>
             </div>
             
             <div className="summary-divider" />

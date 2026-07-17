@@ -341,9 +341,9 @@ export default function CheckoutPage() {
                 <span>Discount</span>
                 <span>− {formatCurrency(totalDiscount)}</span>
               </div>
-              <div className="summary-row summary-row--green" style={{ color: '#2e7d32', display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
+              <div className="summary-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
                 <span>Delivery Charges</span>
-                <span>{shippingCost > 0 ? formatCurrency(shippingCost) : 'Free'}</span>
+                <span>{shippingCost > 0 ? formatCurrency(shippingCost) : <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '14px' }}>Enter pincode to calculate</span>}</span>
               </div>
               
               <div style={{ height: '1px', background: 'rgba(0,0,0,0.1)', margin: '16px 0' }} />
