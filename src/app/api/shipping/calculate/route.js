@@ -1,4 +1,4 @@
-import { calculateShipping } from "@/lib/shiprocket";
+import { calculateShipping } from "../../../../lib/shiprocket";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
