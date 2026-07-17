@@ -64,7 +64,7 @@ function ReturnRefundPolicyPage() {
           <h3>Refund Processing</h3>
           <ul>
             <li>Approved refunds will be processed within 7–10 business days.</li>
-            <li>The time taken for the refund to reflect in the customer's account may vary depending on the payment provider or bank.</li>
+            <li>The time taken for the refund to reflect in the customer&apos;s account may vary depending on the payment provider or bank.</li>
           </ul>
 
           <h3>Shipping Charges</h3>

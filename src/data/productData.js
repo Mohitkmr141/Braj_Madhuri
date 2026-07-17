@@ -44,12 +44,12 @@ const PRODUCT_DATA = {
         title: "Thakur Ji Singhasan",
         description: "Decorative singhasan for Laddu Gopal and Thakur ji seva.",
       },
-      "Thakur Ji Singhasan": {
+      "Thakur Ji Singhasan 2": {
         title: "Thakur Ji Singhasan",
         description:
           "Traditional singhasan setup for home mandir presentation.",
       },
-      "Thakur Ji Singhasan": {
+      "Thakur Ji Singhasan 3": {
         title: "Thakur Ji Singhasan",
         description: "Elegant singhasan for festive and daily shringar.",
       },
@@ -232,7 +232,7 @@ const PRODUCT_DATA = {
         title: "Special Ubtan",
         description: "Natural ayurvedic ubtan for Thakur ji snan seva.",
       },
-      "Special Ubtan": {
+      "Special Ubtan 2": {
         title: "Special Ubtan",
         description: "Herbal ubtan blend for devotional bathing rituals.",
       },

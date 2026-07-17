@@ -18,6 +18,11 @@ const formatDate = (isoString) => {
   }).format(date);
 };
 
+// Open external URL (e.g. PDF)
+const openPdf = (url) => {
+  if (url) window.open(url, "_blank");
+};
+
 export default function AdminOrdersPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
@@ -27,6 +32,37 @@ export default function AdminOrdersPage() {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("orders");
   const [updatingStock, setUpdatingStock] = useState(null);
+  const [actionLoading, setActionLoading] = useState(null);
+
+  const handleShiprocketAction = async (orderId, actionName) => {
+    setActionLoading(`${orderId}-${actionName}`);
+    try {
+      const res = await fetch("/api/admin/shiprocket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: actionName, orderId })
+      });
+      const data = await res.json();
+      
+      if (!data.success) {
+        alert(`Failed: ${data.error}`);
+      } else {
+        alert("Action successful!");
+        
+        // Handle PDF responses
+        if (data.data?.manifest_url) openPdf(data.data.manifest_url);
+        if (data.data?.label_url) openPdf(data.data.label_url);
+        if (data.data?.invoice_url) openPdf(data.data.invoice_url);
+        
+        // Refresh orders to get updated AWB if applicable
+        fetchOrders();
+      }
+    } catch (err) {
+      alert("Network error processing Shiprocket action.");
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -196,6 +232,7 @@ export default function AdminOrdersPage() {
                     <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Items</th>
                     <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Total</th>
                     <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Status</th>
+                    <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Shiprocket</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -242,6 +279,41 @@ export default function AdminOrdersPage() {
                           }}>
                             {order.status}
                           </span>
+                        </td>
+                        <td style={{ padding: "16px", fontSize: "12px" }}>
+                          {!order.shiprocketOrderId ? (
+                            <div style={{ color: "var(--text-muted)", fontStyle: "italic" }}>Not Synced</div>
+                          ) : (
+                            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                              {order.awbCode && (
+                                <div style={{ background: "#e3f2fd", color: "#1565c0", padding: "4px 8px", borderRadius: "4px", fontWeight: "600", marginBottom: "4px", fontSize: "11px" }}>
+                                  AWB: {order.awbCode}
+                                </div>
+                              )}
+                              <select 
+                                onChange={(e) => {
+                                  if (e.target.value) {
+                                    handleShiprocketAction(order.id, e.target.value);
+                                    e.target.value = "";
+                                  }
+                                }}
+                                disabled={!!actionLoading}
+                                style={{ padding: "6px", borderRadius: "4px", border: "1px solid #ddd", background: "#f9f9f9", cursor: "pointer", fontSize: "12px" }}
+                              >
+                                <option value="">Select Action...</option>
+                                <option value="generate_awb">Generate AWB</option>
+                                <option value="generate_pickup">Request Pickup</option>
+                                <option value="generate_label">Download Label</option>
+                                <option value="print_invoice">Download Invoice</option>
+                                <option value="generate_manifest">Generate Manifest</option>
+                                <option value="print_manifest">Download Manifest</option>
+                                {order.awbCode && <option value="track_awb">Track AWB</option>}
+                              </select>
+                              {actionLoading && actionLoading.startsWith(order.id) && (
+                                <div style={{ color: "var(--maroon)", fontSize: "11px" }}>Processing...</div>
+                              )}
+                            </div>
+                          )}
                         </td>
                       </tr>
                     );

@@ -29,46 +29,49 @@ export async function getShiprocketToken() {
 }
 
 /**
- * Calls the Shiprocket Courier Serviceability API to fetch live rates.
- * @param {string} deliveryPincode - The customer's pincode
- * @param {number} weight - Weight of the package in kg (default 0.5)
- * @param {number} cod - 1 for COD, 0 for prepaid. (Default 0 since we only accept online payments)
+ * Helper to make API calls to Shiprocket with auth
  */
-export async function calculateShipping(deliveryPincode, weight = 0.5, cod = 0) {
+async function shiprocketRequest(endpoint, method = "GET", body = null) {
   const token = await getShiprocketToken();
-  const pickupPincode = process.env.SHIPROCKET_PICKUP_PINCODE || "281121"; // Default to Vrindavan if not set
-
-  const url = new URL(`${SHIPROCKET_BASE_URL}/courier/serviceability/`);
-  url.searchParams.append("pickup_postcode", pickupPincode);
-  url.searchParams.append("delivery_postcode", deliveryPincode);
-  url.searchParams.append("weight", weight);
-  url.searchParams.append("cod", cod);
-
-  const response = await fetch(url, {
-    method: "GET",
+  const options = {
+    method,
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`Failed to calculate shipping rates: ${errorData.message || response.statusText}`);
+  };
+  if (body) {
+    options.body = JSON.stringify(body);
   }
 
-  const data = await response.json();
+  const response = await fetch(`${SHIPROCKET_BASE_URL}${endpoint}`, options);
+  
+  if (!response.ok) {
+    let errorMessage = response.statusText;
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.message || errorData.error || response.statusText;
+    } catch(e) {}
+    throw new Error(`Shiprocket API Error (${endpoint}): ${errorMessage}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Calls the Shiprocket Courier Serviceability API to fetch live rates.
+ */
+export async function calculateShipping(deliveryPincode, weight = 0.5, cod = 0) {
+  const pickupPincode = process.env.SHIPROCKET_PICKUP_PINCODE || "281121"; // Default to Vrindavan if not set
+  const endpoint = `/courier/serviceability/?pickup_postcode=${pickupPincode}&delivery_postcode=${deliveryPincode}&weight=${weight}&cod=${cod}`;
+  const data = await shiprocketRequest(endpoint);
   return data.data; // This contains the recommended_courier_company_id and available_courier_companies
 }
 
 /**
  * Maps your website's order data and sends it to Shiprocket API.
- * @param {object} order - The order object from your database/checkout
  */
 export async function createShiprocketOrder(order) {
-  const token = await getShiprocketToken();
-
-  // Map order items to Shiprocket format
   const orderItems = order.cartItems.map((item) => ({
     name: item.title,
     sku: item.id || "SKU-UNKNOWN",
@@ -81,8 +84,8 @@ export async function createShiprocketOrder(order) {
 
   const shiprocketOrderData = {
     order_id: order.orderNumber,
-    order_date: new Date().toISOString().split("T")[0], // YYYY-MM-DD
-    pickup_location: "Primary", // You may need to change this to your actual Shiprocket pickup location name
+    order_date: new Date().toISOString().split("T")[0],
+    pickup_location: "Primary",
     billing_customer_name: order.customerName,
     billing_last_name: "",
     billing_address: order.address,
@@ -92,34 +95,80 @@ export async function createShiprocketOrder(order) {
     billing_country: "India",
     billing_email: order.email,
     billing_phone: order.phone,
-    shipping_is_billing: true, // Assuming shipping address is same as billing
+    shipping_is_billing: true,
     order_items: orderItems,
-    payment_method: "Prepaid", // We only accept online payments
+    payment_method: "Prepaid",
     shipping_charges: order.shippingCost || 0,
     giftwrap_charges: 0,
     transaction_charges: 0,
     total_discount: 0,
     sub_total: order.totalAmount,
-    length: 10, // Default dimensions in cm
+    length: 10,
     breadth: 10,
     height: 10,
-    weight: 0.5, // Default weight in kg
+    weight: 0.5,
   };
 
-  const response = await fetch(`${SHIPROCKET_BASE_URL}/orders/create/ad-hoc`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(shiprocketOrderData),
+  return shiprocketRequest("/orders/create/adhoc", "POST", shiprocketOrderData);
+}
+
+/**
+ * Generate AWB for a shipment
+ */
+export async function generateAWB(shipmentId) {
+  return shiprocketRequest("/courier/assign/awb", "POST", {
+    shipment_id: shipmentId,
   });
+}
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`Failed to create Shiprocket order: ${errorData.message || response.statusText}`);
-  }
+/**
+ * Generate Pickup for a shipment
+ */
+export async function generatePickup(shipmentId) {
+  return shiprocketRequest("/courier/generate/pickup", "POST", {
+    shipment_id: [shipmentId],
+  });
+}
 
-  const data = await response.json();
-  return data; // Contains order_id, shipment_id, status
+/**
+ * Generate Manifest
+ */
+export async function generateManifest(shipmentId) {
+  return shiprocketRequest("/manifests/generate", "POST", {
+    shipment_id: [shipmentId],
+  });
+}
+
+/**
+ * Print Manifest
+ */
+export async function printManifest(shipmentId) {
+  return shiprocketRequest("/manifests/print", "POST", {
+    shipment_ids: [shipmentId],
+  });
+}
+
+/**
+ * Generate Label
+ */
+export async function generateLabel(shipmentId) {
+  return shiprocketRequest("/courier/generate/label", "POST", {
+    shipment_id: [shipmentId],
+  });
+}
+
+/**
+ * Print Invoice
+ */
+export async function printInvoice(orderIds) {
+  return shiprocketRequest("/orders/print/invoice", "POST", {
+    ids: orderIds,
+  });
+}
+
+/**
+ * Track AWB
+ */
+export async function trackAWB(awbCode) {
+  return shiprocketRequest(`/courier/track/awb/${awbCode}`, "GET");
 }

@@ -89,7 +89,10 @@ export async function POST(request) {
       if (srResult && srResult.order_id) {
         await prisma.order.update({
           where: { id: result.newOrder.id },
-          data: { shiprocketOrderId: srResult.order_id }
+          data: { 
+            shiprocketOrderId: srResult.order_id,
+            shiprocketShipmentId: srResult.shipment_id 
+          }
         });
       }
     } catch (err) {
