@@ -78,6 +78,16 @@ export default function CheckoutPage() {
     }
   };
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -91,29 +101,86 @@ export default function CheckoutPage() {
     
     setIsSubmitting(true);
     
+    const res = await loadRazorpayScript();
+    if (!res) {
+      setError("Razorpay SDK failed to load. Are you online?");
+      setIsSubmitting(false);
+      return;
+    }
+    
     try {
-      const response = await fetch("/api/checkout", {
+      const orderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          formData,
-          cartItems,
-          cartTotal: finalTotalAmount,
-          shippingCost,
-          paymentMethod,
-        }),
+        body: JSON.stringify({ amount: finalTotalAmount }),
       });
-
-      const data = await response.json();
-
-      if (data.success) {
-        emptyCart();
-        // Pass the generated order number to the success page via query params
-        router.push(`/success?orderId=${data.orderNumber}`);
-      } else {
-        setError(data.error || "Failed to process order. Please try again.");
+      const orderData = await orderRes.json();
+      
+      if (!orderData.success) {
+        setError(orderData.error || "Failed to create order.");
         setIsSubmitting(false);
+        return;
       }
+      
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: "The Braj Madhuri",
+        description: "Online Payment",
+        order_id: orderData.order.id,
+        handler: async function (response) {
+          try {
+            const verifyRes = await fetch("/api/checkout", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                formData,
+                cartItems,
+                cartTotal: finalTotalAmount,
+                shippingCost,
+                paymentMethod,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+            const data = await verifyRes.json();
+            if (data.success) {
+              emptyCart();
+              router.push(`/success?orderId=${data.orderNumber}`);
+            } else {
+              setError(data.error || "Payment verification failed.");
+              setIsSubmitting(false);
+            }
+          } catch (err) {
+            console.error(err);
+            setError("An unexpected error occurred during verification.");
+            setIsSubmitting(false);
+          }
+        },
+        prefill: {
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: {
+          color: "#c9972a", 
+        },
+        modal: {
+          ondismiss: function () {
+            setIsSubmitting(false);
+          }
+        }
+      };
+      
+      const rzp1 = new window.Razorpay(options);
+      rzp1.on('payment.failed', function (response){
+        setError(`Payment Failed: ${response.error.description}`);
+        setIsSubmitting(false);
+      });
+      rzp1.open();
+      
     } catch (err) {
       console.error(err);
       setError("An unexpected error occurred. Please try again.");

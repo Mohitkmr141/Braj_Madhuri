@@ -172,6 +172,10 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
         </nav>
       </aside>
 
+      <div className="announcement">
+        <span>Notice:</span> Please review our <Link href="/shipping-policy" style={{ color: "var(--white)", textDecoration: "underline" }}>Shipping Policy</Link> and <Link href="/return-and-refund-policy" style={{ color: "var(--white)", textDecoration: "underline" }}>Return & Refund Policy</Link>.
+      </div>
+
       {pathname === "/" && (
         <div className="bm-banner">
           {/* eslint-disable-next-line @next/next/no-img-element */}

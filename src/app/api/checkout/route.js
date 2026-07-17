@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { sendOrderEmail } from '../../../lib/mailer.js';
 import { createShiprocketOrder } from '../../../lib/shiprocket.js';
+import crypto from 'crypto';
 
 let prisma;
 function getPrisma() {
@@ -13,7 +14,23 @@ export async function POST(request) {
   const prisma = getPrisma();
   try {
     const body = await request.json();
-    const { formData, cartItems, cartTotal, shippingCost, paymentMethod } = body;
+    const { formData, cartItems, cartTotal, shippingCost, paymentMethod, razorpay_payment_id, razorpay_order_id, razorpay_signature } = body;
+
+    // Verify Razorpay signature if online payment
+    if (paymentMethod === 'online') {
+      if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+        return NextResponse.json({ success: false, error: 'Missing payment details' }, { status: 400 });
+      }
+      const bodyToSign = razorpay_order_id + "|" + razorpay_payment_id;
+      const expectedSignature = crypto
+        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .update(bodyToSign.toString())
+        .digest('hex');
+
+      if (expectedSignature !== razorpay_signature) {
+        return NextResponse.json({ success: false, error: 'Invalid payment signature' }, { status: 400 });
+      }
+    }
 
     const result = await prisma.$transaction(async (tx) => {
       // 1. Check stock for all items
