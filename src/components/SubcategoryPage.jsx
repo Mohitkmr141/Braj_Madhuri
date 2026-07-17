@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import "./SubcategoryPage.css";
 import CATEGORIES from "../data/categoriesData.js";
+import { useWishlist } from "../context/WishlistContext.jsx";
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 
@@ -47,6 +48,9 @@ function ProductDetailCard({ product, addToCart }) {
   const [flashing, flash] = useCartFlash();
   const [isZoomed, setIsZoomed] = useState(false);
   const [selectedColor, setSelectedColor] = useState("Pink");
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+
+  const isFav = isInWishlist(product.id, selectedSize);
 
   const discount =
     product.originalPrice && product.price
@@ -66,6 +70,23 @@ function ProductDetailCard({ product, addToCart }) {
     flash("btn");
   };
 
+  const handleToggleWishlist = (e) => {
+    e.stopPropagation();
+    if (isFav) {
+      removeFromWishlist(product.id, selectedSize);
+    } else {
+      addToWishlist({
+        id: product.id,
+        title: product.title || product.folderName,
+        image: product.imageUrl,
+        price: product.price ?? 250,
+        originalPrice: product.originalPrice,
+        size: selectedSize,
+        color: (product.title || product.folderName) === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" ? selectedColor : undefined
+      });
+    }
+  };
+
   const displayTitle = product.title || product.folderName;
 
   return (
@@ -79,6 +100,15 @@ function ProductDetailCard({ product, addToCart }) {
           sizes="(max-width: 700px) 100vw, 340px"
           style={{ objectFit: "cover" }}
         />
+        <button 
+          className={`wishlist-toggle-btn ${isFav ? 'active' : ''}`}
+          onClick={handleToggleWishlist}
+          aria-label={isFav ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <svg viewBox="0 0 24 24" fill={isFav ? "var(--maroon)" : "none"} stroke={isFav ? "var(--maroon)" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
       </div>
 
       {isZoomed && typeof document !== "undefined" && createPortal(
@@ -160,16 +190,34 @@ function ProductDetailCard({ product, addToCart }) {
                 </div>
               )}
 
-              <button
-                className="add-cart-btn gallery-cart-btn quick-view-atc"
-                type="button"
-                onClick={() => {
-                  handleAddToCart();
-                  setIsZoomed(false);
-                }}
-              >
-                Add To Cart
-              </button>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  className="add-cart-btn gallery-cart-btn quick-view-atc"
+                  type="button"
+                  onClick={() => {
+                    handleAddToCart();
+                    setIsZoomed(false);
+                  }}
+                  style={{ flex: 1 }}
+                >
+                  Add To Cart
+                </button>
+                <button 
+                  className={`wishlist-quick-btn ${isFav ? 'active' : ''}`}
+                  onClick={handleToggleWishlist}
+                  aria-label={isFav ? "Remove from wishlist" : "Add to wishlist"}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: '46px', borderRadius: '4px', border: `1px solid ${isFav ? 'var(--maroon)' : '#ccc'}`,
+                    background: isFav ? 'var(--maroon)' : '#fff', cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" fill={isFav ? "#fff" : "none"} stroke={isFav ? "#fff" : "#333"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>,

@@ -1,0 +1,220 @@
+/* ──────────────────────────────────────────────────────────────────────────
+   WishlistPage.css  –  Styles for the user's Wishlist (Favourites)
+   ────────────────────────────────────────────────────────────────────────── */
+
+.wishlist-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 24px;
+  min-height: 70vh;
+  font-family: var(--font-body);
+}
+
+.wishlist-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.wishlist-header h1 {
+  font-family: var(--font-display);
+  font-size: 36px;
+  color: var(--maroon);
+  margin-bottom: 8px;
+}
+
+.wishlist-header p {
+  color: #666;
+  font-size: 16px;
+}
+
+/* Empty State */
+.wishlist-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.wishlist-empty-icon {
+  width: 80px;
+  height: 80px;
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.wishlist-empty-state h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.wishlist-empty-state p {
+  color: #777;
+  margin-bottom: 30px;
+  max-width: 400px;
+}
+
+.wishlist-shop-btn {
+  background: var(--maroon);
+  color: #fff;
+  padding: 12px 30px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.wishlist-shop-btn:hover {
+  background: #541624;
+  transform: translateY(-2px);
+}
+
+/* Wishlist Grid */
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.wishlist-card {
+  position: relative;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.wishlist-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.wishlist-remove-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  color: #666;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.wishlist-remove-btn:hover {
+  background: #fff;
+  color: #e74c3c;
+  transform: scale(1.1);
+}
+
+.wishlist-img-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.1;
+  background: #f9f9f9;
+}
+
+.wishlist-info {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.wishlist-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wishlist-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--maroon);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wishlist-original-price {
+  font-size: 14px;
+  font-weight: 400;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.wishlist-meta {
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 4px;
+}
+
+.wishlist-move-to-cart-btn {
+  margin-top: auto;
+  padding: 12px;
+  background: #fff;
+  color: var(--maroon);
+  border: 1px solid var(--maroon);
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.wishlist-move-to-cart-btn:hover {
+  background: var(--maroon);
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .wishlist-wrapper {
+    padding: 40px 16px;
+  }
+  
+  .wishlist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+  }
+  
+  .wishlist-title {
+    font-size: 14px;
+  }
+  
+  .wishlist-price {
+    font-size: 16px;
+  }
+  
+  .wishlist-move-to-cart-btn {
+    font-size: 12px;
+    padding: 8px;
+  }
+  
+  .wishlist-remove-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 18px;
+  }
+}

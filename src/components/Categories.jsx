@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import "./CategoryGalleries.css";
 import CATEGORIES from "../data/categoriesData.js";
+import { useWishlist } from "../context/WishlistContext.jsx";
 
 const formatFolderName = (name) => {
   const parts = name.split("/");
@@ -190,6 +191,9 @@ export default function CategoryGalleries({
 function ProductCard({ product, addToCart, autoOpen }) {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(autoOpen || false);
   const [selectedColor, setSelectedColor] = useState("Pink");
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+
+  const isFav = isInWishlist(product?.id, product?.size);
 
   // If the autoOpen prop changes (e.g. user navigates), update the state
   useEffect(() => {
@@ -210,6 +214,23 @@ function ProductCard({ product, addToCart, autoOpen }) {
   const displayDesc = product.description || product.categoryDesc || formatFolderName(product.folderName);
   const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0;
 
+  const handleToggleWishlist = (e) => {
+    e.stopPropagation();
+    if (isFav) {
+      removeFromWishlist(product.id, product.size);
+    } else {
+      addToWishlist({
+        id: product.id,
+        title: displayTitle,
+        image: product.imageUrl,
+        price: product.price ?? 250,
+        originalPrice: product.originalPrice,
+        size: product.size,
+        color: displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" ? selectedColor : undefined
+      });
+    }
+  };
+
   return (
     <article className="image-card reveal" onClick={() => setIsQuickViewOpen(true)} style={{ cursor: 'pointer' }}>
       <div className="image-card-img-wrapper">
@@ -227,7 +248,15 @@ function ProductCard({ product, addToCart, autoOpen }) {
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           style={{ objectFit: "cover" }}
         />
-
+        <button 
+          className={`wishlist-toggle-btn ${isFav ? 'active' : ''}`}
+          onClick={handleToggleWishlist}
+          aria-label={isFav ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <svg viewBox="0 0 24 24" fill={isFav ? "var(--maroon)" : "none"} stroke={isFav ? "var(--maroon)" : "currentColor"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
       </div>
 
       <div className="image-card-info">
@@ -326,27 +355,44 @@ function ProductCard({ product, addToCart, autoOpen }) {
                 </div>
               )}
 
-              <button
-                className="add-cart-btn gallery-cart-btn quick-view-atc"
-                type="button"
-                disabled={isOutOfStock}
-                style={isOutOfStock ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
-                onClick={() => {
-                  if (isOutOfStock) return;
-                  addToCart?.({
-                    id: product.id,
-                    title: displayTitle,
-                    image: product.imageUrl,
-                    price: product.price ?? 250,
-                    originalPrice: product.originalPrice,
-                    size: product.size,
-                    color: displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" ? selectedColor : undefined
-                  });
-                  setIsQuickViewOpen(false);
-                }}
-              >
-                {isOutOfStock ? "Out of Stock" : "Add To Cart"}
-              </button>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  className="add-cart-btn gallery-cart-btn quick-view-atc"
+                  type="button"
+                  disabled={isOutOfStock}
+                  style={isOutOfStock ? { opacity: 0.6, cursor: 'not-allowed', flex: 1 } : { flex: 1 }}
+                  onClick={() => {
+                    if (isOutOfStock) return;
+                    addToCart?.({
+                      id: product.id,
+                      title: displayTitle,
+                      image: product.imageUrl,
+                      price: product.price ?? 250,
+                      originalPrice: product.originalPrice,
+                      size: product.size,
+                      color: displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" ? selectedColor : undefined
+                    });
+                    setIsQuickViewOpen(false);
+                  }}
+                >
+                  {isOutOfStock ? "Out of Stock" : "Add To Cart"}
+                </button>
+                <button 
+                  className={`wishlist-quick-btn ${isFav ? 'active' : ''}`}
+                  onClick={handleToggleWishlist}
+                  aria-label={isFav ? "Remove from wishlist" : "Add to wishlist"}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: '46px', borderRadius: '4px', border: `1px solid ${isFav ? 'var(--maroon)' : '#ccc'}`,
+                    background: isFav ? 'var(--maroon)' : '#fff', cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" fill={isFav ? "#fff" : "none"} stroke={isFav ? "#fff" : "#333"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>,

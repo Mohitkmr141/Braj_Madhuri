@@ -7,11 +7,13 @@ import Footer from "../components/Footer.jsx";
 import FloatingCart from "../components/FloatingCart.jsx";
 import { CartProvider } from "../context/CartContext.jsx";
 import { AuthProvider } from "../context/AuthContext.jsx";
+import { WishlistProvider } from "../context/WishlistContext.jsx";
 
 export default function SiteShell({ children }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [cartItems, setCartItems] = useState([]);
+  const [wishlistItems, setWishlistItems] = useState([]);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -20,16 +22,20 @@ export default function SiteShell({ children }) {
     try {
       const stored = localStorage.getItem("bm_cart_items");
       if (stored) setCartItems(JSON.parse(stored));
+      
+      const storedWishlist = localStorage.getItem("bm_wishlist_items");
+      if (storedWishlist) setWishlistItems(JSON.parse(storedWishlist));
     } catch (e) {
-      console.error("Failed to load cart", e);
+      console.error("Failed to load cart/wishlist", e);
     }
   }, []);
 
   useEffect(() => {
     if (isClient) {
       localStorage.setItem("bm_cart_items", JSON.stringify(cartItems));
+      localStorage.setItem("bm_wishlist_items", JSON.stringify(wishlistItems));
     }
-  }, [cartItems, isClient]);
+  }, [cartItems, wishlistItems, isClient]);
 
   const addToCart = useCallback((product) => {
     setCartItems((prev) => {
@@ -92,6 +98,35 @@ export default function SiteShell({ children }) {
     [cartItems, cartCount, cartTotal, addToCart, updateQuantity, removeFromCart, emptyCart]
   );
 
+  const addToWishlist = useCallback((product) => {
+    setWishlistItems((prev) => {
+      const existing = prev.find((item) => item.id === product.id && item.size === product.size);
+      if (existing) return prev;
+      return [...prev, product];
+    });
+  }, []);
+
+  const removeFromWishlist = useCallback((id, size) => {
+    setWishlistItems((prev) => prev.filter((item) => !(item.id === id && item.size === size)));
+  }, []);
+
+  const isInWishlist = useCallback((id, size) => {
+    return wishlistItems.some((item) => item.id === id && item.size === size);
+  }, [wishlistItems]);
+
+  const wishlistCount = useMemo(() => wishlistItems.length, [wishlistItems]);
+
+  const wishlistContextValue = useMemo(
+    () => ({
+      wishlistItems,
+      addToWishlist,
+      removeFromWishlist,
+      isInWishlist,
+      wishlistCount,
+    }),
+    [wishlistItems, addToWishlist, removeFromWishlist, isInWishlist, wishlistCount]
+  );
+
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
@@ -152,13 +187,15 @@ export default function SiteShell({ children }) {
   return (
     <AuthProvider>
       <CartProvider value={contextValue}>
-        <p className="visually-hidden" aria-live="polite">
-          {cartAnnouncement}
-        </p>
-        <Header cartCount={cartCount} cartTotal={cartTotal} />
-        {children}
-        <Footer />
-        <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
+        <WishlistProvider value={wishlistContextValue}>
+          <p className="visually-hidden" aria-live="polite">
+            {cartAnnouncement}
+          </p>
+          <Header cartCount={cartCount} cartTotal={cartTotal} wishlistCount={wishlistCount} />
+          {children}
+          <Footer />
+          <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
+        </WishlistProvider>
       </CartProvider>
     </AuthProvider>
   );

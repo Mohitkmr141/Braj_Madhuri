@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   ["Contact Us", "/contact"],
 ];
 
-const Header = ({ cartCount = 0, cartTotal = 0 }) => {
+const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen]           = useState(false);
@@ -228,6 +228,22 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
             <span>Search</span>
           </button>
 
+          {/* Wishlist button */}
+          <Link
+            href="/wishlist"
+            style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginLeft: "16px", color: 'white', textDecoration: 'none' }}
+            aria-label={`Wishlist has ${wishlistCount} items`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '24px', height: '24px' }}>
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            {wishlistCount > 0 && (
+              <span className="bm-cart__badge" style={{ top: "-5px", right: "-8px" }}>
+                {wishlistCount > 99 ? "99+" : wishlistCount}
+              </span>
+            )}
+          </Link>
+
           {/* Cart button */}
           <Link
             href="/cart"
@@ -312,6 +328,21 @@ const Header = ({ cartCount = 0, cartTotal = 0 }) => {
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </button>
+            {/* Wishlist Mobile */}
+            <Link
+              href="/wishlist"
+              style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: "4px", color: 'white', textDecoration: 'none', marginLeft: "4px" }}
+              aria-label={`Wishlist has ${wishlistCount} items`}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+              {wishlistCount > 0 && (
+                <span className="bm-cart__badge" style={{ top: "-2px", right: "-4px", width: "14px", height: "14px", fontSize: "8px" }}>
+                  {wishlistCount > 99 ? "99+" : wishlistCount}
+                </span>
+              )}
+            </Link>
             {/* Cart Mobile */}
             <Link
               href="/cart"
