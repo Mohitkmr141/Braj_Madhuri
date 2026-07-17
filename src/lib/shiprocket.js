@@ -4,6 +4,7 @@ export const SHIPROCKET_BASE_URL = "https://apiv2.shiprocket.in/v1/external";
  * Authenticates with Shiprocket and retrieves a secure session token.
  */
 export async function getShiprocketToken() {
+
   const email = process.env.SHIPROCKET_EMAIL;
   const password = process.env.SHIPROCKET_PASSWORD;
 
