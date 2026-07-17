@@ -145,19 +145,19 @@
 
 /* === NAV BAR === */
 .bm-nav-bar {
-  background: rgba(74, 21, 33, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(74, 21, 33, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   width: 100%;
   z-index: 1000;
   position: sticky;
   top: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  transition: box-shadow 0.4s ease, background 0.4s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1), background 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .bm-nav-bar.sticky {
-  background: rgba(74, 21, 33, 0.95);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  background: rgba(74, 21, 33, 0.88);
+  box-shadow: 0 16px 40px -8px rgba(0,0,0,0.3);
 }
 
 /* Desktop links */
@@ -196,12 +196,13 @@
   width: 0;
   height: 2px;
   background: var(--clr-gold);
+  box-shadow: 0 0 8px var(--clr-gold);
   transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   transform: translateX(-50%);
 }
-.bm-nav-link:hover { color: #fff; background: rgba(255,255,255,.05); }
+.bm-nav-link:hover { color: #fff; background: rgba(255,255,255,.08); }
 .bm-nav-link:hover::after, .bm-nav-link.active::after { width: 100%; }
-.bm-nav-link.active { color: var(--clr-gold); font-weight: 600; }
+.bm-nav-link.active { color: var(--clr-gold); font-weight: 600; text-shadow: 0 0 12px rgba(212, 175, 55, 0.4); }
 
 /* Mobile nav bar */
 .bm-nav__mobile-bar {
