@@ -80,15 +80,15 @@ const PRODUCT_DATA = {
         description:
           "Rose fragrance for pooja, festivals, and daily freshness.",
       },
-      "Jasmine Floral Spray": {
+      "Jamine Floral Spray": {
         title: "Jasmine Floral Spray",
         description: "Gentle jasmine fragrance with a clean floral finish.",
       },
-      "Shyam Darbar Floral Spray": {
+      "Shyram Darbar Floral Spray": {
         title: "Shyam Darbar Floral Spray",
         description: "Temple-inspired fragrance for devotional spaces.",
       },
-      "Ashtagandh Floral Spray": {
+      "Ashtganth Herbal Spray": {
         title: "Ashtagandh Floral Spray",
         description: "Sacred ashtagandh-inspired aroma for pooja ambience.",
       },
@@ -96,10 +96,6 @@ const PRODUCT_DATA = {
         title: "Bela Floral Spray",
         description:
           "Sweet bela fragrance for calm and refreshing surroundings.",
-      },
-      "Floral Spray Combo": {
-        title: "Floral Spray Combo",
-        description: "Assorted floral sprays for mandir and home fragrance.",
       },
     },
   },
