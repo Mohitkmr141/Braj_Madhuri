@@ -1,5 +1,5 @@
 const PRODUCT_DATA = {
-  "Dhoop & Incense/Aggarbaties": {
+  "Dhoop & Incense/Incense Stick": {
     title: "Premium Agarbatti Collection",
     description:
       "Hand-rolled devotional agarbatti for daily pooja and mandir fragrance.",
@@ -145,10 +145,6 @@ const PRODUCT_DATA = {
       "Sandalwood Dhoop Sticks": {
         title: "Sandalwood Dhoop Sticks",
         description: "Classic sandalwood fragrance for pooja and meditation.",
-      },
-      "Panchratan Dhoop": {
-        title: "Panchratan Dhoop",
-        description: "Traditional panchratan dhoop blend for devotional use.",
       },
     },
   },

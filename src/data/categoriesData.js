@@ -90,19 +90,11 @@ const CATEGORIES = [
     "emoji": "👑",
     "folderKeys": [
       "Jewellery Collection/Jewellery",
-      "Jewellery Collection/Jewellery/Long Mala(4.5 inches)",
-      "Jewellery Collection/Jewellery/Najariya for Ladduu Gopal (Size 4,5,6)",
-      "Jewellery Collection/Jewellery/Pearl Kundan Mala",
-      "Jewellery Collection/Jewellery/Slideshow",
       "Jewellery Collection/Mukut"
     ],
     "subcategoryFolderMap": {
       "Jewellery": [
-        "Jewellery Collection/Jewellery",
-        "Jewellery Collection/Jewellery/Long Mala(4.5 inches)",
-        "Jewellery Collection/Jewellery/Najariya for Ladduu Gopal (Size 4,5,6)",
-        "Jewellery Collection/Jewellery/Pearl Kundan Mala",
-        "Jewellery Collection/Jewellery/Slideshow"
+        "Jewellery Collection/Jewellery"
       ],
       "Mukut": [
         "Jewellery Collection/Mukut"
@@ -159,18 +151,14 @@ const CATEGORIES = [
     "label": "Tulsi Kanthi Mala",
     "emoji": "📿",
     "folderKeys": [
-      "Tulsi Kanthi Mala/Kanthi Mala Regular",
-      "Tulsi Kanthi Mala/Kathi Mala Fine Beads",
+      "Tulsi Kanthi Mala/Kanthi Mala (2 Rounds)",
       "Tulsi Kanthi Mala/Original Tusli Jaap Mala",
       "Tulsi Kanthi Mala/Tulsi Designer Mala",
       "Tulsi Kanthi Mala/Tulsi Mala Single Round"
     ],
     "subcategoryFolderMap": {
-      "Kanthi Mala Regular": [
-        "Tulsi Kanthi Mala/Kanthi Mala Regular"
-      ],
-      "Kathi Mala Fine Beads": [
-        "Tulsi Kanthi Mala/Kathi Mala Fine Beads"
+      "Kanthi Mala (2 Rounds)": [
+        "Tulsi Kanthi Mala/Kanthi Mala (2 Rounds)"
       ],
       "Original Tusli Jaap Mala": [
         "Tulsi Kanthi Mala/Original Tusli Jaap Mala"
@@ -183,42 +171,11 @@ const CATEGORIES = [
       ]
     },
     "subcategories": [
-      "Kanthi Mala Regular",
-      "Kathi Mala Fine Beads",
+      "Kanthi Mala (2 Rounds)",
       "Original Tusli Jaap Mala",
       "Tulsi Designer Mala",
       "Tulsi Mala Single Round"
     ]
-  },
-  {
-    "id": "incense-dhoop-sticks",
-    "label": "Incense & Dhoop Sticks",
-    "emoji": "✨",
-    "folderKeys": [
-      "Incense & Dhoop Sticks"
-    ],
-    "subcategoryFolderMap": {},
-    "subcategories": []
-  },
-  {
-    "id": "japa-essentials",
-    "label": "Japa Essentials",
-    "emoji": "✨",
-    "folderKeys": [
-      "Japa Essentials"
-    ],
-    "subcategoryFolderMap": {},
-    "subcategories": []
-  },
-  {
-    "id": "products",
-    "label": "products",
-    "emoji": "✨",
-    "folderKeys": [
-      "products"
-    ],
-    "subcategoryFolderMap": {},
-    "subcategories": []
   }
 ];
 
