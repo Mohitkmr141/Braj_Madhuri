@@ -49,23 +49,23 @@ const CATEGORIES = [
     "subcategories": []
   },
   {
-    "id": "itra-fragnances",
-    "label": "Itra & Fragnances",
-    "emoji": "🌸",
+    "id": "itra-fragrances",
+    "label": "Itra & Fragrances",
+    "emoji": "✨",
     "folderKeys": [
-      "Itra & Fragnances/Shri Ang Itra",
-      "Itra & Fragnances/Temple & Home Fragnance Spray",
-      "Itra & Fragnances/Vastra Itra"
+      "Itra & Fragrances/Shri Ang Itra",
+      "Itra & Fragrances/Temple & Home Fragnance Spray",
+      "Itra & Fragrances/Vastra Itra"
     ],
     "subcategoryFolderMap": {
       "Shri Ang Itra": [
-        "Itra & Fragnances/Shri Ang Itra"
+        "Itra & Fragrances/Shri Ang Itra"
       ],
       "Temple & Home Fragnance Spray": [
-        "Itra & Fragnances/Temple & Home Fragnance Spray"
+        "Itra & Fragrances/Temple & Home Fragnance Spray"
       ],
       "Vastra Itra": [
-        "Itra & Fragnances/Vastra Itra"
+        "Itra & Fragrances/Vastra Itra"
       ]
     },
     "subcategories": [

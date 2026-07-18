@@ -6,6 +6,10 @@ import "./CategoryGrid.css";
 import PRODUCT_IMAGE_MAP from "../data/productImages.js";
 import CATEGORIES from "../data/categoriesData.js";
 
+const THUMBNAIL_OVERRIDES = {
+  "bhakti-combos": "/images/images/Bhakti Combos/Nitya Sewa Kit.jpeg"
+};
+
 /**
  * Build a lookup: categoryId → first representative image URL.
  * For each category we try each folderKey in order and use the
@@ -14,6 +18,10 @@ import CATEGORIES from "../data/categoriesData.js";
 function buildThumbnailMap() {
   const map = {};
   CATEGORIES.forEach((cat) => {
+    if (THUMBNAIL_OVERRIDES[cat.id]) {
+      map[cat.id] = THUMBNAIL_OVERRIDES[cat.id];
+      return;
+    }
     for (const key of cat.folderKeys) {
       const images = PRODUCT_IMAGE_MAP[key];
       if (images && images.length > 0) {
