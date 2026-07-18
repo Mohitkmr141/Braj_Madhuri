@@ -47,34 +47,16 @@ export default function CheckoutPage() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-  };
 
-  const calculateShippingRates = async () => {
-    if (!formData.pincode || formData.pincode.length < 6) {
-      setError("Please enter a valid 6-digit Pincode to calculate shipping.");
-      return;
-    }
-    setIsCalculatingShipping(true);
-    setError("");
-    try {
-      const res = await fetch("/api/shipping/calculate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pincode: formData.pincode }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setShippingCost(data.shippingCost);
+    // Auto-calculate shipping cost on state change
+    if (name === "state") {
+      if (value === "Delhi") {
+        setShippingCost(79);
+      } else if (value) {
+        setShippingCost(119);
       } else {
-        setError(data.error || "Failed to calculate shipping.");
         setShippingCost(0);
       }
-    } catch (err) {
-      console.error(err);
-      setError("An error occurred while calculating shipping.");
-      setShippingCost(0);
-    } finally {
-      setIsCalculatingShipping(false);
     }
   };
 
@@ -291,17 +273,7 @@ export default function CheckoutPage() {
               </div>
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>
                 <label htmlFor="pincode">Pincode *</label>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <input type="text" id="pincode" name="pincode" value={formData.pincode} onChange={handleInputChange} required style={{ flex: 1 }} />
-                  <button 
-                    type="button" 
-                    onClick={calculateShippingRates} 
-                    disabled={isCalculatingShipping}
-                    style={{ padding: '0 15px', background: 'var(--gold)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-                  >
-                    {isCalculatingShipping ? "..." : "Calc Shipping"}
-                  </button>
-                </div>
+                <input type="text" id="pincode" name="pincode" value={formData.pincode} onChange={handleInputChange} required />
               </div>
             </div>
           </div>
@@ -343,7 +315,7 @@ export default function CheckoutPage() {
               </div>
               <div className="summary-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
                 <span>Delivery Charges</span>
-                <span>{shippingCost > 0 ? formatCurrency(shippingCost) : <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '14px' }}>Enter pincode to calculate</span>}</span>
+                <span>{shippingCost > 0 ? formatCurrency(shippingCost) : <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '14px' }}>Select state to calculate</span>}</span>
               </div>
               
               <div style={{ height: '1px', background: 'rgba(0,0,0,0.1)', margin: '16px 0' }} />
