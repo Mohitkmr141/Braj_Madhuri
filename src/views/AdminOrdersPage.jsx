@@ -28,11 +28,18 @@ export default function AdminOrdersPage() {
   const [password, setPassword] = useState("");
   const [orders, setOrders] = useState([]);
   const [inventory, setInventory] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("orders");
-  const [updatingStock, setUpdatingStock] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
+  
+  // Product Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [productForm, setProductForm] = useState({
+    title: "", categoryId: "", price: "", originalPrice: "", stock: "10", imageUrl: "", description: "", size: "", subheading: ""
+  });
 
   const handleShiprocketAction = async (orderId, actionName) => {
     setActionLoading(`${orderId}-${actionName}`);
@@ -57,7 +64,7 @@ export default function AdminOrdersPage() {
         // Refresh orders to get updated AWB if applicable
         fetchOrders();
       }
-    } catch (err) {
+    } catch {
       alert("Network error processing Shiprocket action.");
     } finally {
       setActionLoading(null);
@@ -95,10 +102,11 @@ export default function AdminOrdersPage() {
   const fetchInventory = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/inventory");
+      const res = await fetch("/api/admin/products");
       const data = await res.json();
       if (data.success) {
         setInventory(data.products);
+        setCategories(data.categories || []);
       } else {
         setError(data.error || "Failed to fetch inventory.");
       }
@@ -110,30 +118,69 @@ export default function AdminOrdersPage() {
     }
   };
 
-  const handleUpdateStock = async (id, newStock) => {
-    const parsedStock = parseInt(newStock, 10);
-    if (isNaN(parsedStock) || parsedStock < 0) return;
-    
-    setUpdatingStock(id);
+  const handleOpenProductModal = (product = null) => {
+    setEditingProduct(product);
+    if (product) {
+      setProductForm({
+        title: product.title || "",
+        categoryId: product.categoryId || "",
+        price: product.price || "",
+        originalPrice: product.originalPrice || "",
+        stock: product.stock !== undefined ? String(product.stock) : "10",
+        imageUrl: product.imageUrl || "",
+        description: product.description || "",
+        size: product.size || "",
+        subheading: product.subheading || ""
+      });
+    } else {
+      setProductForm({
+        title: "", categoryId: "", price: "", originalPrice: "", stock: "10", imageUrl: "", description: "", size: "", subheading: ""
+      });
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleSaveProduct = async (e) => {
+    e.preventDefault();
     try {
-      const res = await fetch("/api/admin/inventory", {
-        method: "PATCH",
+      const url = "/api/admin/products";
+      const method = editingProduct ? "PUT" : "POST";
+      const body = { ...productForm };
+      if (editingProduct) body.id = editingProduct.id;
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, stock: parsedStock })
+        body: JSON.stringify(body)
       });
       const data = await res.json();
       if (data.success) {
-        setInventory(prev => prev.map(p => p.id === id ? data.product : p));
+        setIsModalOpen(false);
+        fetchInventory(); // Refresh list
       } else {
-        alert("Failed to update stock: " + data.error);
+        alert("Failed to save product: " + data.error);
       }
-    } catch (err) {
-      console.error(err);
-      alert("Error updating stock.");
-    } finally {
-      setUpdatingStock(null);
+    } catch {
+      alert("Error saving product.");
     }
   };
+
+  const handleDeleteProduct = async (id) => {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+    try {
+      const res = await fetch(`/api/admin/products?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        fetchInventory(); // Refresh list
+      } else {
+        alert("Failed to delete product: " + data.error);
+      }
+    } catch {
+      alert("Error deleting product.");
+    }
+  };
+
+
 
   // Re-fetch when switching tabs
   React.useEffect(() => {
@@ -203,7 +250,7 @@ export default function AdminOrdersPage() {
                   fontWeight: "600"
                 }}
               >
-                Inventory
+                Products
               </button>
             </div>
           </div>
@@ -323,13 +370,22 @@ export default function AdminOrdersPage() {
             </div>
           </div>
         )) : (
-          <div style={{ background: "#fff", borderRadius: "12px", boxShadow: "0 12px 32px rgba(0,0,0,0.04)", overflow: "hidden", border: "1px solid rgba(0,0,0,0.05)" }}>
-            <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          <div style={{ background: "#fff", borderRadius: "12px", boxShadow: "0 12px 32px rgba(0,0,0,0.04)", overflow: "hidden", border: "1px solid rgba(0,0,0,0.05)", padding: "20px" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+              <button 
+                onClick={() => handleOpenProductModal()}
+                style={{ background: "var(--maroon)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+              >
+                + Add New Product
+              </button>
+            </div>
+            <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", borderRadius: "8px", border: "1px solid rgba(0,0,0,0.05)" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", minWidth: "800px" }}>
                 <thead>
                   <tr style={{ background: "var(--surface-warm, #fcfaf5)", borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
                     <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Product ID</th>
                     <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Name</th>
+                    <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Category</th>
                     <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Price</th>
                     <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Current Stock</th>
                     <th style={{ padding: "16px", fontWeight: "600", color: "var(--muted)", fontSize: "14px" }}>Actions</th>
@@ -345,6 +401,9 @@ export default function AdminOrdersPage() {
                         {product.title}
                         {product.size && <span style={{ fontSize: "12px", color: "#666", marginLeft: "8px" }}>({product.size})</span>}
                       </td>
+                      <td style={{ padding: "16px", fontSize: "13px" }}>
+                        {product.category?.title || "Unknown"}
+                      </td>
                       <td style={{ padding: "16px", fontSize: "14px" }}>
                         {formatCurrency(product.price)}
                       </td>
@@ -355,26 +414,23 @@ export default function AdminOrdersPage() {
                       </td>
                       <td style={{ padding: "16px" }}>
                         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                          <input 
-                            type="number" 
-                            defaultValue={product.stock}
-                            min="0"
-                            id={`stock-${product.id}`}
-                            style={{ width: "60px", padding: "4px 8px", border: "1px solid #ddd", borderRadius: "4px" }}
-                          />
                           <button
-                            disabled={updatingStock === product.id}
-                            onClick={() => {
-                              const input = document.getElementById(`stock-${product.id}`);
-                              handleUpdateStock(product.id, input.value);
-                            }}
+                            onClick={() => handleOpenProductModal(product)}
                             style={{ 
-                              background: "var(--maroon)", color: "#fff", border: "none", 
-                              padding: "6px 12px", borderRadius: "4px", cursor: "pointer", fontSize: "12px",
-                              opacity: updatingStock === product.id ? 0.6 : 1
+                              background: "transparent", color: "var(--maroon)", border: "1px solid var(--maroon)", 
+                              padding: "6px 12px", borderRadius: "4px", cursor: "pointer", fontSize: "12px"
                             }}
                           >
-                            {updatingStock === product.id ? "Saving..." : "Update"}
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProduct(product.id)}
+                            style={{ 
+                              background: "#d32f2f", color: "#fff", border: "none", 
+                              padding: "6px 12px", borderRadius: "4px", cursor: "pointer", fontSize: "12px"
+                            }}
+                          >
+                            Delete
                           </button>
                         </div>
                       </td>
@@ -382,6 +438,75 @@ export default function AdminOrdersPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+
+        {isModalOpen && (
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" }}>
+            <div style={{ background: "#fff", padding: "32px", borderRadius: "12px", width: "100%", maxWidth: "600px", maxHeight: "90vh", overflowY: "auto", position: "relative" }}>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                style={{ position: "absolute", top: "20px", right: "20px", background: "transparent", border: "none", fontSize: "24px", cursor: "pointer", color: "#555" }}
+              >&times;</button>
+              <h2 style={{ fontFamily: "'Playfair Display', serif", color: "var(--maroon)", marginBottom: "24px" }}>
+                {editingProduct ? "Edit Product" : "Add New Product"}
+              </h2>
+              <form onSubmit={handleSaveProduct} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div style={{ display: "flex", gap: "16px" }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Title *</label>
+                    <input required type="text" value={productForm.title} onChange={e => setProductForm({...productForm, title: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px" }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Category *</label>
+                    <select required value={productForm.categoryId} onChange={e => setProductForm({...productForm, categoryId: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px", background: "#fff" }}>
+                      <option value="">Select Category</option>
+                      {categories.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+                    </select>
+                  </div>
+                </div>
+                
+                <div style={{ display: "flex", gap: "16px" }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Price *</label>
+                    <input required type="number" step="0.01" value={productForm.price} onChange={e => setProductForm({...productForm, price: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px" }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Original Price</label>
+                    <input type="number" step="0.01" value={productForm.originalPrice} onChange={e => setProductForm({...productForm, originalPrice: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px" }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Stock *</label>
+                    <input required type="number" value={productForm.stock} onChange={e => setProductForm({...productForm, stock: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px" }} />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Image URL</label>
+                  <input type="text" placeholder="/images/product.jpg" value={productForm.imageUrl} onChange={e => setProductForm({...productForm, imageUrl: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px" }} />
+                </div>
+
+                <div style={{ display: "flex", gap: "16px" }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Subheading</label>
+                    <input type="text" value={productForm.subheading} onChange={e => setProductForm({...productForm, subheading: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px" }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Size (e.g. 5x7 inches)</label>
+                    <input type="text" value={productForm.size} onChange={e => setProductForm({...productForm, size: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px" }} />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Description</label>
+                  <textarea rows="4" value={productForm.description} onChange={e => setProductForm({...productForm, description: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px", fontFamily: "inherit" }}></textarea>
+                </div>
+
+                <button type="submit" style={{ background: "var(--maroon)", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", cursor: "pointer", fontWeight: "600", marginTop: "16px" }}>
+                  {editingProduct ? "Save Changes" : "Create Product"}
+                </button>
+              </form>
             </div>
           </div>
         )}
