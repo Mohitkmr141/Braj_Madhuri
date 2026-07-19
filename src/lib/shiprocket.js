@@ -88,7 +88,7 @@ export async function createShiprocketOrder(order) {
   const shiprocketOrderData = {
     order_id: order.orderNumber,
     order_date: new Date().toISOString().split("T")[0],
-    pickup_location: "Primary",
+    pickup_location: "Home",
     billing_customer_name: order.customerName,
     billing_last_name: "",
     billing_address: order.address,

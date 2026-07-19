@@ -78,10 +78,12 @@ export async function POST(request) {
       return { orderNumber, newOrder };
     });
 
-    // 5. Trigger Email Alert (Non-blocking)
-    sendOrderEmail(result.newOrder).catch((err) => {
-      console.error("Failed to send background email:", err);
-    });
+    // 5. Trigger Email Alert
+    try {
+      await sendOrderEmail(result.newOrder);
+    } catch (err) {
+      console.error("Failed to send email:", err);
+    }
 
     // 6. Trigger Shiprocket Order Creation
     try {
