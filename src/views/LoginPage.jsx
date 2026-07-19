@@ -75,7 +75,7 @@ export default function LoginPage() {
             <span className="auth-back__arrow">←</span> Back to Home
           </Link>
 
-          <span className="auth-card__eyebrow">Jai Shri Krishna 🪷</span>
+          <span className="auth-card__eyebrow">Shri Radhavallabho Jayati</span>
           <h1 className="auth-card__title">Sign In</h1>
           <p className="auth-card__subtitle">
             Welcome back. Enter your details to continue.

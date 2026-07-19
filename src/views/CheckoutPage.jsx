@@ -75,7 +75,7 @@ export default function CheckoutPage() {
     setError("");
     
     // Simple Validation
-    if (!formData.firstName || !formData.address || !formData.city || !formData.pincode || !formData.phone) {
+    if (!formData.firstName || !formData.address || !formData.city || !formData.pincode || !formData.phone || !formData.email) {
       setError("Please fill in all required fields.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -214,8 +214,8 @@ export default function CheckoutPage() {
                 <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleInputChange} />
               </div>
               <div className="form-group full-width">
-                <label htmlFor="email">Email Address</label>
-                <input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} />
+                <label htmlFor="email">Email Address *</label>
+                <input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} required />
               </div>
               <div className="form-group full-width">
                 <label htmlFor="phone">Phone Number *</label>

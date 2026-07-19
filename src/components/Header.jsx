@@ -100,7 +100,7 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
             </button>
           </div>
           <div className="search-suggestions" aria-label="Popular searches">
-            {["Agarbatti", "Japa Mala", "Poshak", "Dhoop", "Chandan", "Combo Pack"].map((chip) => (
+            {["Agarbatti", "Japa Mala", "Poshak", "Dhoop", "Chandan"].map((chip) => (
               <button
                 key={chip}
                 type="button"

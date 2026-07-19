@@ -82,11 +82,13 @@ export const sendOrderEmail = async (order) => {
   };
 
   try {
-    // Send both emails simultaneously
-    await Promise.all([
-      transporter.sendMail(adminMailOptions),
-      transporter.sendMail(customerMailOptions)
-    ]);
+    const promises = [transporter.sendMail(adminMailOptions)];
+    
+    if (order.email) {
+      promises.push(transporter.sendMail(customerMailOptions));
+    }
+    
+    await Promise.allSettled(promises);
     console.log("Order emails sent successfully for: %s", order.orderNumber);
     return { success: true };
   } catch (error) {
