@@ -4,7 +4,6 @@ import React from "react";
 import { useRouter } from "next/navigation";
 
 import TrustBar from "../components/TrustBar.jsx";
-import FeaturedBanner from "../components/FeaturedBanner.jsx";
 import ComboPacks from "../components/ComboPacks.jsx";
 import Reviews from "../components/Reviews.jsx";
 import CategoryGalleries from "../components/Categories.jsx";
@@ -30,7 +29,6 @@ function HomePage() {
       <TrustBar />
       <CategoryGrid activeCategory={null} onExplore={handleExploreCategory} />
       <CategoryGalleries addToCart={addToCart} />
-      <FeaturedBanner />
       <ComboPacks addToCart={addToCart} />
       <Reviews />
     </main>

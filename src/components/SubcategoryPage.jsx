@@ -44,6 +44,7 @@ function useCartFlash() {
 // ── ProductDetailCard ────────────────────────────────────────────────────────
 
 function ProductDetailCard({ product, addToCart }) {
+  const displayTitle = product.title || product.folderName;
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "");
   const [flashing, flash] = useCartFlash();
   const [isZoomed, setIsZoomed] = useState(false);
@@ -60,12 +61,12 @@ function ProductDetailCard({ product, addToCart }) {
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
-      title: product.title || product.folderName,
+      title: displayTitle,
       image: product.imageUrl,
       price: product.price ?? 250,
       originalPrice: product.originalPrice,
       size: selectedSize,
-      color: (product.title || product.folderName) === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" ? selectedColor : undefined
+      color: displayTitle?.includes("Meenakari Chandrika Chokar") ? selectedColor : undefined
     });
     flash("btn");
   };
@@ -77,17 +78,15 @@ function ProductDetailCard({ product, addToCart }) {
     } else {
       addToWishlist({
         id: product.id,
-        title: product.title || product.folderName,
+        title: displayTitle,
         image: product.imageUrl,
         price: product.price ?? 250,
         originalPrice: product.originalPrice,
         size: selectedSize,
-        color: (product.title || product.folderName) === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" ? selectedColor : undefined
+        color: displayTitle?.includes("Meenakari Chandrika Chokar") ? selectedColor : undefined
       });
     }
   };
-
-  const displayTitle = product.title || product.folderName;
 
   return (
     <article className="subcat-product-card reveal" onClick={() => setIsZoomed(true)} style={{ cursor: 'pointer' }}>
@@ -174,7 +173,7 @@ function ProductDetailCard({ product, addToCart }) {
                 </>
               )}
 
-              {displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" && (
+              {displayTitle?.includes("Meenakari Chandrika Chokar") && (
                 <div style={{ marginBottom: "15px" }}>
                   <label htmlFor={`color-select-zoom-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
                   <select 
@@ -256,7 +255,7 @@ function ProductDetailCard({ product, addToCart }) {
           </p>
         )}
 
-        {displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" && (
+        {displayTitle?.includes("Meenakari Chandrika Chokar") && (
           <div style={{ margin: "15px 0" }}>
             <label htmlFor={`color-select-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
             <select 
@@ -282,7 +281,7 @@ function ProductDetailCard({ product, addToCart }) {
                   key={size}
                   type="button"
                   className={`subcat-size-btn${selectedSize === size ? " subcat-size-btn--active" : ""}`}
-                  onClick={() => setSelectedSize(size)}
+                  onClick={(e) => { e.stopPropagation(); setSelectedSize(size); }}
                   aria-pressed={selectedSize === size}
                 >
                   {size}
@@ -291,8 +290,6 @@ function ProductDetailCard({ product, addToCart }) {
             </div>
           </>
         )}
-
-        {/* Shipping badges removed */}
 
         {/* Add to Cart */}
         <button

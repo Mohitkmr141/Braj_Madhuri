@@ -66,6 +66,7 @@ export default function CartPage() {
                   <div className="cart-item-details">
                     <h3 className="cart-item-title">{item.title}</h3>
                     {item.size && <div className="cart-item-size">Size: {item.size}</div>}
+                    {item.color && <div className="cart-item-size">Color: {item.color}</div>}
                     
                     <div className="cart-item-pricing">
                       <span className="cart-item-price">{formatCurrency(item.price || 250)}</span>

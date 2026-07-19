@@ -4,7 +4,6 @@ import React, { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CategoryGalleries from "../components/Categories.jsx";
 import CategoryGrid from "../components/CategoryGrid.jsx";
-import FeaturedBanner from "../components/FeaturedBanner.jsx";
 import SubcategoryPage from "../components/SubcategoryPage.jsx";
 import { useCart } from "../context/CartContext.jsx";
 import CATEGORIES from "../data/categoriesData.js";
@@ -61,7 +60,6 @@ function ShopPage() {
             router.push(`/shop?category=${encodeURIComponent(catId)}`)
           }
         />
-        <FeaturedBanner />
       </main>
     );
   }
@@ -92,7 +90,6 @@ function ShopPage() {
         activeProductId={activeProductId}
         onClearFilter={() => handleExploreCategory(null)}
       />
-      <FeaturedBanner />
     </main>
   );
 }

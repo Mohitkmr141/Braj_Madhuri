@@ -27,7 +27,7 @@ const FeaturedBanner = () => {
         </div>
         <div className="featured-products">
           {specials.map(([name, price]) => (
-            <div className="featured-prod reveal" key={name}>
+            <div className="featured-prod reveal" key={name} suppressHydrationWarning>
               <div className="featured-prod-icon" aria-hidden="true">
                 🪷
               </div>

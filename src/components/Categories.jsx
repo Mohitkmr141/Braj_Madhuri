@@ -226,7 +226,7 @@ function ProductCard({ product, addToCart, autoOpen }) {
         price: product.price ?? 250,
         originalPrice: product.originalPrice,
         size: product.size,
-        color: displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" ? selectedColor : undefined
+        color: displayTitle.includes("Meenakari Chandrika Chokar") ? selectedColor : undefined
       });
     }
   };
@@ -296,7 +296,7 @@ function ProductCard({ product, addToCart, autoOpen }) {
               price: product.price ?? 250,
               originalPrice: product.originalPrice,
               size: product.size,
-              color: displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" ? selectedColor : undefined
+              color: displayTitle.includes("Meenakari Chandrika Chokar") ? selectedColor : undefined
             }); 
           }}
         >
@@ -349,7 +349,7 @@ function ProductCard({ product, addToCart, autoOpen }) {
                 {displayDesc}
               </p>
 
-              {displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" && (
+              {displayTitle.includes("Meenakari Chandrika Chokar") && (
                 <div style={{ marginBottom: "15px" }}>
                   <label htmlFor="color-select" style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
                   <select 
@@ -380,7 +380,7 @@ function ProductCard({ product, addToCart, autoOpen }) {
                       price: product.price ?? 250,
                       originalPrice: product.originalPrice,
                       size: product.size,
-                      color: displayTitle === "Meenakari Chandrika Chokar for 4,5,6 laddu gopal" ? selectedColor : undefined
+                      color: displayTitle.includes("Meenakari Chandrika Chokar") ? selectedColor : undefined
                     });
                     setIsQuickViewOpen(false);
                   }}

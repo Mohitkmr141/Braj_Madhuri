@@ -20,7 +20,7 @@ export const sendOrderEmail = async (order) => {
   const itemsHtml = order.cartItems
     .map(
       (item) =>
-        `<li>${item.quantity}x ${item.title} ${item.size ? `(Size: ${item.size})` : ""} - ₹${item.price}</li>`
+        `<li>${item.quantity}x ${item.title} ${item.size ? `(Size: ${item.size})` : ""} ${item.color ? `[Color: ${item.color}]` : ""} - ₹${item.price}</li>`
     )
     .join("");
 

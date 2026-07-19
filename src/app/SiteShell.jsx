@@ -165,11 +165,13 @@ export default function SiteShell({ children }) {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === 1) { // ELEMENT_NODE
             if (node.classList.contains("reveal")) {
-              observeElement(node);
+              setTimeout(() => observeElement(node), 100);
             }
             // Find nested .reveal elements
             const nestedReveals = node.querySelectorAll(".reveal");
-            nestedReveals.forEach(observeElement);
+            if (nestedReveals.length > 0) {
+              setTimeout(() => nestedReveals.forEach(observeElement), 100);
+            }
           }
         });
       });

@@ -306,7 +306,7 @@ export default function AdminOrdersPage() {
                         <td style={{ padding: "16px", fontSize: "13px" }}>
                           {items && items.length > 0 ? items.map(item => (
                             <div key={`${item.id}-${item.size}`} style={{ marginBottom: "2px" }}>
-                              {item.quantity}x {item.title} {item.size && `(${item.size})`}
+                              {item.quantity}x {item.title} {item.size && `(Size: ${item.size})`} {item.color && `[Color: ${item.color}]`}
                             </div>
                           )) : "No items"}
                         </td>
