@@ -46,18 +46,28 @@ export default function CheckoutPage() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-
-    // Auto-calculate shipping cost on state change
-    if (name === "state") {
-      if (value === "Delhi") {
-        setShippingCost(79);
-      } else if (value) {
-        setShippingCost(119);
-      } else {
-        setShippingCost(0);
-      }
-    }
   };
+
+  // Calculate shipping cost dynamically based on state and city
+  React.useEffect(() => {
+    const { state, city } = formData;
+    if (!state) {
+      setShippingCost(0);
+      return;
+    }
+
+    const ncrCities = [
+      "faridabad", "gurgaon", "gurugram", "noida", "ghaziabad", "greater noida"
+    ];
+    const isDelhiState = state === "Delhi";
+    const isNcrCity = ncrCities.includes(city.trim().toLowerCase());
+
+    if (isDelhiState || isNcrCity) {
+      setShippingCost(79); // Zone A
+    } else {
+      setShippingCost(119); // Zone B
+    }
+  }, [formData.state, formData.city]);
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
