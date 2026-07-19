@@ -263,6 +263,11 @@ function ProductCard({ product, addToCart, autoOpen }) {
         <h3 className="item-title">
           {displayTitle}
         </h3>
+        {product.subheading && (
+          <div style={{ marginTop: "-2px", marginBottom: "8px", color: "var(--text-muted)", fontSize: "13px", fontWeight: "500", fontFamily: "var(--font-sans, 'Inter', sans-serif)" }}>
+            {product.subheading}
+          </div>
+        )}
         <p className="item-description">
           {displayDesc}
         </p>
@@ -318,6 +323,11 @@ function ProductCard({ product, addToCart, autoOpen }) {
             </div>
             <div className="quick-view-info-panel">
               <h3 className="quick-view-title">{displayTitle}</h3>
+              {product.subheading && (
+                <div style={{ marginTop: "-8px", marginBottom: "16px", color: "var(--text-muted)", fontSize: "15px", fontWeight: "500", fontFamily: "var(--font-sans, 'Inter', sans-serif)" }}>
+                  {product.subheading}
+                </div>
+              )}
               
               <div className="quick-view-price-row">
                 {product.price !== null && (

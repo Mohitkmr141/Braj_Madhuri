@@ -130,6 +130,11 @@ function ProductDetailCard({ product, addToCart }) {
             </div>
             <div className="quick-view-info-panel">
               <h3 className="quick-view-title">{displayTitle}</h3>
+              {product.subheading && (
+                <div style={{ marginTop: "-8px", marginBottom: "16px", color: "var(--text-muted)", fontSize: "15px", fontWeight: "500", fontFamily: "var(--font-sans, 'Inter', sans-serif)" }}>
+                  {product.subheading}
+                </div>
+              )}
               
               <div className="quick-view-price-row">
                 {product.price !== undefined && (
@@ -147,11 +152,6 @@ function ProductDetailCard({ product, addToCart }) {
 
               <p className="quick-view-description">
                 {product.description && <span>{product.description}</span>}
-                {product.subheading && (
-                  <span style={{ display: "block", marginTop: "4px", fontStyle: "italic", color: "#8a6b4e" }}>
-                    {product.subheading}
-                  </span>
-                )}
                 {!product.description && product.categoryDesc && <span>{product.categoryDesc}</span>}
               </p>
 
@@ -227,6 +227,11 @@ function ProductDetailCard({ product, addToCart }) {
       {/* ── Info panel ──────────────────────────────────────── */}
       <div className="subcat-info-panel">
         <h3 className="subcat-product-title">{displayTitle}</h3>
+        {product.subheading && (
+          <div style={{ marginTop: "-4px", marginBottom: "12px", color: "var(--text-muted)", fontSize: "14px", fontWeight: "500", fontFamily: "var(--font-sans, 'Inter', sans-serif)" }}>
+            {product.subheading}
+          </div>
+        )}
 
         {/* Pricing */}
         <div className="subcat-pricing">
@@ -244,14 +249,9 @@ function ProductDetailCard({ product, addToCart }) {
         </div>
 
         {/* Description */}
-        {(product.description || product.subheading || product.categoryDesc) && (
+        {(product.description || product.categoryDesc) && (
           <p className="subcat-description">
             {product.description && <span>{product.description}</span>}
-            {product.subheading && (
-              <span style={{ display: "block", marginTop: "4px", fontStyle: "italic", color: "#8a6b4e" }}>
-                {product.subheading}
-              </span>
-            )}
             {!product.description && product.categoryDesc && <span>{product.categoryDesc}</span>}
           </p>
         )}

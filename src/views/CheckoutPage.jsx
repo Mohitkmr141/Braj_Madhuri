@@ -314,7 +314,7 @@ export default function CheckoutPage() {
               </div>
               <div className="summary-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
                 <span>Delivery Charges</span>
-                <span>{shippingCost > 0 ? formatCurrency(shippingCost) : <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '14px' }}>Select state to calculate</span>}</span>
+                <span>{shippingCost > 0 ? formatCurrency(shippingCost) : <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '14px', fontFamily: "'Inter', sans-serif" }}>Select state to calculate</span>}</span>
               </div>
               
               <div style={{ height: '1px', background: 'rgba(0,0,0,0.1)', margin: '16px 0' }} />

@@ -133,7 +133,7 @@ export default function CartPage() {
             </div>
             <div className="summary-row" style={{ fontSize: '14px' }}>
               <span>Delivery Charges</span>
-              <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Calculated at checkout</span>
+              <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Calculated at checkout</span>
             </div>
             
             <div className="summary-divider" />
