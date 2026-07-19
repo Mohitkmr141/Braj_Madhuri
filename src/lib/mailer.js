@@ -24,7 +24,7 @@ export const sendOrderEmail = async (order) => {
     )
     .join("");
 
-  const mailOptions = {
+  const adminMailOptions = {
     from: `"The Braj Madhuri" <${process.env.EMAIL_USER}>`,
     to: process.env.EMAIL_USER, // Sending alert to the admin
     subject: `New Order Received! [${order.orderNumber}]`,
@@ -55,12 +55,42 @@ export const sendOrderEmail = async (order) => {
     `,
   };
 
+  const customerMailOptions = {
+    from: `"The Braj Madhuri" <${process.env.EMAIL_USER}>`,
+    to: order.email, // Sending confirmation to the customer
+    subject: `Order Confirmation - The Braj Madhuri [${order.orderNumber}]`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+        <h2 style="color: #4A1521;">Thank you for your order! 🪷</h2>
+        <p>Dear ${order.customerName},</p>
+        <p>We have successfully received your order and are processing it. Here are your order details:</p>
+        
+        <h3 style="color: #C9972A;">Order Details:</h3>
+        <p><strong>Order ID:</strong> ${order.orderNumber}</p>
+        <p><strong>Total Amount:</strong> ₹${order.totalAmount}</p>
+        
+        <h3 style="color: #C9972A;">Items Ordered:</h3>
+        <ul>
+          ${itemsHtml}
+        </ul>
+        
+        <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;" />
+        <p style="font-size: 14px; color: #555;">If you have any questions, feel free to reply to this email or contact us on WhatsApp.</p>
+        <p style="font-size: 14px; color: #555; margin-top: 10px;"><strong>Jai Shri Krishna · Radhe Radhe</strong></p>
+      </div>
+    `,
+  };
+
   try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent: %s", info.messageId);
+    // Send both emails simultaneously
+    await Promise.all([
+      transporter.sendMail(adminMailOptions),
+      transporter.sendMail(customerMailOptions)
+    ]);
+    console.log("Order emails sent successfully for: %s", order.orderNumber);
     return { success: true };
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("Error sending emails:", error);
     return { success: false, error: error.message };
   }
 };
