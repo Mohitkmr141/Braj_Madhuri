@@ -48,26 +48,17 @@ export default function CheckoutPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Calculate shipping cost dynamically based on state and city
+  // Calculate shipping cost dynamically based on selected zone
   React.useEffect(() => {
-    const { state, city } = formData;
-    if (!state) {
-      setShippingCost(0);
-      return;
-    }
-
-    const ncrCities = [
-      "faridabad", "gurgaon", "gurugram", "noida", "ghaziabad", "greater noida"
-    ];
-    const isDelhiState = state === "Delhi";
-    const isNcrCity = ncrCities.includes(city.trim().toLowerCase());
-
-    if (isDelhiState || isNcrCity) {
+    const { state } = formData;
+    if (state === "Delhi NCR") {
       setShippingCost(79); // Zone A
-    } else {
+    } else if (state === "Rest of India") {
       setShippingCost(119); // Zone B
+    } else {
+      setShippingCost(0);
     }
-  }, [formData.state, formData.city]);
+  }, [formData.state]);
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -239,45 +230,11 @@ export default function CheckoutPage() {
                 <input type="text" id="city" name="city" value={formData.city} onChange={handleInputChange} required />
               </div>
               <div className="form-group">
-                <label htmlFor="state">State *</label>
+                <label htmlFor="state">Shipping Zone *</label>
                 <select id="state" name="state" value={formData.state} onChange={handleInputChange} required>
-                  <option value="">Select State</option>
-                  <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-                  <option value="Andhra Pradesh">Andhra Pradesh</option>
-                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                  <option value="Assam">Assam</option>
-                  <option value="Bihar">Bihar</option>
-                  <option value="Chandigarh">Chandigarh</option>
-                  <option value="Chhattisgarh">Chhattisgarh</option>
-                  <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
-                  <option value="Delhi">Delhi</option>
-                  <option value="Goa">Goa</option>
-                  <option value="Gujarat">Gujarat</option>
-                  <option value="Haryana">Haryana</option>
-                  <option value="Himachal Pradesh">Himachal Pradesh</option>
-                  <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                  <option value="Jharkhand">Jharkhand</option>
-                  <option value="Karnataka">Karnataka</option>
-                  <option value="Kerala">Kerala</option>
-                  <option value="Ladakh">Ladakh</option>
-                  <option value="Lakshadweep">Lakshadweep</option>
-                  <option value="Madhya Pradesh">Madhya Pradesh</option>
-                  <option value="Maharashtra">Maharashtra</option>
-                  <option value="Manipur">Manipur</option>
-                  <option value="Meghalaya">Meghalaya</option>
-                  <option value="Mizoram">Mizoram</option>
-                  <option value="Nagaland">Nagaland</option>
-                  <option value="Odisha">Odisha</option>
-                  <option value="Puducherry">Puducherry</option>
-                  <option value="Punjab">Punjab</option>
-                  <option value="Rajasthan">Rajasthan</option>
-                  <option value="Sikkim">Sikkim</option>
-                  <option value="Tamil Nadu">Tamil Nadu</option>
-                  <option value="Telangana">Telangana</option>
-                  <option value="Tripura">Tripura</option>
-                  <option value="Uttar Pradesh">Uttar Pradesh</option>
-                  <option value="Uttarakhand">Uttarakhand</option>
-                  <option value="West Bengal">West Bengal</option>
+                  <option value="">Select Zone</option>
+                  <option value="Delhi NCR">Zone A - Delhi NCR</option>
+                  <option value="Rest of India">Zone B - Rest of India</option>
                 </select>
               </div>
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>
