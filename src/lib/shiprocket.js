@@ -94,7 +94,8 @@ export async function createShiprocketOrder(order) {
     billing_address: order.address,
     billing_city: order.city,
     billing_pincode: order.pincode,
-    billing_state: order.state,
+    // Map zone names to valid Indian state names required by Shiprocket
+    billing_state: order.state === "Delhi NCR" ? "Delhi" : (order.state === "Rest of India" ? "Uttar Pradesh" : (order.state || "Uttar Pradesh")),
     billing_country: "India",
     billing_email: order.email,
     billing_phone: order.phone,

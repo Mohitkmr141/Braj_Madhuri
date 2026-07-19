@@ -278,14 +278,14 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
                 aria-expanded={accountOpen}
                 aria-label="Account menu"
               >
-                <span className="bm-account-avatar">{user.name.charAt(0).toUpperCase()}</span>
-                <span className="bm-account-name">{user.name.split(" ")[0]}</span>
+                <span className="bm-account-avatar">{(user.name || user.email || "U").charAt(0).toUpperCase()}</span>
+                <span className="bm-account-name">{(user.name || user.email || "Account").split(" ")[0]}</span>
                 <span className="bm-account-caret" aria-hidden="true">▾</span>
               </button>
               {accountOpen && (
                 <div className="bm-account-dropdown" role="menu">
                   <div className="bm-account-dropdown__header">
-                    <span className="bm-account-dropdown__name">{user.name}</span>
+                    <span className="bm-account-dropdown__name">{user.name || user.email}</span>
                     <span className="bm-account-dropdown__email">{user.email}</span>
                   </div>
                   <Link href="/" className="bm-account-dropdown__item" role="menuitem" onClick={() => setAccountOpen(false)}>
@@ -370,7 +370,7 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
                 onClick={() => { signOut(); }}
                 aria-label="Sign out"
               >
-                <span className="bm-account-avatar">{user.name.charAt(0).toUpperCase()}</span>
+                <span className="bm-account-avatar">{(user.name || user.email || "U").charAt(0).toUpperCase()}</span>
               </button>
             ) : (
               <Link href="/login" className="bm-auth-link bm-auth-link--primary bm-auth-link--sm">

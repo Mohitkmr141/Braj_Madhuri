@@ -37,7 +37,13 @@ export default function LoginPage() {
       });
 
       if (result.error) {
-        setError(result.error);
+        // Map raw NextAuth error strings to friendly messages
+        const errorMap = {
+          "No user found with this email": "No account found with that email. Please sign up first.",
+          "Invalid password": "Incorrect password. Please try again.",
+          "Missing email or password": "Please enter your email and password.",
+        };
+        setError(errorMap[result.error] || "Invalid email or password. Please try again.");
       } else {
         router.push("/");
       }
@@ -142,12 +148,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Forgot password */}
-            <div className="auth-forgot">
-              <Link href="/forgot-password" className="auth-forgot-link">
-                Forgot your password?
-              </Link>
-            </div>
+            {/* Forgot password placeholder - coming soon */}
 
             <button
               type="submit"

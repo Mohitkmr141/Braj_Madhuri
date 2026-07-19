@@ -11,7 +11,7 @@ function getPrisma() {
 }
 
 export async function GET() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
   if (!session || session.value !== 'authenticated') {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
@@ -45,7 +45,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
   if (!session || session.value !== 'authenticated') {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
@@ -87,7 +87,7 @@ export async function POST(request) {
 }
 
 export async function PUT(request) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
   if (!session || session.value !== 'authenticated') {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
@@ -127,7 +127,7 @@ export async function PUT(request) {
 }
 
 export async function DELETE(request) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
   if (!session || session.value !== 'authenticated') {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });

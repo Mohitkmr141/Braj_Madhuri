@@ -17,7 +17,12 @@ export const sendOrderEmail = async (order) => {
     },
   });
 
-  const itemsHtml = order.cartItems
+  // cartItems may be stored as a JSON string in the DB — parse it if needed
+  const items = typeof order.cartItems === 'string'
+    ? JSON.parse(order.cartItems)
+    : (order.cartItems || []);
+
+  const itemsHtml = items
     .map(
       (item) =>
         `<li>${item.quantity}x ${item.title} ${item.size ? `(Size: ${item.size})` : ""} ${item.color ? `[Color: ${item.color}]` : ""} - ₹${item.price}</li>`
@@ -88,11 +93,13 @@ export const sendOrderEmail = async (order) => {
       promises.push(transporter.sendMail(customerMailOptions));
     }
     
-    await Promise.allSettled(promises);
+    // Use Promise.all so errors are NOT silently swallowed
+    await Promise.all(promises);
     console.log("Order emails sent successfully for: %s", order.orderNumber);
     return { success: true };
   } catch (error) {
-    console.error("Error sending emails:", error);
-    return { success: false, error: error.message };
+    console.error("Error sending emails:", error.message);
+    // Re-throw so the caller knows email failed (checkout route catches it separately)
+    throw error;
   }
 };

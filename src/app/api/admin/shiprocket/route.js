@@ -18,7 +18,7 @@ function getPrisma() {
 }
 
 export async function POST(request) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
   if (!session || session.value !== 'authenticated') {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });

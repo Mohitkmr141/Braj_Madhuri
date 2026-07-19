@@ -75,7 +75,7 @@ export default function CheckoutPage() {
     setError("");
     
     // Simple Validation
-    if (!formData.firstName || !formData.address || !formData.city || !formData.pincode || !formData.phone || !formData.email) {
+    if (!formData.firstName || !formData.address || !formData.city || !formData.pincode || !formData.phone || !formData.email || !formData.state) {
       setError("Please fill in all required fields.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -233,8 +233,8 @@ export default function CheckoutPage() {
                 <label htmlFor="state">Shipping Zone *</label>
                 <select id="state" name="state" value={formData.state} onChange={handleInputChange} required>
                   <option value="">Select Zone</option>
-                  <option value="Delhi NCR">Zone A - Delhi NCR</option>
-                  <option value="Rest of India">Zone B - Rest of India</option>
+                  <option value="Delhi NCR">Zone A - Delhi NCR (₹79)</option>
+                  <option value="Rest of India">Zone B - Rest of India (₹119)</option>
                 </select>
               </div>
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>
