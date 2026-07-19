@@ -52,7 +52,9 @@ async function shiprocketRequest(endpoint, method = "GET", body = null) {
     try {
       const errorData = await response.json();
       errorMessage = errorData.message || errorData.error || response.statusText;
-    } catch(e) {}
+    } catch {
+      // Ignore if response is not JSON
+    }
     throw new Error(`Shiprocket API Error (${endpoint}): ${errorMessage}`);
   }
 

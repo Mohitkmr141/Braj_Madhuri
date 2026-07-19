@@ -30,7 +30,6 @@ export default function CheckoutPage() {
   
   const [paymentMethod] = useState("online");
   const [shippingCost, setShippingCost] = useState(0);
-  const [isCalculatingShipping, setIsCalculatingShipping] = useState(false);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 

@@ -323,9 +323,7 @@
   border: none;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, padding-left 0.15s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
   letter-spacing: 0.01em;
 }
 
