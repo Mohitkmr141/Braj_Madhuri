@@ -9,6 +9,7 @@ import {
   printInvoice, 
   trackAWB 
 } from '../../../../lib/shiprocket.js';
+import { cookies } from 'next/headers';
 
 let prisma;
 function getPrisma() {
@@ -17,6 +18,12 @@ function getPrisma() {
 }
 
 export async function POST(request) {
+  const cookieStore = cookies();
+  const session = cookieStore.get('admin_session');
+  if (!session || session.value !== 'authenticated') {
+    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  }
+
   const prisma = getPrisma();
   try {
     const { action, orderId } = await request.json();

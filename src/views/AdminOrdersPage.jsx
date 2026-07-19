@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import "../components/Checkout.css";
 
 const formatCurrency = (value) =>
@@ -71,14 +72,30 @@ export default function AdminOrdersPage() {
     }
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (password === "admin123") {
-      setIsAuthenticated(true);
-      fetchOrders();
-    } else {
-      setError("Incorrect Master Password");
+    setError("");
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsAuthenticated(true);
+      } else {
+        setError(data.error || "Incorrect Master Password");
+      }
+    } catch (err) {
+      setError("Network error. Please try again.");
     }
+  };
+
+  const handleLogout = async () => {
+    await fetch("/api/admin/logout", { method: "POST" });
+    setIsAuthenticated(false);
+    setPassword("");
   };
 
   const fetchOrders = async () => {
@@ -183,7 +200,7 @@ export default function AdminOrdersPage() {
 
 
   // Re-fetch when switching tabs
-  React.useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated) {
       if (activeTab === "orders") fetchOrders();
       else fetchInventory();
@@ -254,7 +271,7 @@ export default function AdminOrdersPage() {
               </button>
             </div>
           </div>
-          <button onClick={() => { setIsAuthenticated(false); setPassword(""); }} style={{ background: "transparent", border: "1px solid var(--maroon)", color: "var(--maroon)", padding: "8px 16px", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}>
+          <button onClick={handleLogout} style={{ background: "transparent", border: "1px solid var(--maroon)", color: "var(--maroon)", padding: "8px 16px", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}>
             Logout
           </button>
         </div>

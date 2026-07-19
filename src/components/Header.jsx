@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import heroBanner from "../../public/header-banner.jpg";
 import SearchBar from "./SearchBar.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import { useSession, signOut } from "next-auth/react";
 import "./Header.css";
 
 const NAV_ITEMS = [
@@ -17,7 +17,8 @@ const NAV_ITEMS = [
 
 const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { data: session, status } = useSession();
+  const user = session?.user;
   const [menuOpen, setMenuOpen]           = useState(false);
   const [navSticky, setNavSticky]         = useState(false);
   const [searchOpen, setSearchOpen]       = useState(false);
@@ -158,7 +159,7 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
             <button
               type="button"
               className="bm-drawer__link"
-              onClick={() => { logout(); closeMenu(); }}
+              onClick={() => { signOut(); closeMenu(); }}
               style={{ width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", fontSize: "inherit" }}
             >
               Sign Out
@@ -298,7 +299,7 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
                     type="button"
                     className="bm-account-dropdown__item bm-account-dropdown__item--logout"
                     role="menuitem"
-                    onClick={() => { logout(); setAccountOpen(false); }}
+                    onClick={() => { signOut(); setAccountOpen(false); }}
                   >
                     ← Sign Out
                   </button>
@@ -366,7 +367,7 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
               <button
                 type="button"
                 className="bm-account-btn bm-account-btn--user bm-account-btn--sm"
-                onClick={() => { logout(); }}
+                onClick={() => { signOut(); }}
                 aria-label="Sign out"
               >
                 <span className="bm-account-avatar">{user.name.charAt(0).toUpperCase()}</span>

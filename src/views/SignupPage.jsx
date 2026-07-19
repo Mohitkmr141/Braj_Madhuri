@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../context/AuthContext.jsx";
+import { signIn } from "next-auth/react";
 import "./Auth.css";
 
 function getPasswordStrength(pw) {
@@ -22,7 +22,6 @@ const STRENGTH_CLASSES = ["", "weak", "fair", "good", "strong"];
 
 export default function SignupPage() {
   const router = useRouter();
-  const { signup } = useAuth();
 
   const [form, setForm]       = useState({ name: "", email: "", password: "", confirm: "" });
   const [showPw, setShowPw]   = useState(false);
@@ -46,16 +45,43 @@ export default function SignupPage() {
     if (form.password !== form.confirm) { setError("Passwords do not match. Please re-enter."); return; }
 
     setLoading(true);
-    // Small delay for UX feel
-    await new Promise((r) => setTimeout(r, 600));
 
-    const result = signup(form.name, form.email, form.password);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          password: form.password,
+        }),
+      });
 
-    if (!result.ok) {
-      setError(result.error);
-    } else {
-      router.push("/");
+      const data = await res.json();
+
+      if (!data.success) {
+        setError(data.error);
+        setLoading(false);
+        return;
+      }
+
+      // Auto login after successful signup
+      const signInResult = await signIn("credentials", {
+        redirect: false,
+        email: form.email,
+        password: form.password,
+      });
+
+      if (signInResult.error) {
+        setError("Account created, but failed to log in automatically.");
+      } else {
+        router.push("/");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 

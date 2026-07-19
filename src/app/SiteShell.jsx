@@ -6,7 +6,7 @@ import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 import FloatingCart from "../components/FloatingCart.jsx";
 import { CartProvider } from "../context/CartContext.jsx";
-import { AuthProvider } from "../context/AuthContext.jsx";
+import { SessionProvider } from "next-auth/react";
 import { WishlistProvider } from "../context/WishlistContext.jsx";
 
 export default function SiteShell({ children }) {
@@ -187,7 +187,7 @@ export default function SiteShell({ children }) {
   }, [pathname, searchParams]);
 
   return (
-    <AuthProvider>
+    <SessionProvider>
       <CartProvider value={contextValue}>
         <WishlistProvider value={wishlistContextValue}>
           <p className="visually-hidden" aria-live="polite">
@@ -199,6 +199,6 @@ export default function SiteShell({ children }) {
           <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
         </WishlistProvider>
       </CartProvider>
-    </AuthProvider>
+    </SessionProvider>
   );
 }

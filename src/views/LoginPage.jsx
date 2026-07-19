@@ -4,12 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../context/AuthContext.jsx";
+import { signIn } from "next-auth/react";
 import "./Auth.css";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
 
   const [form, setForm]       = useState({ email: "", password: "" });
   const [showPw, setShowPw]   = useState(false);
@@ -29,15 +28,24 @@ export default function LoginPage() {
     if (!form.password)        { setError("Please enter your password."); return; }
 
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 600));
 
-    const result = login(form.email, form.password);
-    setLoading(false);
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email: form.email,
+        password: form.password,
+      });
 
-    if (!result.ok) {
-      setError(result.error);
-    } else {
-      router.push("/");
+      if (result.error) {
+        setError(result.error);
+      } else {
+        router.push("/");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
