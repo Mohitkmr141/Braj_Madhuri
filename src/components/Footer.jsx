@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -12,8 +13,8 @@ const Footer = () => {
       marginTop: 'auto'
     }}>
       <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-        <a href="/return-and-refund-policy" style={{ color: 'var(--maroon)', textDecoration: 'none', fontWeight: '500', fontFamily: 'Inter, sans-serif', fontSize: '14px' }}>Return & Refund Policy</a>
-        <a href="/shipping-policy" style={{ color: 'var(--maroon)', textDecoration: 'none', fontWeight: '500', fontFamily: 'Inter, sans-serif', fontSize: '14px' }}>Shipping Policy</a>
+        <Link href="/return-and-refund-policy" style={{ color: 'var(--maroon)', textDecoration: 'none', fontWeight: '500', fontFamily: 'Inter, sans-serif', fontSize: '14px' }}>Return & Refund Policy</Link>
+        <Link href="/shipping-policy" style={{ color: 'var(--maroon)', textDecoration: 'none', fontWeight: '500', fontFamily: 'Inter, sans-serif', fontSize: '14px' }}>Shipping Policy</Link>
       </div>
       <p style={{ 
         margin: 0, 

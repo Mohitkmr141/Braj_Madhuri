@@ -51,7 +51,7 @@ export default function CartPage() {
           
           <div className="cart-items-list">
             {cartItems.map((item) => {
-              const itemKey = `${item.id}-${item.size || 'default'}`;
+              const itemKey = `${item.id}-${item.size || 'default'}-${item.color || 'default'}`;
               return (
                 <div key={itemKey} className="cart-item-card">
                   <div className="cart-item-img">
@@ -84,7 +84,7 @@ export default function CartPage() {
                       <div className="qty-controls">
                         <button 
                           className="qty-btn" 
-                          onClick={() => updateQuantity(item.id, item.size, item.quantity - 1)}
+                          onClick={() => updateQuantity(item.id, item.size, item.quantity - 1, item.color)}
                           aria-label="Decrease quantity"
                         >
                           –
@@ -98,7 +98,7 @@ export default function CartPage() {
                         />
                         <button 
                           className="qty-btn" 
-                          onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)}
+                          onClick={() => updateQuantity(item.id, item.size, item.quantity + 1, item.color)}
                           aria-label="Increase quantity"
                         >
                           +
@@ -106,7 +106,7 @@ export default function CartPage() {
                       </div>
                       <button 
                         className="cart-remove-btn" 
-                        onClick={() => removeFromCart(item.id, item.size)}
+                        onClick={() => removeFromCart(item.id, item.size, item.color)}
                       >
                         Remove
                       </button>

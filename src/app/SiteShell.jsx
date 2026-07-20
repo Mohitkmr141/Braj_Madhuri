@@ -44,10 +44,10 @@ export default function SiteShell({ children }) {
         product = { id: `legacy-${Date.now()}`, title: 'Item', price: product, image: '', originalPrice: null };
       }
       
-      const existing = prev.find((item) => item.id === product.id && item.size === product.size);
+      const existing = prev.find((item) => item.id === product.id && item.size === product.size && item.color === product.color);
       if (existing) {
         return prev.map((item) =>
-          item.id === product.id && item.size === product.size
+          item.id === product.id && item.size === product.size && item.color === product.color
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -56,18 +56,18 @@ export default function SiteShell({ children }) {
     });
   }, []);
 
-  const updateQuantity = useCallback((id, size, quantity) => {
+  const updateQuantity = useCallback((id, size, quantity, color) => {
     setCartItems((prev) =>
       quantity < 1
-        ? prev.filter((item) => !(item.id === id && item.size === size))
+        ? prev.filter((item) => !(item.id === id && item.size === size && item.color === color))
         : prev.map((item) =>
-            item.id === id && item.size === size ? { ...item, quantity } : item
+            item.id === id && item.size === size && item.color === color ? { ...item, quantity } : item
           )
     );
   }, []);
 
-  const removeFromCart = useCallback((id, size) => {
-    setCartItems((prev) => prev.filter((item) => !(item.id === id && item.size === size)));
+  const removeFromCart = useCallback((id, size, color) => {
+    setCartItems((prev) => prev.filter((item) => !(item.id === id && item.size === size && item.color === color)));
   }, []);
 
   const emptyCart = useCallback(() => {

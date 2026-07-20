@@ -87,9 +87,10 @@ export async function POST(request) {
         });
       }
 
-      // 3. Generate unique Order Number
-      const randomId = Math.floor(Math.random() * 900000) + 100000;
-      const orderNumber = `BM-${randomId}`;
+      // 3. Generate unique Order Number (timestamp + random suffix for collision safety)
+      const timestamp = Date.now().toString(36).toUpperCase();
+      const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      const orderNumber = `BM-${timestamp}${randomSuffix}`;
 
       // 4. Save order to database
       const newOrder = await tx.order.create({

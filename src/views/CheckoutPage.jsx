@@ -62,6 +62,11 @@ export default function CheckoutPage() {
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
+      // Prevent multiple script injections
+      if (document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
+        resolve(true);
+        return;
+      }
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.onload = () => resolve(true);
@@ -74,9 +79,33 @@ export default function CheckoutPage() {
     e.preventDefault();
     setError("");
     
-    // Simple Validation
+    // Validation
     if (!formData.firstName || !formData.address || !formData.city || !formData.pincode || !formData.phone || !formData.email || !formData.state) {
       setError("Please fill in all required fields.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    // Phone validation (10 digits)
+    const phoneDigits = formData.phone.replace(/\D/g, '');
+    if (phoneDigits.length !== 10) {
+      setError("Please enter a valid 10-digit phone number.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    // Pincode validation (6 digits)
+    const pincodeDigits = formData.pincode.replace(/\D/g, '');
+    if (pincodeDigits.length !== 6) {
+      setError("Please enter a valid 6-digit pincode.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -96,6 +125,12 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: finalTotalAmount }),
       });
+      if (!orderRes.ok) {
+        const errData = await orderRes.json().catch(() => ({}));
+        setError(errData.error || "Failed to create payment order. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
       const orderData = await orderRes.json();
       
       if (!orderData.success) {
@@ -127,6 +162,12 @@ export default function CheckoutPage() {
                 razorpay_signature: response.razorpay_signature,
               }),
             });
+            if (!verifyRes.ok) {
+              const errData = await verifyRes.json().catch(() => ({}));
+              setError(errData.error || "Order verification failed. Please contact support.");
+              setIsSubmitting(false);
+              return;
+            }
             const data = await verifyRes.json();
             if (data.success) {
               emptyCart();

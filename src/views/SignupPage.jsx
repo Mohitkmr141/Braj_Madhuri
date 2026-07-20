@@ -41,6 +41,8 @@ export default function SignupPage() {
 
     if (!form.name.trim()) { setError("Please enter your full name."); return; }
     if (!form.email.trim()) { setError("Please enter your email address."); return; }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email.trim())) { setError("Please enter a valid email address."); return; }
     if (form.password.length < 6) { setError("Password must be at least 6 characters."); return; }
     if (form.password !== form.confirm) { setError("Passwords do not match. Please re-enter."); return; }
 

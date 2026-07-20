@@ -4,7 +4,12 @@ import { cookies } from 'next/headers';
 export async function POST(request) {
   try {
     const { password } = await request.json();
-    const correctPassword = process.env.ADMIN_PASSWORD || "admin123";
+    const correctPassword = process.env.ADMIN_PASSWORD;
+
+    if (!correctPassword) {
+      console.error('[Admin Login] ADMIN_PASSWORD environment variable is not set.');
+      return NextResponse.json({ success: false, error: 'Server configuration error' }, { status: 500 });
+    }
 
     if (password === correctPassword) {
       // Set secure cookie

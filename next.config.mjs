@@ -1,22 +1,24 @@
-import os from 'os';
+/** @type {import('next').NextConfig} */
+const nextConfig = {};
 
-function getLocalIPs() {
-  const interfaces = os.networkInterfaces();
-  const ips = [];
-  for (const name of Object.keys(interfaces)) {
-    for (const iface of interfaces[name]) {
-      if (iface.family === 'IPv4' && !iface.internal) {
-        ips.push(iface.address);
+// Only set allowedDevOrigins in development to prevent HMR errors
+if (process.env.NODE_ENV === 'development') {
+  const os = await import('os');
+
+  function getLocalIPs() {
+    const interfaces = os.networkInterfaces();
+    const ips = [];
+    for (const name of Object.keys(interfaces)) {
+      for (const iface of interfaces[name]) {
+        if (iface.family === 'IPv4' && !iface.internal) {
+          ips.push(iface.address);
+        }
       }
     }
+    return ips;
   }
-  return ips;
-}
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  // Dynamically allow all current local IPs to prevent HMR errors
-  allowedDevOrigins: [...getLocalIPs(), '192.168.1.20', '192.168.26.91'],
-};
+  nextConfig.allowedDevOrigins = [...getLocalIPs(), '192.168.1.20', '192.168.26.91'];
+}
 
 export default nextConfig;

@@ -25,6 +25,8 @@ export default function LoginPage() {
     setError("");
 
     if (!form.email.trim())    { setError("Please enter your email address."); return; }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email.trim())) { setError("Please enter a valid email address."); return; }
     if (!form.password)        { setError("Please enter your password."); return; }
 
     setLoading(true);
