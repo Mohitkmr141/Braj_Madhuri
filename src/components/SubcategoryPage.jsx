@@ -431,7 +431,7 @@ export default function SubcategoryPage({
 }) {
   const [dbProducts, setDbProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortOrder, setSortOrder] = useState("default");
+  const [sortOrder, setSortOrder] = useState("low-to-high");
 
   useEffect(() => {
     fetch('/api/products')
