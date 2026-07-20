@@ -1,30 +1,37 @@
 import nodemailer from "nodemailer";
 
-// ─── Singleton transporter ────────────────────────────────────────────────────
-// Created once at module load time so the TCP connection to Gmail is reused
-// across all orders rather than being torn down and rebuilt on every request.
+// ─── Transporter factory & singleton ──────────────────────────────────────────
 let _transporter = null;
 
-function getTransporter() {
-  if (_transporter) return _transporter;
+function createFreshTransporter() {
+  const user = process.env.EMAIL_USER?.trim();
+  const pass = process.env.EMAIL_PASS?.replace(/\s+/g, "");
 
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    return null; // No credentials — will be caught in sendOrderEmail
+  if (!user || !pass) {
+    return null;
   }
 
-  _transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS, // Gmail App Password
-    }
+  return nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: { user, pass },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
   });
+}
 
+function getTransporter() {
+  if (!_transporter) {
+    _transporter = createFreshTransporter();
+  }
   return _transporter;
 }
 
 // ─── Retry helper ─────────────────────────────────────────────────────────────
 // Retries a promise-returning fn up to `maxAttempts` times with a delay.
+// If an attempt fails, it recreates the transporter in case of broken sockets.
 async function withRetry(fn, maxAttempts = 3, delayMs = 1000) {
   let lastError;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -32,6 +39,8 @@ async function withRetry(fn, maxAttempts = 3, delayMs = 1000) {
       return await fn();
     } catch (err) {
       lastError = err;
+      // Re-initialize transporter on socket connection drop
+      _transporter = createFreshTransporter();
       if (attempt < maxAttempts) {
         console.warn(`[Email] Attempt ${attempt} failed: ${err.message} — retrying in ${delayMs}ms…`);
         await new Promise((res) => setTimeout(res, delayMs));
@@ -41,21 +50,30 @@ async function withRetry(fn, maxAttempts = 3, delayMs = 1000) {
   throw lastError;
 }
 
-// ─── Build HTML helpers ───────────────────────────────────────────────────────
+// ─── Build HTML helpers for Orders ───────────────────────────────────────────
 function buildItemsHtml(order) {
-  const items =
-    typeof order.cartItems === "string"
-      ? JSON.parse(order.cartItems)
-      : order.cartItems || [];
+  let items = [];
+  try {
+    items =
+      typeof order.cartItems === "string"
+        ? JSON.parse(order.cartItems)
+        : order.cartItems || [];
+  } catch (err) {
+    console.error("[Email] Error parsing cart items:", err);
+  }
+
+  if (!Array.isArray(items) || items.length === 0) {
+    return "<li style='color:#777;'>No item details available</li>";
+  }
 
   return items
     .map(
       (item) =>
         `<li style="margin-bottom:6px;">
-          <strong>${item.quantity}x ${item.title}</strong>
+          <strong>${item.quantity || 1}x ${item.title || "Product"}</strong>
           ${item.size ? `<span style="color:#888;"> (Size: ${item.size})</span>` : ""}
           ${item.color ? `<span style="color:#888;"> [${item.color}]</span>` : ""}
-          — ₹${item.price}
+          — ₹${item.price || 0}
         </li>`
     )
     .join("");
@@ -113,7 +131,45 @@ function buildCustomerHtml(order, itemsHtml) {
     </div>`;
 }
 
-// ─── Main export ──────────────────────────────────────────────────────────────
+// ─── Build HTML helpers for Contact / Inquiries ──────────────────────────────
+function buildContactAdminHtml({ name, email, phone, subject, message }) {
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:10px;">
+      <h2 style="color:#4A1521;margin-top:0;">📩 New Website Inquiry</h2>
+      <p style="color:#555;">A new message was submitted on <strong>The Braj Madhuri</strong> contact form.</p>
+
+      <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;width:30%;border-radius:4px;">Sender Name</td><td style="padding:8px;">${name}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold;">Email Address</td><td style="padding:8px;"><a href="mailto:${email}" style="color:#4A1521;text-decoration:none;">${email}</a></td></tr>
+        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;">Phone Number</td><td style="padding:8px;">${phone || "Not provided"}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold;">Subject</td><td style="padding:8px;">${subject || "General Inquiry"}</td></tr>
+      </table>
+
+      <h3 style="color:#C9972A;">Message Content</h3>
+      <div style="padding:16px;background:#f9f9f9;border-left:4px solid #C9972A;white-space:pre-wrap;color:#333;font-size:14px;line-height:1.6;">${message}</div>
+
+      <hr style="border:none;border-top:1px solid #e0e0e0;margin:20px 0;" />
+      <p style="font-size:12px;color:#888;">You can reply directly to this email or send a response to ${email}.</p>
+    </div>`;
+}
+
+function buildContactCustomerHtml({ name, subject, message }) {
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:10px;">
+      <h2 style="color:#4A1521;margin-top:0;">🪷 We've received your message</h2>
+      <p style="color:#555;">Dear <strong>${name}</strong>,</p>
+      <p style="color:#555;">Thank you for reaching out to <strong>The Braj Madhuri</strong>. We have received your message regarding <em>"${subject || "General Inquiry"}"</em> and our team will respond as quickly as possible.</p>
+
+      <h4 style="color:#C9972A;margin-bottom:6px;">Copy of your message:</h4>
+      <div style="padding:12px;background:#fdf8f0;border-radius:6px;white-space:pre-wrap;color:#444;font-size:13px;line-height:1.5;">${message}</div>
+
+      <hr style="border:none;border-top:1px solid #e0e0e0;margin:20px 0;" />
+      <p style="font-size:14px;color:#4A1521;font-weight:bold;margin-top:10px;">Jai Shri Krishna · Radhe Radhe 🙏</p>
+      <p style="font-size:12px;color:#aaa;margin-top:16px;">© The Braj Madhuri</p>
+    </div>`;
+}
+
+// ─── Main Exports ─────────────────────────────────────────────────────────────
 export const sendOrderEmail = async (order) => {
   const transporter = getTransporter();
 
@@ -123,10 +179,10 @@ export const sendOrderEmail = async (order) => {
   }
 
   const itemsHtml = buildItemsHtml(order);
-  const adminEmail = process.env.EMAIL_USER;
+  const adminEmail = process.env.EMAIL_USER?.trim();
   const customerEmail = order.email?.trim();
 
-  // ── 1. Send admin notification (with retry) ──────────────────────────────
+  // 1. Send admin notification (with retry)
   const adminResult = await withRetry(
     () =>
       transporter.sendMail({
@@ -138,14 +194,14 @@ export const sendOrderEmail = async (order) => {
     3,
     1000
   ).then(() => {
-    console.log(`[Email] ✅ Admin email sent for order ${order.orderNumber}`);
+    console.log(`[Email] ✅ Admin order email sent for ${order.orderNumber}`);
     return { ok: true };
   }).catch((err) => {
-    console.error(`[Email] ❌ Admin email FAILED for order ${order.orderNumber}:`, err.message);
+    console.error(`[Email] ❌ Admin order email FAILED for ${order.orderNumber}:`, err.message);
     return { ok: false, error: err.message };
   });
 
-  // ── 2. Send customer confirmation (with retry, only if email provided) ───
+  // 2. Send customer confirmation (with retry)
   let customerResult = { ok: true, skipped: true };
   if (customerEmail) {
     customerResult = await withRetry(
@@ -165,14 +221,72 @@ export const sendOrderEmail = async (order) => {
       console.error(`[Email] ❌ Customer email FAILED to ${customerEmail} for order ${order.orderNumber}:`, err.message);
       return { ok: false, error: err.message };
     });
-  } else {
-    console.warn(`[Email] ⚠️ No customer email for order ${order.orderNumber} — skipping customer email.`);
   }
 
-  // Return combined result — admin email is the critical one
   return {
     success: adminResult.ok,
     admin: adminResult,
     customer: customerResult,
   };
 };
+
+export const sendContactEmail = async ({ name, email, phone, subject, message }) => {
+  const transporter = getTransporter();
+
+  if (!transporter) {
+    console.warn("[Email] No EMAIL_USER or EMAIL_PASS in .env — skipping contact email send.");
+    return { success: false, skipped: true, error: "Email credentials not configured on server." };
+  }
+
+  const adminEmail = process.env.EMAIL_USER?.trim();
+  const customerEmail = email?.trim();
+
+  // 1. Send inquiry notification to admin
+  const adminResult = await withRetry(
+    () =>
+      transporter.sendMail({
+        from: `"The Braj Madhuri Inquiries" <${adminEmail}>`,
+        to: adminEmail,
+        replyTo: customerEmail ? `"${name}" <${customerEmail}>` : adminEmail,
+        subject: `📩 Contact Inquiry: ${subject || "Website Message"} [from ${name}]`,
+        html: buildContactAdminHtml({ name, email, phone, subject, message }),
+      }),
+    3,
+    1000
+  ).then(() => {
+    console.log(`[Email] ✅ Admin contact email sent for message from ${name} (${email})`);
+    return { ok: true };
+  }).catch((err) => {
+    console.error(`[Email] ❌ Admin contact email FAILED:`, err.message);
+    return { ok: false, error: err.message };
+  });
+
+  // 2. Send receipt auto-reply to customer
+  let customerResult = { ok: true, skipped: true };
+  if (customerEmail) {
+    customerResult = await withRetry(
+      () =>
+        transporter.sendMail({
+          from: `"The Braj Madhuri" <${adminEmail}>`,
+          to: customerEmail,
+          subject: `We've received your message — The Braj Madhuri`,
+          html: buildContactCustomerHtml({ name, subject, message }),
+        }),
+      3,
+      1000
+    ).then(() => {
+      console.log(`[Email] ✅ Customer receipt sent to ${customerEmail}`);
+      return { ok: true };
+    }).catch((err) => {
+      console.error(`[Email] ❌ Customer receipt FAILED to ${customerEmail}:`, err.message);
+      return { ok: false, error: err.message };
+    });
+  }
+
+  return {
+    success: adminResult.ok,
+    admin: adminResult,
+    customer: customerResult,
+  };
+};
+
