@@ -2,6 +2,12 @@ import { Suspense } from "react";
 import SiteShell from "./SiteShell.jsx";
 import "../App.css";
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata = {
   title: {
     default: "The Braj Madhuri",
