@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import "./SubcategoryPage.css";
@@ -329,40 +329,15 @@ export default function SubcategoryPage({
   addToCart,
   onBack,
   onBackToCategory,
+  dbProducts = [],
+  productsLoading = false,
 }) {
-  const [dbProducts, setDbProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('/api/products')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.categories) {
-          // Flatten categories to products
-          const flatProducts = data.categories.flatMap(c => 
-            c.products.map(p => ({
-              ...p,
-              categoryTitle: c.title,
-              categoryDesc: c.description,
-              sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null
-            }))
-          );
-          setDbProducts(flatProducts);
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
-
   const products = useMemo(
     () => resolveSubcategoryProducts(catId, subName, dbProducts),
     [catId, subName, dbProducts]
   );
 
-  if (loading) {
+  if (productsLoading) {
     return <section className="subcat-page"><div className="subcat-section-header"><h2 className="subcat-section-title">Loading...</h2></div></section>;
   }
 

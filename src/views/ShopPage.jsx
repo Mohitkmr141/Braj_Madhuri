@@ -1,12 +1,47 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CategoryGalleries from "../components/Categories.jsx";
 import CategoryGrid from "../components/CategoryGrid.jsx";
 import SubcategoryPage from "../components/SubcategoryPage.jsx";
 import { useCart } from "../context/CartContext.jsx";
 import CATEGORIES from "../data/categoriesData.js";
+
+// Module-level cache so the products fetch only happens once per session
+// even when navigating back and forth between subcategory and category views.
+let _productsCache = null;
+let _productsFetchPromise = null;
+
+function fetchProducts() {
+  if (_productsCache) return Promise.resolve(_productsCache);
+  if (_productsFetchPromise) return _productsFetchPromise;
+
+  _productsFetchPromise = fetch("/api/products")
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success && data.categories) {
+        const flatProducts = data.categories.flatMap((c) =>
+          c.products.map((p) => ({
+            ...p,
+            categoryTitle: c.title,
+            categoryDesc: c.description,
+            sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null,
+          }))
+        );
+        _productsCache = flatProducts;
+        return flatProducts;
+      }
+      return [];
+    })
+    .catch((err) => {
+      console.error(err);
+      _productsFetchPromise = null; // allow retry on error
+      return [];
+    });
+
+  return _productsFetchPromise;
+}
 
 function ShopPage() {
   const router = useRouter();
@@ -15,6 +50,23 @@ function ShopPage() {
   const activeCategory = searchParams.get("category");
   const searchQuery = searchParams.get("search");
   const activeProductId = searchParams.get("product");
+
+  // Shared products state — fetched once, reused by both views
+  const [dbProducts, setDbProducts] = useState(_productsCache ?? []);
+  const [productsLoading, setProductsLoading] = useState(!_productsCache);
+
+  useEffect(() => {
+    if (_productsCache) {
+      setDbProducts(_productsCache);
+      setProductsLoading(false);
+      return;
+    }
+    setProductsLoading(true);
+    fetchProducts().then((products) => {
+      setDbProducts(products);
+      setProductsLoading(false);
+    });
+  }, []);
 
   // Parse compound subcategory key "catId::SubName"
   const isSubcategory = activeCategory?.includes("::");
@@ -55,6 +107,8 @@ function ShopPage() {
           subName={subName}
           catLabel={catLabel}
           addToCart={addToCart}
+          dbProducts={dbProducts}
+          productsLoading={productsLoading}
           onBack={() => router.push("/shop")}
           onBackToCategory={() =>
             router.push(`/shop?category=${encodeURIComponent(catId)}`)
@@ -89,6 +143,8 @@ function ShopPage() {
         searchQuery={searchQuery}
         activeProductId={activeProductId}
         onClearFilter={() => handleExploreCategory(null)}
+        dbProducts={dbProducts}
+        productsLoading={productsLoading}
       />
     </main>
   );
