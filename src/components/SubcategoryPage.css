@@ -21,6 +21,8 @@
   font-size: 13px;
   color: #9a7c50;
   flex-wrap: wrap;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .subcat-breadcrumb__sep {
