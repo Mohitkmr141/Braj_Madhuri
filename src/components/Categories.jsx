@@ -81,7 +81,7 @@ function resolveFilter(filterFolder, searchQuery, allProducts) {
     
     products = products.filter(p => {
       const imgTitle = (p.title || p.folderName).toLowerCase();
-      const imgDesc = (p.description || "").toLowerCase();
+      const imgDesc = (p.description || p.categoryDesc || "").toLowerCase();
       return imgTitle.includes(query) || imgDesc.includes(query);
     });
 

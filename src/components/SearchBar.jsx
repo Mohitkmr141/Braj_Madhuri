@@ -11,8 +11,11 @@ function buildSearchIndex(dbProducts) {
     id: product.id,
     folder: product.folderName,
     title: product.title || product.folderName,
+    // Include both description fields so the index matches what the gallery filter uses
     description: product.description || product.categoryDesc || "",
+    categoryDesc: product.categoryDesc || "",
     price: product.price,
+    imageUrl: product.imageUrl,
   }));
 }
 
@@ -104,7 +107,9 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
   };
 
   const goToResult = (result) => {
-    router.push(`/shop?product=${result.id}`);
+    // Navigate to the shop page with the product title as search query
+    // so CategoryGalleries scrolls into view and highlights the product
+    router.push(`/shop?search=${encodeURIComponent(result.title)}`);
     setQuery("");
     setResults([]);
     setIsOpen(false);
@@ -244,13 +249,18 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
               type="button"
               className="search-view-all"
               onMouseDown={() => {
-                router.push("/shop");
+                // Pass the current query so the shop page shows filtered results
+                if (query.trim()) {
+                  router.push(`/shop?search=${encodeURIComponent(query.trim())}`);
+                } else {
+                  router.push("/shop");
+                }
                 setQuery("");
                 setIsOpen(false);
                 onClose?.();
               }}
             >
-              View all products →
+              View all results →
             </button>
           </li>
         </ul>

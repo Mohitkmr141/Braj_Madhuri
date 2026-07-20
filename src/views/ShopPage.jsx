@@ -33,18 +33,16 @@ function ShopPage() {
   };
 
   useEffect(() => {
-    if (!activeCategory) return;
-    // Only scroll to collections grid for non-subcategory filters
-    if (!isSubcategory) {
+    // Scroll to the collections grid when a category filter or search query is active
+    if (isSubcategory) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else if (activeCategory || searchQuery) {
       document.getElementById("collections")?.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
-    } else {
-      // Scroll to top of page for product detail view
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [activeCategory, isSubcategory]);
+  }, [activeCategory, searchQuery, isSubcategory]);
 
   // ── Subcategory product detail view ───────────────────────────────────────
   if (isSubcategory) {
