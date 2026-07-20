@@ -1,13 +1,9 @@
-import { PrismaClient } from '@prisma/client';
+import { getPrisma } from '../../../lib/prisma.js';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-let prisma;
-function getPrisma() {
-  if (!prisma) prisma = new PrismaClient();
-  return prisma;
-}
+
 
 export async function GET() {
   const prisma = getPrisma();
@@ -27,3 +23,5 @@ export async function GET() {
     );
   }
 }
+
+

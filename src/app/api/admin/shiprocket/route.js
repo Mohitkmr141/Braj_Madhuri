@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { getPrisma } from '../../../../lib/prisma.js';
 import { NextResponse } from 'next/server';
 import { 
   generateAWB, 
@@ -11,11 +11,7 @@ import {
 } from '../../../../lib/shiprocket.js';
 import { cookies } from 'next/headers';
 
-let prisma;
-function getPrisma() {
-  if (!prisma) prisma = new PrismaClient();
-  return prisma;
-}
+
 
 export async function POST(request) {
   const cookieStore = await cookies();
@@ -102,3 +98,5 @@ export async function POST(request) {
     );
   }
 }
+
+

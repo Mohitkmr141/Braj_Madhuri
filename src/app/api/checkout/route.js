@@ -1,14 +1,10 @@
-import { PrismaClient } from '@prisma/client';
+import { getPrisma } from '../../../lib/prisma.js';
 import { NextResponse } from 'next/server';
 import { sendOrderEmail } from '../../../lib/mailer.js';
 import { createShiprocketOrder } from '../../../lib/shiprocket.js';
 import crypto from 'crypto';
 
-let prisma;
-function getPrisma() {
-  if (!prisma) prisma = new PrismaClient();
-  return prisma;
-}
+
 
 export async function POST(request) {
   const prisma = getPrisma();
@@ -158,3 +154,5 @@ export async function POST(request) {
     );
   }
 }
+
+

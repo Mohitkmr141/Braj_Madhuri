@@ -1,8 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import { getPrisma } from "../../../../lib/prisma.js";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
+const prisma = getPrisma();
 
 export async function POST(request) {
   try {
@@ -54,3 +54,4 @@ export async function POST(request) {
     );
   }
 }
+

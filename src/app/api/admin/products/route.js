@@ -1,14 +1,10 @@
-import { PrismaClient } from '@prisma/client';
+import { getPrisma } from '../../../../lib/prisma.js';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-let prisma;
-function getPrisma() {
-  if (!prisma) prisma = new PrismaClient();
-  return prisma;
-}
+
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -155,3 +151,5 @@ export async function DELETE(request) {
     );
   }
 }
+
+
