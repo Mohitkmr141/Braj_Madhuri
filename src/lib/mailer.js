@@ -17,11 +17,7 @@ function getTransporter() {
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS, // Gmail App Password
-    },
-    pool: true,          // Keep connection alive between sends
-    maxConnections: 3,   // Allow up to 3 simultaneous connections
-    rateDelta: 1000,     // Wait 1s between messages if needed
-    rateLimit: 5,        // Max 5 messages per rateDelta window
+    }
   });
 
   return _transporter;
