@@ -5,58 +5,130 @@ import "./Reviews.css";
 
 const REVIEWS = [
   {
-    name: "Mohit Kumar",
-    initial: "M",
-    location: "Delhi",
+    name: "Hema",
+    initial: "H",
+    location: "New Delhi",
     rating: 5,
-    text: "Bahut hi sundar products hain, Radhe Radhe! Agarbatti ki khushboo bahut achhi hai.",
-    product: "Agarbatti Collection",
+    text: "I ordered 'Nitya Seva Kit' which make me so happy and satisfied that all the products are of good quality specially at such pocket friendly rate. Fregnance of each and every Itr are very soothing. Radhe Radhe 😊 🙏",
+    product: "Nitya Seva Kit",
     color: "#C9972A",
   },
   {
-    name: "Priya Sharma",
-    initial: "P",
-    location: "Mathura",
+    name: "Anisha Rawat",
+    initial: "A",
+    location: "New Delhi",
     rating: 5,
-    text: "Thakur Ji ki poshak ekdum original aur sundar hai. Braj Dham se aane ki feeling aati hai!",
-    product: "Thakur Ji Poshak",
+    text: "I am very happy to say that Our Thakur ji liked all your products very much and what can I say, the amount of praise I would get is enough for your service. 🧡🧡",
+    product: "Verified Customer",
     color: "#4A1521",
   },
   {
-    name: "Anita Devi",
+    name: "Arpita",
     initial: "A",
-    location: "Vrindavan",
+    location: "Agartala",
     rating: 5,
-    text: "Japa mala bahut hi achhi quality ki hai. Fast delivery bhi mili. Highly recommended!",
-    product: "Japa Mala",
+    text: "Im happy to receive the product, fragrance is so soothing and quantity of Itra Khas was so good. Perfume is very good, I applied on Madav Ji — Room was getting good fragrance, feels so good. I'm happy a lot, thank you. Radhe Radhe 🙏",
+    product: "Itra Khas",
     color: "#7B3F00",
   },
   {
-    name: "Sunita Gupta",
+    name: "Advocate Shivani",
     initial: "S",
-    location: "Jaipur",
+    location: "Rampur, Uttar Pradesh",
     rating: 5,
-    text: "Sab kuch bilkul authentic hai. Attar ki khushboo man ko prasann kar deti hai. Radhe Radhe!",
-    product: "Attar Collection",
-    color: "#1B5E20",
+    text: "Apke diye hue product bhut hi acche hain. Fragrance acchi lagi 😍",
+    product: "Verified Customer",
+    color: "#5B1A8A",
   },
   {
-    name: "Rajesh Mishra",
-    initial: "R",
-    location: "Lucknow",
+    name: "Monika",
+    initial: "M",
+    location: "New Delhi",
     rating: 5,
-    text: "Pehli baar order kiya tha, experience bahut achha raha. Packaging bhi bahut careful thi.",
-    product: "First Order",
+    text: "Received the product and I must say it is worth buying.",
+    product: "Verified Customer",
+    color: "#B5451B",
+  },
+  {
+    name: "Mamta Prajapati",
+    initial: "M",
+    location: "Surat, Gujarat",
+    rating: 5,
+    text: "Maine mere Laddu Gopal ke liye jo bhi purchase kiya hai woh bahut safely idher aaya hai.. thank u so much, muje sabhi seva bahut pasand aai 😊 Radhe Radhe 🙏",
+    product: "Verified Customer",
+    color: "#1A6B3C",
+  },
+  {
+    name: "Joshna Reddy",
+    initial: "J",
+    location: "Mumbai",
+    rating: 5,
+    text: "I am extremely happy with my purchase. The packaging was perfect — everything arrived safely, neatly packed, and in excellent condition. The seva kit was beautifully arranged and contained everything as expected. The itar was the highlight for me. Its fragrance is very soothing, pleasant, and long-lasting, making it perfect for Thakurji seva. The aroma feels pure and calming, creating a peaceful devotional atmosphere. Overall, the quality, presentation, and fragrance exceeded my expectations. Highly recommended for anyone looking for items for Thakurji seva. 🙏✨",
+    product: "Seva Kit & Itar",
     color: "#0D47A1",
   },
   {
-    name: "Deepa Verma",
-    initial: "D",
-    location: "Mumbai",
+    name: "Ena Pathak",
+    initial: "E",
+    location: "Delhi",
     rating: 5,
-    text: "The Braj Madhuri se products le kar dil khush ho gaya. Sab products premium quality ke hain.",
-    product: "Multiple Products",
-    color: "#4A148C",
+    text: "I ordered few products from the wide variety of range offered. I loved each and every product especially the havan cups and agarbattis — I am impressed. Great quality, burns clean, perfect for everyday use. The soothing fragrance simply elevates the puja experience. Highly recommend.",
+    product: "Havan Cups & Agarbatti",
+    color: "#6A0572",
+  },
+  {
+    name: "Sangeeta Nagpal",
+    initial: "S",
+    location: "Noida, Uttar Pradesh",
+    rating: 5,
+    text: "I am happy with the products purchased, really awesome and with good fragrance. Will be happy to purchase the other products too.",
+    product: "Verified Customer",
+    color: "#1B5E20",
+  },
+  {
+    name: "Nimisha",
+    initial: "N",
+    location: "Noida, Uttar Pradesh",
+    rating: 5,
+    text: "Soothing fragrance and good quality chandan.. perfect for daily offering.. worth buying.",
+    product: "Chandan",
+    color: "#C9972A",
+  },
+  {
+    name: "Alka Verma",
+    initial: "A",
+    location: "Faridabad, Haryana",
+    rating: 5,
+    text: "Itra ki mahak manabhavan hai. Laddu Gopal ke vastr naram mulayam hain. Sticks ki mahak bhi bheeni bheeni hai... kul milakar sabhi products bahut acche hain. Jai Shri Radhe 🙏",
+    product: "Itra & Vastra",
+    color: "#8B1A1A",
+  },
+  {
+    name: "Surbhi Choudhary",
+    initial: "S",
+    location: "Greater Noida",
+    rating: 5,
+    text: "Nice collection of fragrances, I liked ❤️ them all.",
+    product: "Fragrance Collection",
+    color: "#C2185B",
+  },
+  {
+    name: "Sapna",
+    initial: "S",
+    location: "Bhavnagar, Gujarat",
+    rating: 5,
+    text: "Bahot acha paking kar k bheja or sab product bahot acha he 😍 I m so happy.",
+    product: "Verified Customer",
+    color: "#00695C",
+  },
+  {
+    name: "Surbhi",
+    initial: "S",
+    location: "Noida, Uttar Pradesh",
+    rating: 5,
+    text: "I bought camphor, kesar tilak and dhoop sticks.. they are 💯 pure and feels very calm and spiritual when I used for pooja. Love all the products.",
+    product: "Camphor, Kesar Tilak & Dhoop",
+    color: "#37474F",
   },
 ];
 
@@ -148,22 +220,24 @@ export default function Reviews() {
     };
   }, []);
 
-  // Duplicate reviews for seamless loop
+  // Duplicate reviews for seamless infinite loop
   const allReviews = [...REVIEWS, ...REVIEWS];
 
   return (
-    <section className="reviews-section" id="reviews" aria-label="Customer Reviews">
+    <section
+      className="reviews-section"
+      id="reviews"
+      aria-label="Customer Reviews"
+    >
       {/* Header */}
       <div className="reviews-header reveal">
         <span className="reviews-eyebrow">What Our Devotees Say</span>
-        <h2 className="reviews-title">Loved by Our Community</h2>
+        <h2 className="reviews-title">Trusted by Devotees Across India</h2>
         <div className="reviews-rating-row">
-          <div className="reviews-rating-score">4.9</div>
+          <span className="reviews-rating-score">4.9</span>
           <div>
-            <div className="reviews-rating-stars" aria-label="4.9 out of 5 stars">
-              ★★★★★
-            </div>
-            <p className="reviews-rating-count">Based on 500+ happy customers</p>
+            <div className="reviews-rating-stars">★★★★★</div>
+            <p className="reviews-rating-count">Based on verified customer reviews</p>
           </div>
         </div>
       </div>
@@ -178,13 +252,17 @@ export default function Reviews() {
               <div className="review-author" style={{ marginTop: "16px" }}>
                 <div
                   className="review-avatar"
-                  style={{ background: `linear-gradient(135deg, ${review.color}cc, ${review.color})` }}
+                  style={{
+                    background: `linear-gradient(135deg, ${review.color}cc, ${review.color})`,
+                  }}
                 >
                   {review.initial}
                 </div>
                 <div className="review-author-info">
                   <span className="review-author-name">{review.name}</span>
-                  <span className="review-author-location">📍 {review.location}</span>
+                  <span className="review-author-location">
+                    📍 {review.location}
+                  </span>
                 </div>
               </div>
             </div>

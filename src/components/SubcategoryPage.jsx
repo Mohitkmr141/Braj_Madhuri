@@ -48,7 +48,8 @@ function ProductDetailCard({ product, addToCart }) {
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "");
   const [flashing, flash] = useCartFlash();
   const [isZoomed, setIsZoomed] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("Pink");
+  const initialColor = (product?.title || product?.folderName || "").includes("Pearl Choker") ? "Green" : ((product?.title || product?.folderName || "").includes("Long Kundan Haar") ? "Yellow" : ((product?.title || product?.folderName || "").includes("Small Haar") ? "Green" : ((product?.title || product?.folderName || "").includes("Enamael Pendants") ? "Orange" : ((product?.title || product?.folderName || "").includes("Lotus Mala") ? "Red" : ((product?.title || product?.folderName || "").includes("Heavy Kundan Mala Haar") ? "Orange" : ((product?.title || product?.folderName || "") === "Kundan Haar" ? "Pink" : "Pink"))))));
+  const [selectedColor, setSelectedColor] = useState(initialColor);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
 
   const isFav = isInWishlist(product.id, selectedSize);
@@ -66,7 +67,7 @@ function ProductDetailCard({ product, addToCart }) {
       price: product.price ?? 250,
       originalPrice: product.originalPrice,
       size: selectedSize,
-      color: displayTitle?.includes("Meenakari Chandrika Chokar") ? selectedColor : undefined
+      color: (displayTitle?.includes("Meenakari Chandrika Chokar") || displayTitle?.includes("Pearl Choker") || displayTitle?.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle?.includes("Lotus Mala") || displayTitle?.includes("Small Haar") || displayTitle?.includes("Enamael Pendants")) ? selectedColor : undefined
     });
     flash("btn");
   };
@@ -83,7 +84,7 @@ function ProductDetailCard({ product, addToCart }) {
         price: product.price ?? 250,
         originalPrice: product.originalPrice,
         size: selectedSize,
-        color: displayTitle?.includes("Meenakari Chandrika Chokar") ? selectedColor : undefined
+        color: (displayTitle?.includes("Meenakari Chandrika Chokar") || displayTitle?.includes("Pearl Choker") || displayTitle?.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle?.includes("Lotus Mala") || displayTitle?.includes("Small Haar") || displayTitle?.includes("Enamael Pendants")) ? selectedColor : undefined
       });
     }
   };
@@ -173,7 +174,7 @@ function ProductDetailCard({ product, addToCart }) {
                 </>
               )}
 
-              {displayTitle?.includes("Meenakari Chandrika Chokar") && (
+              {(displayTitle?.includes("Meenakari Chandrika Chokar") || displayTitle?.includes("Pearl Choker") || displayTitle?.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle?.includes("Lotus Mala") || displayTitle?.includes("Small Haar") || displayTitle?.includes("Enamael Pendants")) && (
                 <div style={{ marginBottom: "15px" }}>
                   <label htmlFor={`color-select-zoom-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
                   <select 
@@ -182,9 +183,53 @@ function ProductDetailCard({ product, addToCart }) {
                     onChange={(e) => setSelectedColor(e.target.value)}
                     style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
                   >
-                    <option value="Pink">Pink</option>
-                    <option value="Blue">Blue</option>
-                    <option value="Magenta">Magenta</option>
+                    {displayTitle?.includes("Pearl Choker") ? (
+                      <>
+                        <option value="Green">Green</option>
+                        <option value="Peach">Peach</option>
+                        <option value="Yellow">Yellow</option>
+                      </>
+                    ) : displayTitle?.includes("Long Kundan Haar") ? (
+                      <>
+                        <option value="Yellow">Yellow</option>
+                        <option value="Pink">Pink</option>
+                        <option value="Golden">Golden</option>
+                      </>
+                    ) : displayTitle?.includes("Small Haar") ? (
+                      <>
+                        <option value="Green">Green</option>
+                        <option value="Pink">Pink</option>
+                        <option value="Silver">Silver</option>
+                      </>
+                    ) : displayTitle?.includes("Enamael Pendants") ? (
+                      <>
+                        <option value="Orange">Orange</option>
+                        <option value="Green">Green</option>
+                        <option value="Red">Red</option>
+                      </>
+                    ) : displayTitle?.includes("Lotus Mala") ? (
+                      <>
+                        <option value="Red">Red</option>
+                        <option value="Green">Green</option>
+                      </>
+                    ) : displayTitle?.includes("Heavy Kundan Mala Haar") ? (
+                      <>
+                        <option value="Orange">Orange</option>
+                        <option value="Light Green">Light Green</option>
+                      </>
+                    ) : displayTitle === "Kundan Haar" ? (
+                      <>
+                        <option value="Pink">Pink</option>
+                        <option value="Green">Green</option>
+                        <option value="Turquoise">Turquoise</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="Pink">Pink</option>
+                        <option value="Blue">Blue</option>
+                        <option value="Magenta">Magenta</option>
+                      </>
+                    )}
                   </select>
                 </div>
               )}
@@ -255,7 +300,7 @@ function ProductDetailCard({ product, addToCart }) {
           </p>
         )}
 
-        {displayTitle?.includes("Meenakari Chandrika Chokar") && (
+        {(displayTitle?.includes("Meenakari Chandrika Chokar") || displayTitle?.includes("Pearl Choker") || displayTitle?.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle?.includes("Lotus Mala") || displayTitle?.includes("Small Haar") || displayTitle?.includes("Enamael Pendants")) && (
           <div style={{ margin: "15px 0" }}>
             <label htmlFor={`color-select-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
             <select 
@@ -264,9 +309,53 @@ function ProductDetailCard({ product, addToCart }) {
               onChange={(e) => setSelectedColor(e.target.value)}
               style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
             >
-              <option value="Pink">Pink</option>
-              <option value="Blue">Blue</option>
-              <option value="Magenta">Magenta</option>
+              {displayTitle?.includes("Pearl Choker") ? (
+                <>
+                  <option value="Green">Green</option>
+                  <option value="Peach">Peach</option>
+                  <option value="Yellow">Yellow</option>
+                </>
+              ) : displayTitle?.includes("Long Kundan Haar") ? (
+                <>
+                  <option value="Yellow">Yellow</option>
+                  <option value="Pink">Pink</option>
+                  <option value="Golden">Golden</option>
+                </>
+              ) : displayTitle?.includes("Small Haar") ? (
+                <>
+                  <option value="Green">Green</option>
+                  <option value="Pink">Pink</option>
+                  <option value="Silver">Silver</option>
+                </>
+              ) : displayTitle?.includes("Enamael Pendants") ? (
+                <>
+                  <option value="Orange">Orange</option>
+                  <option value="Green">Green</option>
+                  <option value="Red">Red</option>
+                </>
+              ) : displayTitle?.includes("Lotus Mala") ? (
+                <>
+                  <option value="Red">Red</option>
+                  <option value="Green">Green</option>
+                </>
+              ) : displayTitle?.includes("Heavy Kundan Mala Haar") ? (
+                <>
+                  <option value="Orange">Orange</option>
+                  <option value="Light Green">Light Green</option>
+                </>
+              ) : displayTitle === "Kundan Haar" ? (
+                <>
+                  <option value="Pink">Pink</option>
+                  <option value="Green">Green</option>
+                  <option value="Turquoise">Turquoise</option>
+                </>
+              ) : (
+                <>
+                  <option value="Pink">Pink</option>
+                  <option value="Blue">Blue</option>
+                  <option value="Magenta">Magenta</option>
+                </>
+              )}
             </select>
           </div>
         )}
