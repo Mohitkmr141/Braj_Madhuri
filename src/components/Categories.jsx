@@ -101,15 +101,40 @@ export default function CategoryGalleries({
   activeProductId,
   addToCart,
   onClearFilter,
-  dbProducts = [],
-  productsLoading = false,
 }) {
+  const [dbProducts, setDbProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.categories) {
+          // Flatten categories to products
+          const flatProducts = data.categories.flatMap(c => 
+            c.products.map(p => ({
+              ...p,
+              categoryTitle: c.title,
+              categoryDesc: c.description,
+              sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null
+            }))
+          );
+          setDbProducts(flatProducts);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
+
   const { products: visibleProducts, title, isAll } = useMemo(
     () => resolveFilter(filterFolder, searchQuery, dbProducts),
     [filterFolder, searchQuery, dbProducts]
   );
 
-  if (productsLoading) {
+  if (loading) {
     return <section className="galleries-wrapper" id="collections"><div className="section-header"><h2 className="section-title">Loading Products...</h2></div></section>;
   }
 
