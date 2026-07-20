@@ -115,31 +115,29 @@ export async function POST(request) {
 
     console.log(`[Checkout] Order ${result.orderNumber} saved. Razorpay Payment ID: ${razorpay_payment_id}`);
 
-    // ── Send emails (non-blocking — never fails the order response) ───────────
-    sendOrderEmail(result.newOrder).then((emailResult) => {
-      if (!emailResult.success && !emailResult.skipped) {
-        console.error(`[Checkout] Email delivery had issues for order ${result.orderNumber}:`, emailResult);
-      }
-    }).catch((err) => {
-      // Should never reach here since sendOrderEmail handles all errors internally,
-      // but belt-and-suspenders just in case.
-      console.error(`[Checkout] Unexpected email error for order ${result.orderNumber}:`, err.message);
-    });
-
-    // ── Create Shiprocket order (non-blocking) ────────────────────────────────
-    createShiprocketOrder(result.newOrder).then(async (srResult) => {
-      if (srResult?.order_id) {
-        await prisma.order.update({
-          where: { id: result.newOrder.id },
-          data: {
-            shiprocketOrderId: srResult.order_id,
-            shiprocketShipmentId: srResult.shipment_id,
-          },
-        }).catch((err) => console.error('[Checkout] Failed to update Shiprocket IDs:', err.message));
-      }
-    }).catch((err) => {
-      console.error('[Checkout] Failed to create Shiprocket order:', err.message);
-    });
+    // ── Execute background tasks (emails & shiprocket) before returning ──────────
+    await Promise.allSettled([
+      sendOrderEmail(result.newOrder).then((emailResult) => {
+        if (!emailResult.success && !emailResult.skipped) {
+          console.error(`[Checkout] Email delivery had issues for order ${result.orderNumber}:`, emailResult);
+        }
+      }).catch((err) => {
+        console.error(`[Checkout] Unexpected email error for order ${result.orderNumber}:`, err.message);
+      }),
+      createShiprocketOrder(result.newOrder).then(async (srResult) => {
+        if (srResult?.order_id) {
+          await prisma.order.update({
+            where: { id: result.newOrder.id },
+            data: {
+              shiprocketOrderId: srResult.order_id,
+              shiprocketShipmentId: srResult.shipment_id,
+            },
+          }).catch((err) => console.error('[Checkout] Failed to update Shiprocket IDs:', err.message));
+        }
+      }).catch((err) => {
+        console.error('[Checkout] Failed to create Shiprocket order:', err.message);
+      })
+    ]);
 
     // ── Return success immediately — emails/shiprocket run in background ──────
     return NextResponse.json({ success: true, orderNumber: result.orderNumber });
