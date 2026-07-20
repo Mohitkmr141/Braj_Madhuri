@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 import FloatingCart from "../components/FloatingCart.jsx";
+import FloatingWhatsApp from "../components/FloatingWhatsApp.jsx";
 import { CartProvider } from "../context/CartContext.jsx";
 import { SessionProvider } from "next-auth/react";
 import { WishlistProvider } from "../context/WishlistContext.jsx";
@@ -197,6 +198,7 @@ export default function SiteShell({ children }) {
           {children}
           <Footer />
           <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
+          <FloatingWhatsApp />
         </WishlistProvider>
       </CartProvider>
     </SessionProvider>
