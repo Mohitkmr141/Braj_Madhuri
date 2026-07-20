@@ -670,3 +670,49 @@
     padding: 24px;
   }
 }
+
+/* ── Stock badges ─────────────────────────────────────────────────────────── */
+.stock-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.stock-badge--soldout {
+  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  color: #fff;
+}
+
+.stock-badge--low {
+  background: linear-gradient(135deg, #f9a825, #f57f17);
+  color: #fff;
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ── Disabled / Sold Out button ──────────────────────────────────────────── */
+.subcat-atc-btn--disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  background: #999 !important;
+  pointer-events: none;
+}
+
+.subcat-atc-btn--disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}

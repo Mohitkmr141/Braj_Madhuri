@@ -98,8 +98,14 @@ function ProductDetailCard({ product, addToCart }) {
           alt={displayTitle}
           fill
           sizes="(max-width: 700px) 100vw, 340px"
-          style={{ objectFit: "cover" }}
+          style={{ objectFit: "cover", opacity: product.stock === 0 ? 0.5 : 1 }}
         />
+        {product.stock === 0 && (
+          <div className="stock-badge stock-badge--soldout">Sold Out</div>
+        )}
+        {product.stock > 0 && product.stock <= 3 && (
+          <div className="stock-badge stock-badge--low">Only {product.stock} Left!</div>
+        )}
         <button 
           className={`wishlist-toggle-btn ${isFav ? 'active' : ''}`}
           onClick={handleToggleWishlist}
@@ -238,13 +244,14 @@ function ProductDetailCard({ product, addToCart }) {
                 <button
                   className="add-cart-btn gallery-cart-btn quick-view-atc"
                   type="button"
+                  disabled={product.stock === 0}
                   onClick={() => {
                     handleAddToCart();
                     setIsZoomed(false);
                   }}
-                  style={{ flex: 1 }}
+                  style={{ flex: 1, opacity: product.stock === 0 ? 0.5 : 1, cursor: product.stock === 0 ? 'not-allowed' : 'pointer' }}
                 >
-                  Add To Cart
+                  {product.stock === 0 ? 'Sold Out' : 'Add To Cart'}
                 </button>
                 <button 
                   className={`wishlist-quick-btn ${isFav ? 'active' : ''}`}
@@ -383,11 +390,14 @@ function ProductDetailCard({ product, addToCart }) {
         {/* Add to Cart */}
         <button
           type="button"
-          className={`subcat-atc-btn${flashing === "btn" ? " subcat-atc-btn--added" : ""}`}
-          onClick={(e) => { e.stopPropagation(); handleAddToCart(); }}
-          aria-label={`Add ${displayTitle} to cart`}
+          className={`subcat-atc-btn${flashing === "btn" ? " subcat-atc-btn--added" : ""}${product.stock === 0 ? " subcat-atc-btn--disabled" : ""}`}
+          onClick={(e) => { e.stopPropagation(); if (product.stock > 0) handleAddToCart(); }}
+          disabled={product.stock === 0}
+          aria-label={product.stock === 0 ? `${displayTitle} is sold out` : `Add ${displayTitle} to cart`}
         >
-          {flashing === "btn" ? (
+          {product.stock === 0 ? (
+            <>Sold Out</>
+          ) : flashing === "btn" ? (
             <>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12" />
