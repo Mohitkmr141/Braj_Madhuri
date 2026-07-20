@@ -104,6 +104,7 @@ export default function CategoryGalleries({
 }) {
   const [dbProducts, setDbProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortOrder, setSortOrder] = useState("default");
 
   useEffect(() => {
     fetch('/api/products')
@@ -129,10 +130,18 @@ export default function CategoryGalleries({
       });
   }, []);
 
-  const { products: visibleProducts, title, isAll } = useMemo(
-    () => resolveFilter(filterFolder, searchQuery, dbProducts),
-    [filterFolder, searchQuery, dbProducts]
-  );
+  const { products: visibleProducts, title, isAll } = useMemo(() => {
+    const result = resolveFilter(filterFolder, searchQuery, dbProducts);
+    
+    // Sort products based on sortOrder
+    if (sortOrder === "low-to-high") {
+      result.products.sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else if (sortOrder === "high-to-low") {
+      result.products.sort((a, b) => (b.price || 0) - (a.price || 0));
+    }
+    
+    return result;
+  }, [filterFolder, searchQuery, dbProducts, sortOrder]);
 
   if (loading) {
     return <section className="galleries-wrapper" id="collections"><div className="section-header"><h2 className="section-title">Loading Products...</h2></div></section>;
@@ -156,6 +165,19 @@ export default function CategoryGalleries({
           </button>
         )}
         <div className="section-divider" />
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '15px' }}>
+          <label htmlFor="price-sort" style={{ marginRight: '10px', alignSelf: 'center', fontWeight: 'bold' }}>Sort by Price:</label>
+          <select 
+            id="price-sort" 
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', background: '#fff', cursor: 'pointer' }}
+          >
+            <option value="default">Default</option>
+            <option value="low-to-high">Low to High</option>
+            <option value="high-to-low">High to Low</option>
+          </select>
+        </div>
       </div>
 
       <div className="image-grid">
@@ -227,7 +249,7 @@ function ProductCard({ product, addToCart, autoOpen }) {
         price: product.price ?? 250,
         originalPrice: product.originalPrice,
         size: product.size,
-        color: (displayTitle.includes("Meenakari Chandrika Chokar") || displayTitle.includes("Pearl Choker") || displayTitle.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle.includes("Lotus Mala") || displayTitle.includes("Small Haar") || displayTitle.includes("Enamael Pendants")) ? selectedColor : undefined
+        color: (displayTitle.includes("Meenakari Chandrika Chokar") || displayTitle.includes("Pearl Choker") || displayTitle.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle.includes("Lotus Mala") || displayTitle.includes("Small Haar") || displayTitle.includes("Enamael Pendants") || displayTitle.includes("Long Kundan Haar")) ? selectedColor : undefined
       });
     }
   };
@@ -297,7 +319,7 @@ function ProductCard({ product, addToCart, autoOpen }) {
               price: product.price ?? 250,
               originalPrice: product.originalPrice,
               size: product.size,
-              color: (displayTitle.includes("Meenakari Chandrika Chokar") || displayTitle.includes("Pearl Choker") || displayTitle.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle.includes("Lotus Mala") || displayTitle.includes("Small Haar") || displayTitle.includes("Enamael Pendants")) ? selectedColor : undefined
+              color: (displayTitle.includes("Meenakari Chandrika Chokar") || displayTitle.includes("Pearl Choker") || displayTitle.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle.includes("Lotus Mala") || displayTitle.includes("Small Haar") || displayTitle.includes("Enamael Pendants") || displayTitle.includes("Long Kundan Haar")) ? selectedColor : undefined
             }); 
           }}
         >
@@ -350,7 +372,7 @@ function ProductCard({ product, addToCart, autoOpen }) {
                 {displayDesc}
               </p>
 
-              {(displayTitle.includes("Meenakari Chandrika Chokar") || displayTitle.includes("Pearl Choker") || displayTitle.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle.includes("Lotus Mala") || displayTitle.includes("Small Haar") || displayTitle.includes("Enamael Pendants")) && (
+              {(displayTitle.includes("Meenakari Chandrika Chokar") || displayTitle.includes("Pearl Choker") || displayTitle.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle.includes("Lotus Mala") || displayTitle.includes("Small Haar") || displayTitle.includes("Enamael Pendants") || displayTitle.includes("Long Kundan Haar")) && (
                 <div style={{ marginBottom: "15px" }}>
                   <label htmlFor="color-select" style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
                   <select 
@@ -425,7 +447,7 @@ function ProductCard({ product, addToCart, autoOpen }) {
                       price: product.price ?? 250,
                       originalPrice: product.originalPrice,
                       size: product.size,
-                      color: (displayTitle.includes("Meenakari Chandrika Chokar") || displayTitle.includes("Pearl Choker") || displayTitle.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle.includes("Lotus Mala") || displayTitle.includes("Small Haar") || displayTitle.includes("Enamael Pendants")) ? selectedColor : undefined
+                      color: (displayTitle.includes("Meenakari Chandrika Chokar") || displayTitle.includes("Pearl Choker") || displayTitle.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle.includes("Lotus Mala") || displayTitle.includes("Small Haar") || displayTitle.includes("Enamael Pendants") || displayTitle.includes("Long Kundan Haar")) ? selectedColor : undefined
                     });
                     setIsQuickViewOpen(false);
                   }}

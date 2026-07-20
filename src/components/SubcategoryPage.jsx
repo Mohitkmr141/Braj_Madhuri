@@ -67,7 +67,7 @@ function ProductDetailCard({ product, addToCart }) {
       price: product.price ?? 250,
       originalPrice: product.originalPrice,
       size: selectedSize,
-      color: (displayTitle?.includes("Meenakari Chandrika Chokar") || displayTitle?.includes("Pearl Choker") || displayTitle?.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle?.includes("Lotus Mala") || displayTitle?.includes("Small Haar") || displayTitle?.includes("Enamael Pendants")) ? selectedColor : undefined
+      color: (displayTitle?.includes("Meenakari Chandrika Chokar") || displayTitle?.includes("Pearl Choker") || displayTitle?.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle?.includes("Lotus Mala") || displayTitle?.includes("Small Haar") || displayTitle?.includes("Enamael Pendants") || displayTitle?.includes("Long Kundan Haar")) ? selectedColor : undefined
     });
     flash("btn");
   };
@@ -84,7 +84,7 @@ function ProductDetailCard({ product, addToCart }) {
         price: product.price ?? 250,
         originalPrice: product.originalPrice,
         size: selectedSize,
-        color: (displayTitle?.includes("Meenakari Chandrika Chokar") || displayTitle?.includes("Pearl Choker") || displayTitle?.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle?.includes("Lotus Mala") || displayTitle?.includes("Small Haar") || displayTitle?.includes("Enamael Pendants")) ? selectedColor : undefined
+        color: (displayTitle?.includes("Meenakari Chandrika Chokar") || displayTitle?.includes("Pearl Choker") || displayTitle?.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle?.includes("Lotus Mala") || displayTitle?.includes("Small Haar") || displayTitle?.includes("Enamael Pendants") || displayTitle?.includes("Long Kundan Haar")) ? selectedColor : undefined
       });
     }
   };
@@ -174,7 +174,7 @@ function ProductDetailCard({ product, addToCart }) {
                 </>
               )}
 
-              {(displayTitle?.includes("Meenakari Chandrika Chokar") || displayTitle?.includes("Pearl Choker") || displayTitle?.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle?.includes("Lotus Mala") || displayTitle?.includes("Small Haar") || displayTitle?.includes("Enamael Pendants")) && (
+              {(displayTitle?.includes("Meenakari Chandrika Chokar") || displayTitle?.includes("Pearl Choker") || displayTitle?.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle?.includes("Lotus Mala") || displayTitle?.includes("Small Haar") || displayTitle?.includes("Enamael Pendants") || displayTitle?.includes("Long Kundan Haar")) && (
                 <div style={{ marginBottom: "15px" }}>
                   <label htmlFor={`color-select-zoom-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
                   <select 
@@ -300,7 +300,7 @@ function ProductDetailCard({ product, addToCart }) {
           </p>
         )}
 
-        {(displayTitle?.includes("Meenakari Chandrika Chokar") || displayTitle?.includes("Pearl Choker") || displayTitle?.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle?.includes("Lotus Mala") || displayTitle?.includes("Small Haar") || displayTitle?.includes("Enamael Pendants")) && (
+        {(displayTitle?.includes("Meenakari Chandrika Chokar") || displayTitle?.includes("Pearl Choker") || displayTitle?.includes("Heavy Kundan Mala Haar") || displayTitle === "Kundan Haar" || displayTitle?.includes("Lotus Mala") || displayTitle?.includes("Small Haar") || displayTitle?.includes("Enamael Pendants") || displayTitle?.includes("Long Kundan Haar")) && (
           <div style={{ margin: "15px 0" }}>
             <label htmlFor={`color-select-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
             <select 
@@ -421,6 +421,7 @@ export default function SubcategoryPage({
 }) {
   const [dbProducts, setDbProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortOrder, setSortOrder] = useState("default");
 
   useEffect(() => {
     fetch('/api/products')
@@ -446,10 +447,18 @@ export default function SubcategoryPage({
       });
   }, []);
 
-  const products = useMemo(
-    () => resolveSubcategoryProducts(catId, subName, dbProducts),
-    [catId, subName, dbProducts]
-  );
+  const products = useMemo(() => {
+    const subcatProducts = resolveSubcategoryProducts(catId, subName, dbProducts);
+    
+    // Sort products based on sortOrder
+    if (sortOrder === "low-to-high") {
+      subcatProducts.sort((a, b) => (a.price || 0) - (b.price || 0));
+    } else if (sortOrder === "high-to-low") {
+      subcatProducts.sort((a, b) => (b.price || 0) - (a.price || 0));
+    }
+    
+    return subcatProducts;
+  }, [catId, subName, dbProducts, sortOrder]);
 
   if (loading) {
     return <section className="subcat-page"><div className="subcat-section-header"><h2 className="subcat-section-title">Loading...</h2></div></section>;
@@ -486,6 +495,19 @@ export default function SubcategoryPage({
           {products.length} product{products.length !== 1 ? "s" : ""} available
         </p>
         <div className="subcat-divider" />
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '15px' }}>
+          <label htmlFor="price-sort-subcat" style={{ marginRight: '10px', alignSelf: 'center', fontWeight: 'bold' }}>Sort by Price:</label>
+          <select 
+            id="price-sort-subcat" 
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', background: '#fff', cursor: 'pointer' }}
+          >
+            <option value="default">Default</option>
+            <option value="low-to-high">Low to High</option>
+            <option value="high-to-low">High to Low</option>
+          </select>
+        </div>
       </div>
 
       {/* Product list */}
