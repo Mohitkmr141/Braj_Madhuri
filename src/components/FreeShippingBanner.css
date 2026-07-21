@@ -1,0 +1,52 @@
+.shipping-banner {
+  display: flex;
+  align-items: center;
+  background-color: #fdf3f0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  position: relative;
+  gap: 16px;
+  border: 1px solid rgba(232, 114, 26, 0.1);
+}
+
+.shipping-banner--success {
+  background-color: #edf7ed;
+  border-color: rgba(46, 125, 50, 0.1);
+}
+
+.shipping-banner-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.shipping-banner-content {
+  flex-grow: 1;
+}
+
+.shipping-banner-content p {
+  margin: 0;
+  color: var(--text, #2A1A0E);
+  font-size: 15px;
+  line-height: 1.4;
+  font-family: 'Inter', sans-serif;
+}
+
+.shipping-banner-amount {
+  color: var(--saffron, #E8721A);
+  font-weight: 700;
+}
+
+.shipping-banner-price-tag {
+  color: var(--saffron, #E8721A);
+  font-size: 24px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.shipping-banner--success .shipping-banner-content p {
+  color: #2e7d32;
+  font-weight: 600;
+}

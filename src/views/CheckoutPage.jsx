@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "../context/CartContext.jsx";
+import FreeShippingBanner from "../components/FreeShippingBanner.jsx";
 import "../components/Checkout.css";
 
 const formatCurrency = (value) =>
@@ -50,6 +51,10 @@ export default function CheckoutPage() {
 
   // Calculate shipping cost dynamically based on selected zone
   React.useEffect(() => {
+    if (cartTotal >= 999) {
+      setShippingCost(0);
+      return;
+    }
     const { state } = formData;
     if (state === "Delhi NCR") {
       setShippingCost(79); // Zone A
@@ -58,7 +63,7 @@ export default function CheckoutPage() {
     } else {
       setShippingCost(0);
     }
-  }, [formData.state]);
+  }, [formData.state, cartTotal]);
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -240,6 +245,8 @@ export default function CheckoutPage() {
             <p>Please enter your shipping and payment details.</p>
           </div>
           
+          <FreeShippingBanner cartTotal={cartTotal} />
+          
           {error && <div className="error-message">{error}</div>}
 
           {/* Shipping Address */}
@@ -274,8 +281,8 @@ export default function CheckoutPage() {
                 <label htmlFor="state">Shipping Zone *</label>
                 <select id="state" name="state" value={formData.state} onChange={handleInputChange} required>
                   <option value="">Select Zone</option>
-                  <option value="Delhi NCR">Zone A - Delhi NCR (₹79)</option>
-                  <option value="Rest of India">Zone B - Rest of India (₹119)</option>
+                  <option value="Delhi NCR">Zone A - Delhi NCR {cartTotal >= 999 ? '(Free)' : '(₹79)'}</option>
+                  <option value="Rest of India">Zone B - Rest of India {cartTotal >= 999 ? '(Free)' : '(₹119)'}</option>
                 </select>
               </div>
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>
@@ -322,7 +329,15 @@ export default function CheckoutPage() {
               </div>
               <div className="summary-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
                 <span>Delivery Charges</span>
-                <span>{shippingCost > 0 ? formatCurrency(shippingCost) : <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '14px', fontFamily: "'Inter', sans-serif" }}>Select state to calculate</span>}</span>
+                <span>
+                  {cartTotal >= 999 ? (
+                    <span style={{ color: '#2e7d32', fontWeight: '600' }}>Free</span>
+                  ) : shippingCost > 0 ? (
+                    formatCurrency(shippingCost)
+                  ) : (
+                    <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '14px', fontFamily: "'Inter', sans-serif" }}>Select state to calculate</span>
+                  )}
+                </span>
               </div>
               
               <div style={{ height: '1px', background: 'rgba(0,0,0,0.1)', margin: '16px 0' }} />
