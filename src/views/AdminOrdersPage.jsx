@@ -500,8 +500,37 @@ export default function AdminOrdersPage() {
                 </div>
 
                 <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Image URL</label>
-                  <input type="text" placeholder="/images/product.jpg" value={productForm.imageUrl} onChange={e => setProductForm({...productForm, imageUrl: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px" }} />
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Product Image</label>
+                  {productForm.imageUrl && (
+                    <img src={productForm.imageUrl} alt="Preview" style={{ width: "80px", height: "80px", objectFit: "cover", borderRadius: "6px", marginBottom: "8px", border: "1px solid #ddd" }} />
+                  )}
+                  <input type="file" accept="image/*" onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    // Show a temporary loading state if you want, or just wait for the upload
+                    e.target.disabled = true;
+                    try {
+                      const res = await fetch('/api/admin/upload', {
+                        method: 'POST',
+                        body: formData
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        setProductForm({...productForm, imageUrl: data.url});
+                      } else {
+                        alert("Upload failed: " + data.error);
+                      }
+                    } catch (err) {
+                      alert("Error uploading image");
+                    } finally {
+                      e.target.disabled = false;
+                    }
+                  }} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px" }} />
+                  <input type="hidden" value={productForm.imageUrl} />
                 </div>
 
                 <div style={{ display: "flex", gap: "16px" }}>
