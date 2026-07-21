@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { supabase } from '../../../../lib/supabase.js';
+import { getSupabase } from '../../../../lib/supabase.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +25,8 @@ export async function POST(request) {
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+
+    const supabase = getSupabase();
 
     const { data, error } = await supabase.storage
       .from('products')
