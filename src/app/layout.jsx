@@ -9,12 +9,36 @@ export const viewport = {
 };
 
 export const metadata = {
+  metadataBase: new URL("https://thebrajmadhuri.com"),
   title: {
-    default: "The Braj Madhuri",
+    default: "The Braj Madhuri - Devotional Essentials",
     template: "%s | The Braj Madhuri",
   },
   description:
     "Devotional essentials, pooja fragrances, poshak, mala, dhoop, and seva products from The Braj Madhuri.",
+  keywords: ["The Braj Madhuri", "Devotional Essentials", "Pooja Items", "Poshak", "Mala", "Dhoop", "Seva Products", "Vrindavan items"],
+  openGraph: {
+    title: "The Braj Madhuri - Devotional Essentials",
+    description: "Authentic devotional essentials, pooja fragrances, poshak, and mala from The Braj Madhuri.",
+    url: "https://thebrajmadhuri.com",
+    siteName: "The Braj Madhuri",
+    images: [
+      {
+        url: "/Logo.jpeg",
+        width: 800,
+        height: 600,
+        alt: "The Braj Madhuri Logo",
+      },
+    ],
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Braj Madhuri - Devotional Essentials",
+    description: "Authentic devotional essentials, pooja fragrances, poshak, and mala from The Braj Madhuri.",
+    images: ["/Logo.jpeg"],
+  },
   icons: {
     icon: "/Logo.jpeg",
   },
