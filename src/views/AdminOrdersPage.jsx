@@ -35,6 +35,11 @@ export default function AdminOrdersPage() {
   const [activeTab, setActiveTab] = useState("orders");
   const [actionLoading, setActionLoading] = useState(null);
   
+  // Category Modal State
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isCategorySaving, setIsCategorySaving] = useState(false);
+  const [categoryForm, setCategoryForm] = useState({ title: "", description: "" });
+
   // Product Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -69,6 +74,31 @@ export default function AdminOrdersPage() {
       alert("Network error processing Shiprocket action.");
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleSaveCategory = async (e) => {
+    e.preventDefault();
+    setIsCategorySaving(true);
+    try {
+      const res = await fetch("/api/admin/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(categoryForm)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed to create category");
+      } else {
+        alert("Category created successfully!");
+        setCategories([...categories, data]);
+        setIsCategoryModalOpen(false);
+        setCategoryForm({ title: "", description: "" });
+      }
+    } catch (err) {
+      alert("Network error creating category.");
+    } finally {
+      setIsCategorySaving(false);
     }
   };
 
@@ -390,6 +420,12 @@ export default function AdminOrdersPage() {
           <div style={{ background: "#fff", borderRadius: "12px", boxShadow: "0 12px 32px rgba(0,0,0,0.04)", overflow: "hidden", border: "1px solid rgba(0,0,0,0.05)", padding: "20px" }}>
             <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
               <button 
+                onClick={() => setIsCategoryModalOpen(true)}
+                style={{ background: "#4caf50", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", cursor: "pointer", fontWeight: "600", marginRight: "12px" }}
+              >
+                + Add New Category
+              </button>
+              <button 
                 onClick={() => handleOpenProductModal()}
                 style={{ background: "var(--maroon)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
               >
@@ -551,6 +587,33 @@ export default function AdminOrdersPage() {
 
                 <button type="submit" style={{ background: "var(--maroon)", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", cursor: "pointer", fontWeight: "600", marginTop: "16px" }}>
                   {editingProduct ? "Save Changes" : "Create Product"}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {isCategoryModalOpen && (
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" }}>
+            <div style={{ background: "#fff", padding: "32px", borderRadius: "12px", width: "100%", maxWidth: "500px", maxHeight: "90vh", overflowY: "auto", position: "relative" }}>
+              <button 
+                onClick={() => setIsCategoryModalOpen(false)}
+                style={{ position: "absolute", top: "20px", right: "20px", background: "transparent", border: "none", fontSize: "24px", cursor: "pointer", color: "#555" }}
+              >&times;</button>
+              <h2 style={{ fontFamily: "'Playfair Display', serif", color: "var(--maroon)", marginBottom: "24px" }}>
+                Add New Category
+              </h2>
+              <form onSubmit={handleSaveCategory} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Category Title *</label>
+                  <input required type="text" value={categoryForm.title} onChange={e => setCategoryForm({...categoryForm, title: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Description (Optional)</label>
+                  <textarea rows="3" value={categoryForm.description} onChange={e => setCategoryForm({...categoryForm, description: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px", fontFamily: "inherit" }}></textarea>
+                </div>
+                <button type="submit" disabled={isCategorySaving} style={{ background: "var(--maroon)", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", cursor: isCategorySaving ? "not-allowed" : "pointer", fontWeight: "600", marginTop: "8px", opacity: isCategorySaving ? 0.7 : 1 }}>
+                  {isCategorySaving ? "Saving..." : "Create Category"}
                 </button>
               </form>
             </div>
