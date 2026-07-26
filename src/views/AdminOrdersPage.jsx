@@ -40,11 +40,16 @@ export default function AdminOrdersPage() {
   const [isCategorySaving, setIsCategorySaving] = useState(false);
   const [categoryForm, setCategoryForm] = useState({ title: "", description: "" });
 
+  // Subcategory Modal State
+  const [isSubcategoryModalOpen, setIsSubcategoryModalOpen] = useState(false);
+  const [isSubcategorySaving, setIsSubcategorySaving] = useState(false);
+  const [subcategoryForm, setSubcategoryForm] = useState({ title: "", description: "", categoryId: "" });
+
   // Product Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [productForm, setProductForm] = useState({
-    title: "", categoryId: "", price: "", originalPrice: "", stock: "10", imageUrl: "", description: "", size: "", subheading: ""
+    title: "", categoryId: "", subcategoryId: "", price: "", originalPrice: "", stock: "10", imageUrl: "", description: "", size: "", subheading: ""
   });
 
   const handleShiprocketAction = async (orderId, actionName) => {
@@ -94,11 +99,37 @@ export default function AdminOrdersPage() {
         setCategories([...categories, data]);
         setIsCategoryModalOpen(false);
         setCategoryForm({ title: "", description: "" });
+        fetchInventory();
       }
     } catch (err) {
       alert("Network error creating category.");
     } finally {
       setIsCategorySaving(false);
+    }
+  };
+
+  const handleSaveSubcategory = async (e) => {
+    e.preventDefault();
+    setIsSubcategorySaving(true);
+    try {
+      const res = await fetch("/api/admin/subcategories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(subcategoryForm)
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed to create subcategory");
+      } else {
+        alert("Subcategory created successfully!");
+        setIsSubcategoryModalOpen(false);
+        setSubcategoryForm({ title: "", description: "", categoryId: "" });
+        fetchInventory(); // refresh categories and subcategories
+      }
+    } catch (err) {
+      alert("Network error creating subcategory.");
+    } finally {
+      setIsSubcategorySaving(false);
     }
   };
 
@@ -171,6 +202,7 @@ export default function AdminOrdersPage() {
       setProductForm({
         title: product.title || "",
         categoryId: product.categoryId || "",
+        subcategoryId: product.subcategoryId || "",
         price: product.price || "",
         originalPrice: product.originalPrice || "",
         stock: product.stock !== undefined ? String(product.stock) : "10",
@@ -181,7 +213,7 @@ export default function AdminOrdersPage() {
       });
     } else {
       setProductForm({
-        title: "", categoryId: "", price: "", originalPrice: "", stock: "10", imageUrl: "", description: "", size: "", subheading: ""
+        title: "", categoryId: "", subcategoryId: "", price: "", originalPrice: "", stock: "10", imageUrl: "", description: "", size: "", subheading: ""
       });
     }
     setIsModalOpen(true);
@@ -224,6 +256,36 @@ export default function AdminOrdersPage() {
       }
     } catch {
       alert("Error deleting product.");
+    }
+  };
+
+  const handleDeleteCategory = async (id) => {
+    if (!confirm("WARNING: Are you sure you want to delete this category? This will permanently delete ALL subcategories and products inside it!")) return;
+    try {
+      const res = await fetch(`/api/admin/categories?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        fetchInventory(); 
+      } else {
+        alert("Failed to delete category: " + data.error);
+      }
+    } catch {
+      alert("Error deleting category.");
+    }
+  };
+
+  const handleDeleteSubcategory = async (id) => {
+    if (!confirm("Are you sure you want to delete this subcategory?")) return;
+    try {
+      const res = await fetch(`/api/admin/subcategories?id=${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        fetchInventory(); 
+      } else {
+        alert("Failed to delete subcategory: " + data.error);
+      }
+    } catch {
+      alert("Error deleting subcategory.");
     }
   };
 
@@ -298,6 +360,20 @@ export default function AdminOrdersPage() {
                 }}
               >
                 Products
+              </button>
+              <button 
+                onClick={() => setActiveTab("categories")}
+                style={{ 
+                  background: activeTab === "categories" ? "var(--maroon)" : "transparent",
+                  color: activeTab === "categories" ? "#fff" : "var(--maroon)",
+                  border: "1px solid var(--maroon)",
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontWeight: "600"
+                }}
+              >
+                Categories
               </button>
             </div>
           </div>
@@ -416,7 +492,8 @@ export default function AdminOrdersPage() {
               </table>
             </div>
           </div>
-        )) : (
+          )
+        ) : activeTab === "categories" ? (
           <div style={{ background: "#fff", borderRadius: "12px", boxShadow: "0 12px 32px rgba(0,0,0,0.04)", overflow: "hidden", border: "1px solid rgba(0,0,0,0.05)", padding: "20px" }}>
             <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
               <button 
@@ -425,6 +502,59 @@ export default function AdminOrdersPage() {
               >
                 + Add New Category
               </button>
+              <button 
+                onClick={() => setIsSubcategoryModalOpen(true)}
+                style={{ background: "#2196f3", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
+              >
+                + Add New Subcategory
+              </button>
+            </div>
+            
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              {categories.map((category) => (
+                <div key={category.id} style={{ border: "1px solid #eee", borderRadius: "8px", padding: "16px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", borderBottom: "1px solid #eee", paddingBottom: "12px" }}>
+                    <div>
+                      <h3 style={{ margin: 0, color: "var(--maroon)", fontSize: "18px" }}>{category.title}</h3>
+                      {category.description && <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "var(--text-muted)" }}>{category.description}</p>}
+                    </div>
+                    <button 
+                      onClick={() => handleDeleteCategory(category.id)}
+                      style={{ background: "#d32f2f", color: "#fff", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer", fontSize: "12px" }}
+                    >
+                      Delete Category
+                    </button>
+                  </div>
+                  
+                  {category.subcategories && category.subcategories.length > 0 ? (
+                    <div style={{ paddingLeft: "20px" }}>
+                      <h4 style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#555" }}>Subcategories:</h4>
+                      <ul style={{ listStyleType: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "8px" }}>
+                        {category.subcategories.map(sub => (
+                          <li key={sub.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fcfaf5", padding: "8px 12px", borderRadius: "4px" }}>
+                            <span style={{ fontSize: "14px", fontWeight: "500" }}>{sub.title}</span>
+                            <button 
+                              onClick={() => handleDeleteSubcategory(sub.id)}
+                              style={{ background: "transparent", color: "#d32f2f", border: "1px solid #d32f2f", padding: "4px 8px", borderRadius: "4px", cursor: "pointer", fontSize: "11px" }}
+                            >
+                              Delete
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <div style={{ paddingLeft: "20px", fontSize: "13px", color: "#888", fontStyle: "italic" }}>
+                      No subcategories
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div style={{ background: "#fff", borderRadius: "12px", boxShadow: "0 12px 32px rgba(0,0,0,0.04)", overflow: "hidden", border: "1px solid rgba(0,0,0,0.05)", padding: "20px" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
               <button 
                 onClick={() => handleOpenProductModal()}
                 style={{ background: "var(--maroon)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
@@ -455,7 +585,12 @@ export default function AdminOrdersPage() {
                         {product.size && <span style={{ fontSize: "12px", color: "#666", marginLeft: "8px" }}>({product.size})</span>}
                       </td>
                       <td style={{ padding: "16px", fontSize: "13px" }}>
-                        {product.category?.title || "Unknown"}
+                        <div>{product.category?.title || "Unknown"}</div>
+                        {product.subcategory?.title && (
+                          <div style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "4px" }}>
+                            ↳ {product.subcategory.title}
+                          </div>
+                        )}
                       </td>
                       <td style={{ padding: "16px", fontSize: "14px" }}>
                         {formatCurrency(product.price)}
@@ -513,13 +648,30 @@ export default function AdminOrdersPage() {
                   </div>
                   <div style={{ flex: 1 }}>
                     <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Category *</label>
-                    <select required value={productForm.categoryId} onChange={e => setProductForm({...productForm, categoryId: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px", background: "#fff" }}>
+                    <select required value={productForm.categoryId} onChange={e => setProductForm({...productForm, categoryId: e.target.value, subcategoryId: ""})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px", background: "#fff" }}>
                       <option value="">Select Category</option>
                       {categories.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
                     </select>
                   </div>
                 </div>
                 
+                <div style={{ display: "flex", gap: "16px" }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Subcategory</label>
+                    <select 
+                      value={productForm.subcategoryId} 
+                      onChange={e => setProductForm({...productForm, subcategoryId: e.target.value})} 
+                      style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px", background: "#fff" }}
+                      disabled={!productForm.categoryId}
+                    >
+                      <option value="">Select Subcategory (Optional)</option>
+                      {categories.find(c => c.id === productForm.categoryId)?.subcategories?.map(s => (
+                        <option key={s.id} value={s.id}>{s.title}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
                 <div style={{ display: "flex", gap: "16px" }}>
                   <div style={{ flex: 1 }}>
                     <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Price *</label>
@@ -614,6 +766,40 @@ export default function AdminOrdersPage() {
                 </div>
                 <button type="submit" disabled={isCategorySaving} style={{ background: "var(--maroon)", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", cursor: isCategorySaving ? "not-allowed" : "pointer", fontWeight: "600", marginTop: "8px", opacity: isCategorySaving ? 0.7 : 1 }}>
                   {isCategorySaving ? "Saving..." : "Create Category"}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {isSubcategoryModalOpen && (
+          <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" }}>
+            <div style={{ background: "#fff", padding: "32px", borderRadius: "12px", width: "100%", maxWidth: "500px", maxHeight: "90vh", overflowY: "auto", position: "relative" }}>
+              <button 
+                onClick={() => setIsSubcategoryModalOpen(false)}
+                style={{ position: "absolute", top: "20px", right: "20px", background: "transparent", border: "none", fontSize: "24px", cursor: "pointer", color: "#555" }}
+              >&times;</button>
+              <h2 style={{ fontFamily: "'Playfair Display', serif", color: "var(--maroon)", marginBottom: "24px" }}>
+                Add New Subcategory
+              </h2>
+              <form onSubmit={handleSaveSubcategory} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Parent Category *</label>
+                  <select required value={subcategoryForm.categoryId} onChange={e => setSubcategoryForm({...subcategoryForm, categoryId: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px", background: "#fff" }}>
+                    <option value="">Select Parent Category</option>
+                    {categories.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Subcategory Title *</label>
+                  <input required type="text" value={subcategoryForm.title} onChange={e => setSubcategoryForm({...subcategoryForm, title: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px" }} />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Description (Optional)</label>
+                  <textarea rows="3" value={subcategoryForm.description} onChange={e => setSubcategoryForm({...subcategoryForm, description: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px", fontFamily: "inherit" }}></textarea>
+                </div>
+                <button type="submit" disabled={isSubcategorySaving} style={{ background: "#2196f3", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", cursor: isSubcategorySaving ? "not-allowed" : "pointer", fontWeight: "600", marginTop: "8px", opacity: isSubcategorySaving ? 0.7 : 1 }}>
+                  {isSubcategorySaving ? "Saving..." : "Create Subcategory"}
                 </button>
               </form>
             </div>

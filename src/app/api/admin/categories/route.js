@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
@@ -33,5 +34,34 @@ export async function POST(request) {
     }
     
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request) {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('admin_session');
+  if (!session || session.value !== 'authenticated') {
+    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  }
+
+  try {
+    const url = new URL(request.url);
+    const id = url.searchParams.get("id");
+    
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Category ID is required' }, { status: 400 });
+    }
+
+    await prisma.category.delete({
+      where: { id }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to delete category' },
+      { status: 500 }
+    );
   }
 }

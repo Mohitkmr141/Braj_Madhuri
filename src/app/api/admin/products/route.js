@@ -20,13 +20,17 @@ export async function GET() {
         title: 'asc'
       },
       include: {
-        category: true
+        category: true,
+        subcategory: true
       }
     });
     
     const categories = await prisma.category.findMany({
       orderBy: {
         title: 'asc'
+      },
+      include: {
+        subcategories: true
       }
     });
 
@@ -60,6 +64,7 @@ export async function POST(request) {
       data: {
         title: data.title,
         categoryId: data.categoryId,
+        subcategoryId: data.subcategoryId || null,
         price: parseFloat(data.price) || 0,
         originalPrice: parseFloat(data.originalPrice) || parseFloat(data.price) || 0,
         stock: parseInt(data.stock, 10) || 0,
@@ -102,6 +107,7 @@ export async function PUT(request) {
       data: {
         title: data.title,
         categoryId: data.categoryId,
+        subcategoryId: data.subcategoryId || null,
         price: parseFloat(data.price),
         originalPrice: parseFloat(data.originalPrice) || parseFloat(data.price),
         stock: parseInt(data.stock, 10),

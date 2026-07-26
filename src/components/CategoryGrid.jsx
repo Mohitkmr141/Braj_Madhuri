@@ -37,6 +37,41 @@ const THUMBNAIL_MAP = buildThumbnailMap();
 
 export default function CategoryGrid({ activeCategory, onExplore }) {
   const [openSubcat, setOpenSubcat] = useState(null);
+  const [categoriesList, setCategoriesList] = useState(CATEGORIES);
+
+  React.useEffect(() => {
+    fetch('/api/products')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.categories) {
+          // Merge DB subcategories into the static list
+          const merged = CATEGORIES.map(cat => {
+            const dbCat = data.categories.find(c => c.id === cat.id);
+            if (dbCat && dbCat.subcategories) {
+              const dbSubtitles = dbCat.subcategories.map(s => s.title);
+              const combinedSubcats = [...new Set([...cat.subcategories, ...dbSubtitles])];
+              return { ...cat, subcategories: combinedSubcats };
+            }
+            return cat;
+          });
+          
+          // Append entirely new DB categories that don't exist in static list
+          const newDbCats = data.categories
+            .filter(c => !CATEGORIES.some(staticCat => staticCat.id === c.id))
+            .map(c => ({
+              id: c.id,
+              label: c.title,
+              emoji: "✨",
+              subcategories: c.subcategories ? c.subcategories.map(s => s.title) : [],
+              folderKeys: [],
+              subcategoryFolderMap: {}
+            }));
+
+          setCategoriesList([...merged, ...newDbCats]);
+        }
+      })
+      .catch(err => console.error("Error fetching dynamic categories:", err));
+  }, []);
 
   const handleCategoryClick = (cat) => {
     if (cat.subcategories.length > 0) {
@@ -60,7 +95,7 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
       </div>
 
       <div className="category-grid">
-        {CATEGORIES.map((cat) => {
+        {categoriesList.map((cat) => {
           const imgSrc = THUMBNAIL_MAP[cat.id];
           const isActive = activeCategory === cat.id;
           const isOpen = openSubcat === cat.id;

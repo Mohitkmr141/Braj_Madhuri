@@ -57,21 +57,35 @@ function resolveFilter(filterFolder, searchQuery, allProducts) {
     // If it's a subcategory compound key: "categoryId::SubName"
     if (filterFolder.includes("::")) {
       const [catId, subName] = filterFolder.split("::", 2);
-      const catLabel = CATEGORY_LABEL_MAP[catId] ?? catId;
+      
+      // Try to find a dynamic label from the products first, fallback to static map
+      const dbMatch = allProducts.find(p => p.categoryId === catId);
+      const catLabel = dbMatch?.categoryTitle || CATEGORY_LABEL_MAP[catId] || catId;
+      
       const cat = CATEGORIES.find((c) => c.id === catId);
       const subFolderKeys = cat?.subcategoryFolderMap?.[subName] ?? [];
+      const keySet = new Set(subFolderKeys);
       
-      if (subFolderKeys.length > 0) {
-        const keySet = new Set(subFolderKeys);
-        products = allProducts.filter(p => keySet.has(p.folderName));
-        title = `${catLabel} — ${subName}`;
-        isAll = false;
-      }
+      products = allProducts.filter(p => {
+        const matchesFolder = keySet.has(p.folderName);
+        const matchesDb = p.categoryId === catId && p.subcategory?.title === subName;
+        return matchesFolder || matchesDb;
+      });
+      
+      title = `${catLabel} — ${subName}`;
+      isAll = false;
     } else {
       // It's a top-level category id
       const folders = CATEGORY_FOLDER_MAP[filterFolder] || new Set([filterFolder]);
-      products = allProducts.filter(p => folders.has(p.folderName));
-      title = CATEGORY_LABEL_MAP[filterFolder] ?? filterFolder;
+      products = allProducts.filter(p => {
+        const matchesFolder = folders.has(p.folderName);
+        const matchesDb = p.categoryId === filterFolder;
+        return matchesFolder || matchesDb;
+      });
+      
+      // Try to find a dynamic label from the products first
+      const dbMatch = products.find(p => p.categoryId === filterFolder);
+      title = dbMatch?.categoryTitle || CATEGORY_LABEL_MAP[filterFolder] || filterFolder;
       isAll = false;
     }
   }
@@ -115,6 +129,7 @@ export default function CategoryGalleries({
           const flatProducts = data.categories.flatMap(c => 
             c.products.map(p => ({
               ...p,
+              categoryId: c.id,
               categoryTitle: c.title,
               categoryDesc: c.description,
               sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null

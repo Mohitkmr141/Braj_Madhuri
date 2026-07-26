@@ -28,7 +28,12 @@ function resolveFolderKeys(catId, subName) {
 function resolveSubcategoryProducts(catId, subName, dbProducts) {
   const folderKeys = resolveFolderKeys(catId, subName);
   const keySet = new Set(folderKeys);
-  return dbProducts.filter(p => keySet.has(p.folderName));
+  return dbProducts.filter(p => {
+    // Match by folder name (legacy mapping) OR by DB subcategory title with matching category
+    const matchesFolder = keySet.has(p.folderName);
+    const matchesDbSubcategory = p.categoryId === catId && p.subcategory && p.subcategory.title === subName;
+    return matchesFolder || matchesDbSubcategory;
+  });
 }
 
 // ── Cart flash hook ──────────────────────────────────────────────────────────
@@ -442,6 +447,7 @@ export default function SubcategoryPage({
           const flatProducts = data.categories.flatMap(c => 
             c.products.map(p => ({
               ...p,
+              categoryId: c.id,
               categoryTitle: c.title,
               categoryDesc: c.description,
               sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null

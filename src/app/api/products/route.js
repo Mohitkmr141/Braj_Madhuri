@@ -11,6 +11,7 @@ export async function GET() {
     const categories = await prisma.category.findMany({
       include: {
         products: true,
+        subcategories: true,
       },
     });
 
