@@ -65,3 +65,33 @@ export async function DELETE(request) {
     );
   }
 }
+
+export async function PUT(request) {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('admin_session');
+  if (!session || session.value !== 'authenticated') {
+    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  }
+
+  try {
+    const data = await request.json();
+    const { id, title, description } = data;
+
+    if (!id || !title) {
+      return NextResponse.json({ error: 'ID and Title are required' }, { status: 400 });
+    }
+
+    const category = await prisma.category.update({
+      where: { id },
+      data: {
+        title,
+        description: description || '',
+      }
+    });
+
+    return NextResponse.json(category, { status: 200 });
+  } catch (error) {
+    console.error('Error updating category:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

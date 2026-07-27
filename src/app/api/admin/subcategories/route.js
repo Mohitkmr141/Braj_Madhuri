@@ -64,3 +64,34 @@ export async function DELETE(request) {
     );
   }
 }
+
+export async function PUT(request) {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('admin_session');
+  if (!session || session.value !== 'authenticated') {
+    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  }
+
+  try {
+    const data = await request.json();
+    const { id, title, description, categoryId } = data;
+
+    if (!id || !title || !categoryId) {
+      return NextResponse.json({ success: false, error: 'ID, Title and Category ID are required' }, { status: 400 });
+    }
+
+    const subcategory = await prisma.subcategory.update({
+      where: { id },
+      data: {
+        title,
+        description: description || '',
+        categoryId,
+      }
+    });
+
+    return NextResponse.json({ success: true, subcategory }, { status: 200 });
+  } catch (error) {
+    console.error('Error updating subcategory:', error);
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
+  }
+}

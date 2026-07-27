@@ -38,11 +38,13 @@ export default function AdminOrdersPage() {
   // Category Modal State
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isCategorySaving, setIsCategorySaving] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
   const [categoryForm, setCategoryForm] = useState({ title: "", description: "" });
 
   // Subcategory Modal State
   const [isSubcategoryModalOpen, setIsSubcategoryModalOpen] = useState(false);
   const [isSubcategorySaving, setIsSubcategorySaving] = useState(false);
+  const [editingSubcategory, setEditingSubcategory] = useState(null);
   const [subcategoryForm, setSubcategoryForm] = useState({ title: "", description: "", categoryId: "" });
 
   // Product Modal State
@@ -86,18 +88,23 @@ export default function AdminOrdersPage() {
     e.preventDefault();
     setIsCategorySaving(true);
     try {
-      const res = await fetch("/api/admin/categories", {
-        method: "POST",
+      const url = "/api/admin/categories";
+      const method = editingCategory ? "PUT" : "POST";
+      const body = { ...categoryForm };
+      if (editingCategory) body.id = editingCategory.id;
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(categoryForm)
+        body: JSON.stringify(body)
       });
       const data = await res.json();
       if (!res.ok) {
         alert(data.error || "Failed to create category");
       } else {
-        alert("Category created successfully!");
-        setCategories([...categories, data]);
+        alert(editingCategory ? "Category updated successfully!" : "Category created successfully!");
         setIsCategoryModalOpen(false);
+        setEditingCategory(null);
         setCategoryForm({ title: "", description: "" });
         fetchInventory();
       }
@@ -112,17 +119,23 @@ export default function AdminOrdersPage() {
     e.preventDefault();
     setIsSubcategorySaving(true);
     try {
-      const res = await fetch("/api/admin/subcategories", {
-        method: "POST",
+      const url = "/api/admin/subcategories";
+      const method = editingSubcategory ? "PUT" : "POST";
+      const body = { ...subcategoryForm };
+      if (editingSubcategory) body.id = editingSubcategory.id;
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(subcategoryForm)
+        body: JSON.stringify(body)
       });
       const data = await res.json();
       if (!res.ok) {
         alert(data.error || "Failed to create subcategory");
       } else {
-        alert("Subcategory created successfully!");
+        alert(editingSubcategory ? "Subcategory updated successfully!" : "Subcategory created successfully!");
         setIsSubcategoryModalOpen(false);
+        setEditingSubcategory(null);
         setSubcategoryForm({ title: "", description: "", categoryId: "" });
         fetchInventory(); // refresh categories and subcategories
       }
@@ -497,13 +510,21 @@ export default function AdminOrdersPage() {
           <div style={{ background: "#fff", borderRadius: "12px", boxShadow: "0 12px 32px rgba(0,0,0,0.04)", overflow: "hidden", border: "1px solid rgba(0,0,0,0.05)", padding: "20px" }}>
             <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
               <button 
-                onClick={() => setIsCategoryModalOpen(true)}
+                onClick={() => {
+                  setEditingCategory(null);
+                  setCategoryForm({ title: "", description: "" });
+                  setIsCategoryModalOpen(true);
+                }}
                 style={{ background: "#4caf50", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", cursor: "pointer", fontWeight: "600", marginRight: "12px" }}
               >
                 + Add New Category
               </button>
               <button 
-                onClick={() => setIsSubcategoryModalOpen(true)}
+                onClick={() => {
+                  setEditingSubcategory(null);
+                  setSubcategoryForm({ title: "", description: "", categoryId: "" });
+                  setIsSubcategoryModalOpen(true);
+                }}
                 style={{ background: "#2196f3", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
               >
                 + Add New Subcategory
@@ -518,12 +539,24 @@ export default function AdminOrdersPage() {
                       <h3 style={{ margin: 0, color: "var(--maroon)", fontSize: "18px" }}>{category.title}</h3>
                       {category.description && <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "var(--text-muted)" }}>{category.description}</p>}
                     </div>
-                    <button 
-                      onClick={() => handleDeleteCategory(category.id)}
-                      style={{ background: "#d32f2f", color: "#fff", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer", fontSize: "12px" }}
-                    >
-                      Delete Category
-                    </button>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button 
+                        onClick={() => {
+                          setEditingCategory(category);
+                          setCategoryForm({ title: category.title, description: category.description || "" });
+                          setIsCategoryModalOpen(true);
+                        }}
+                        style={{ background: "transparent", color: "var(--maroon)", border: "1px solid var(--maroon)", padding: "6px 12px", borderRadius: "4px", cursor: "pointer", fontSize: "12px" }}
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteCategory(category.id)}
+                        style={{ background: "#d32f2f", color: "#fff", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer", fontSize: "12px" }}
+                      >
+                        Delete Category
+                      </button>
+                    </div>
                   </div>
                   
                   {category.subcategories && category.subcategories.length > 0 ? (
@@ -533,12 +566,24 @@ export default function AdminOrdersPage() {
                         {category.subcategories.map(sub => (
                           <li key={sub.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fcfaf5", padding: "8px 12px", borderRadius: "4px" }}>
                             <span style={{ fontSize: "14px", fontWeight: "500" }}>{sub.title}</span>
-                            <button 
-                              onClick={() => handleDeleteSubcategory(sub.id)}
-                              style={{ background: "transparent", color: "#d32f2f", border: "1px solid #d32f2f", padding: "4px 8px", borderRadius: "4px", cursor: "pointer", fontSize: "11px" }}
-                            >
-                              Delete
-                            </button>
+                            <div style={{ display: "flex", gap: "8px" }}>
+                              <button 
+                                onClick={() => {
+                                  setEditingSubcategory(sub);
+                                  setSubcategoryForm({ title: sub.title, description: sub.description || "", categoryId: sub.categoryId });
+                                  setIsSubcategoryModalOpen(true);
+                                }}
+                                style={{ background: "transparent", color: "var(--maroon)", border: "1px solid var(--maroon)", padding: "4px 8px", borderRadius: "4px", cursor: "pointer", fontSize: "11px" }}
+                              >
+                                Edit
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteSubcategory(sub.id)}
+                                style={{ background: "transparent", color: "#d32f2f", border: "1px solid #d32f2f", padding: "4px 8px", borderRadius: "4px", cursor: "pointer", fontSize: "11px" }}
+                              >
+                                Delete
+                              </button>
+                            </div>
                           </li>
                         ))}
                       </ul>
@@ -753,7 +798,7 @@ export default function AdminOrdersPage() {
                 style={{ position: "absolute", top: "20px", right: "20px", background: "transparent", border: "none", fontSize: "24px", cursor: "pointer", color: "#555" }}
               >&times;</button>
               <h2 style={{ fontFamily: "'Playfair Display', serif", color: "var(--maroon)", marginBottom: "24px" }}>
-                Add New Category
+                {editingCategory ? "Edit Category" : "Add New Category"}
               </h2>
               <form onSubmit={handleSaveCategory} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <div>
@@ -765,7 +810,7 @@ export default function AdminOrdersPage() {
                   <textarea rows="3" value={categoryForm.description} onChange={e => setCategoryForm({...categoryForm, description: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px", fontFamily: "inherit" }}></textarea>
                 </div>
                 <button type="submit" disabled={isCategorySaving} style={{ background: "var(--maroon)", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", cursor: isCategorySaving ? "not-allowed" : "pointer", fontWeight: "600", marginTop: "8px", opacity: isCategorySaving ? 0.7 : 1 }}>
-                  {isCategorySaving ? "Saving..." : "Create Category"}
+                  {isCategorySaving ? "Saving..." : (editingCategory ? "Save Changes" : "Create Category")}
                 </button>
               </form>
             </div>
@@ -780,7 +825,7 @@ export default function AdminOrdersPage() {
                 style={{ position: "absolute", top: "20px", right: "20px", background: "transparent", border: "none", fontSize: "24px", cursor: "pointer", color: "#555" }}
               >&times;</button>
               <h2 style={{ fontFamily: "'Playfair Display', serif", color: "var(--maroon)", marginBottom: "24px" }}>
-                Add New Subcategory
+                {editingSubcategory ? "Edit Subcategory" : "Add New Subcategory"}
               </h2>
               <form onSubmit={handleSaveSubcategory} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <div>
@@ -798,8 +843,8 @@ export default function AdminOrdersPage() {
                   <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "6px" }}>Description (Optional)</label>
                   <textarea rows="3" value={subcategoryForm.description} onChange={e => setSubcategoryForm({...subcategoryForm, description: e.target.value})} style={{ width: "100%", padding: "10px", border: "1px solid #ddd", borderRadius: "6px", fontFamily: "inherit" }}></textarea>
                 </div>
-                <button type="submit" disabled={isSubcategorySaving} style={{ background: "#2196f3", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", cursor: isSubcategorySaving ? "not-allowed" : "pointer", fontWeight: "600", marginTop: "8px", opacity: isSubcategorySaving ? 0.7 : 1 }}>
-                  {isSubcategorySaving ? "Saving..." : "Create Subcategory"}
+                <button type="submit" disabled={isSubcategorySaving} style={{ background: "var(--maroon)", color: "#fff", border: "none", padding: "12px 24px", borderRadius: "6px", cursor: isSubcategorySaving ? "not-allowed" : "pointer", fontWeight: "600", marginTop: "8px", opacity: isSubcategorySaving ? 0.7 : 1 }}>
+                  {isSubcategorySaving ? "Saving..." : (editingSubcategory ? "Save Changes" : "Create Subcategory")}
                 </button>
               </form>
             </div>
