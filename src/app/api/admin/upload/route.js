@@ -23,14 +23,11 @@ export async function POST(request) {
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `product-images/${fileName}`;
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
     const supabase = getSupabase();
 
     const { data, error } = await supabase.storage
       .from('products')
-      .upload(filePath, buffer, {
+      .upload(filePath, file, {
         contentType: file.type,
         upsert: false
       });
