@@ -76,7 +76,7 @@ function resolveFilter(filterFolder, searchQuery, allProducts) {
       isAll = false;
     } else {
       // It's a top-level category id
-      const folders = CATEGORY_FOLDER_MAP[filterFolder] || new Set([filterFolder]);
+      const folders = CATEGORY_FOLDER_MAP[filterFolder] || new Set();
       products = allProducts.filter(p => {
         const matchesFolder = folders.has(p.folderName);
         const matchesDb = p.categoryId === filterFolder;
