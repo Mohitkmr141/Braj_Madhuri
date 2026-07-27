@@ -437,12 +437,18 @@ export default function SubcategoryPage({
   const [dbProducts, setDbProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState("low-to-high");
+  const [resolvedCatLabel, setResolvedCatLabel] = useState(catLabel);
 
   useEffect(() => {
     fetch('/api/products')
       .then(res => res.json())
       .then(data => {
         if (data.success && data.categories) {
+          const dbCat = data.categories.find(c => c.id === catId);
+          if (dbCat) {
+            setResolvedCatLabel(dbCat.title);
+          }
+
           // Flatten categories to products
           const flatProducts = data.categories.flatMap(c => 
             c.products.map(p => ({
@@ -461,7 +467,7 @@ export default function SubcategoryPage({
         console.error(err);
         setLoading(false);
       });
-  }, []);
+  }, [catId]);
 
   const products = useMemo(() => {
     const subcatProducts = resolveSubcategoryProducts(catId, subName, dbProducts);
@@ -497,7 +503,7 @@ export default function SubcategoryPage({
           className="subcat-breadcrumb__link"
           onClick={onBackToCategory}
         >
-          {catLabel}
+          {resolvedCatLabel}
         </button>
         <span className="subcat-breadcrumb__sep">›</span>
         <span className="subcat-breadcrumb__current">{subName}</span>
@@ -505,7 +511,7 @@ export default function SubcategoryPage({
 
       {/* Section header */}
       <div className="subcat-section-header">
-        <span className="subcat-eyebrow">{catLabel}</span>
+        <span className="subcat-eyebrow">{resolvedCatLabel}</span>
         <h2 className="subcat-section-title">{subName}</h2>
         <p className="subcat-section-subtitle">
           {products.length} product{products.length !== 1 ? "s" : ""} available
@@ -546,7 +552,7 @@ export default function SubcategoryPage({
             className="subcat-empty__back"
             onClick={onBackToCategory}
           >
-            ← Back to {catLabel}
+            ← Back to {resolvedCatLabel}
           </button>
         </div>
       )}

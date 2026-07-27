@@ -47,10 +47,10 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
           // Merge DB subcategories into the static list
           const merged = CATEGORIES.map(cat => {
             const dbCat = data.categories.find(c => c.id === cat.id);
-            if (dbCat && dbCat.subcategories) {
-              const dbSubtitles = dbCat.subcategories.map(s => s.title);
+            if (dbCat) {
+              const dbSubtitles = dbCat.subcategories ? dbCat.subcategories.map(s => s.title) : [];
               const combinedSubcats = [...new Set([...cat.subcategories, ...dbSubtitles])];
-              return { ...cat, subcategories: combinedSubcats };
+              return { ...cat, label: dbCat.title, subcategories: combinedSubcats };
             }
             return cat;
           });
