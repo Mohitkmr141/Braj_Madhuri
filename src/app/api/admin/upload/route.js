@@ -24,10 +24,11 @@ export async function POST(request) {
     const filePath = `product-images/${fileName}`;
 
     const supabase = getSupabase();
+    const arrayBuffer = await file.arrayBuffer();
 
     const { data, error } = await supabase.storage
       .from('products')
-      .upload(filePath, file, {
+      .upload(filePath, arrayBuffer, {
         contentType: file.type,
         upsert: false
       });
