@@ -21,7 +21,7 @@ function resolveFolderKeys(catId, subName) {
   const cat = CATEGORIES.find((c) => c.id === catId);
   if (!cat) return [];
   const map = cat.subcategoryFolderMap ?? {};
-  return map[subName] ?? cat.folderKeys ?? [];
+  return map[subName] || [];
 }
 
 /** Build list of matching products for a subcategory from the DB products array */
