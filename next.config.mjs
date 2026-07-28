@@ -1,5 +1,16 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'vdujlymtqvmztikeokje.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
+  },
+};
 
 // Only set allowedDevOrigins in development to prevent HMR errors
 if (process.env.NODE_ENV === 'development') {
