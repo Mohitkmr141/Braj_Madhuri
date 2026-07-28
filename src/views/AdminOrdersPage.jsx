@@ -34,6 +34,8 @@ export default function AdminOrdersPage() {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("orders");
   const [actionLoading, setActionLoading] = useState(null);
+  const [catImageUploading, setCatImageUploading] = useState(null);
+  const [catImageRemoving, setCatImageRemoving] = useState(null);
   
   // Category Modal State
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -304,6 +306,39 @@ export default function AdminOrdersPage() {
 
 
 
+  // Upload a dedicated thumbnail for a category
+  const handleCategoryImageUpload = async (categoryId, file) => {
+    if (!file) return;
+    setCatImageUploading(categoryId);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('categoryId', categoryId);
+      const res = await fetch('/api/admin/category-image', { method: 'PUT', body: fd });
+      const data = await res.json();
+      if (data.success) { fetchInventory(); }
+      else { alert('Upload failed: ' + data.error); }
+    } catch { alert('Error uploading image.'); }
+    finally { setCatImageUploading(null); }
+  };
+
+  // Remove the dedicated thumbnail for a category
+  const handleCategoryImageRemove = async (categoryId) => {
+    if (!confirm('Remove this category thumbnail? It will fall back to the first product image.')) return;
+    setCatImageRemoving(categoryId);
+    try {
+      const res = await fetch('/api/admin/category-image', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryId }),
+      });
+      const data = await res.json();
+      if (data.success) { fetchInventory(); }
+      else { alert('Remove failed: ' + data.error); }
+    } catch { alert('Error removing image.'); }
+    finally { setCatImageRemoving(null); }
+  };
+
   // Re-fetch when switching tabs
   useEffect(() => {
     if (isAuthenticated) {
@@ -387,6 +422,20 @@ export default function AdminOrdersPage() {
                 }}
               >
                 Categories
+              </button>
+              <button 
+                onClick={() => setActiveTab("categoryImages")}
+                style={{ 
+                  background: activeTab === "categoryImages" ? "var(--maroon)" : "transparent",
+                  color: activeTab === "categoryImages" ? "#fff" : "var(--maroon)",
+                  border: "1px solid var(--maroon)",
+                  padding: "8px 16px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontWeight: "600"
+                }}
+              >
+                🖼️ Category Images
               </button>
             </div>
           </div>
@@ -850,6 +899,51 @@ export default function AdminOrdersPage() {
             </div>
           </div>
         )}
+
+        {activeTab === "categoryImages" && (
+          <div style={{ background: "#fff", borderRadius: "12px", boxShadow: "0 12px 32px rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.05)", padding: "28px" }}>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", color: "var(--maroon)", fontSize: "22px", marginBottom: "6px" }}>Category Images</h2>
+            <p style={{ color: "#888", fontSize: "14px", marginBottom: "24px" }}>Upload or remove a dedicated thumbnail for each category. This is completely independent of your products.</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "20px" }}>
+              {categories.map(cat => (
+                <div key={cat.id} style={{ border: "1px solid rgba(201,151,42,0.3)", borderRadius: "12px", overflow: "hidden", background: "#fdfaf5" }}>
+                  <div style={{ width: "100%", height: "180px", background: "#f0ebe0", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                    {cat.thumbnailUrl
+                      ? <img src={cat.thumbnailUrl} alt={cat.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      : <div style={{ textAlign: "center", color: "#aaa" }}>
+                          <div style={{ fontSize: "36px", marginBottom: "8px" }}>🖼️</div>
+                          <div style={{ fontSize: "12px" }}>No dedicated thumbnail</div>
+                          <div style={{ fontSize: "11px", color: "#bbb", marginTop: "4px" }}>Using first product image</div>
+                        </div>
+                    }
+                    {cat.thumbnailUrl && (
+                      <div style={{ position: "absolute", top: "8px", right: "8px", background: "rgba(76,175,80,0.9)", color: "#fff", fontSize: "11px", padding: "3px 8px", borderRadius: "12px", fontWeight: "600" }}>
+                        ✓ Custom
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ padding: "14px 16px" }}>
+                    <p style={{ fontWeight: "700", color: "var(--maroon)", marginBottom: "12px", fontSize: "14px" }}>{cat.title}</p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                      <label style={{ display: "block", textAlign: "center", padding: "9px", background: catImageUploading === cat.id ? "#ccc" : "var(--maroon)", color: "#fff", borderRadius: "6px", cursor: catImageUploading === cat.id ? "not-allowed" : "pointer", fontWeight: "600", fontSize: "13px" }}>
+                        {catImageUploading === cat.id ? "Uploading..." : (cat.thumbnailUrl ? "📤 Replace Image" : "📤 Upload Image")}
+                        <input type="file" accept="image/*" style={{ display: "none" }} disabled={catImageUploading === cat.id}
+                          onChange={e => { const f = e.target.files?.[0]; if (f) handleCategoryImageUpload(cat.id, f); e.target.value = ''; }} />
+                      </label>
+                      {cat.thumbnailUrl && (
+                        <button onClick={() => handleCategoryImageRemove(cat.id)} disabled={catImageRemoving === cat.id}
+                          style={{ padding: "9px", background: "transparent", color: "#c62828", border: "1px solid #c62828", borderRadius: "6px", cursor: catImageRemoving === cat.id ? "not-allowed" : "pointer", fontWeight: "600", fontSize: "13px" }}>
+                          {catImageRemoving === cat.id ? "Removing..." : "🗑️ Remove Image"}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

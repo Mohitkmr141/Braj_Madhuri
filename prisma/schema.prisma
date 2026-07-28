@@ -11,6 +11,7 @@ model Category {
   id            String    @id
   title         String
   description   String?
+  thumbnailUrl  String?
   basePrice     Float?
   originalPrice Float?
   size          String?

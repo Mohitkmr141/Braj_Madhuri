@@ -17,6 +17,7 @@ export async function GET() {
         },
         subcategories: true,
       },
+      // thumbnailUrl is already a direct field on Category, included automatically
     });
 
     return NextResponse.json({ success: true, categories });

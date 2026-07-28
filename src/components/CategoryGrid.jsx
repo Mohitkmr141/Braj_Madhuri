@@ -21,7 +21,9 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
             if (dbCat) {
               const dbSubtitles = dbCat.subcategories ? dbCat.subcategories.map(s => s.title) : [];
               const combinedSubcats = [...new Set([...cat.subcategories, ...dbSubtitles])];
-              const thumb = dbCat.products && dbCat.products.length > 0 ? dbCat.products[0].imageUrl : null;
+              // Prefer the dedicated category thumbnail; fall back to first product image
+              const thumb = dbCat.thumbnailUrl ||
+                (dbCat.products && dbCat.products.length > 0 ? dbCat.products[0].imageUrl : null);
               return { ...cat, label: dbCat.title, subcategories: combinedSubcats, imageUrl: thumb };
             }
             return cat;
