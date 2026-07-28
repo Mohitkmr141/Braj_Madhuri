@@ -18,7 +18,10 @@ const formatCurrency = (value) =>
 /** Build list of matching products for a subcategory from the DB products array */
 function resolveSubcategoryProducts(catId, subName, dbProducts) {
   return dbProducts.filter(p => {
-    return p.categoryId === catId && p.subcategory && p.subcategory.title === subName;
+    return p.categoryId === catId && (
+      (p.subcategory && p.subcategory.title === subName) ||
+      (p.folderName && p.folderName.split('/').pop() === subName)
+    );
   });
 }
 

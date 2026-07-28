@@ -44,7 +44,10 @@ function resolveFilter(filterFolder, searchQuery, allProducts) {
       const catLabel = dbMatch?.categoryTitle || CATEGORY_LABEL_MAP[catId] || catId;
       
       products = allProducts.filter(p => {
-        return p.categoryId === catId && p.subcategory?.title === subName;
+        return p.categoryId === catId && (
+          p.subcategory?.title === subName || 
+          (p.folderName && p.folderName.split('/').pop() === subName)
+        );
       });
       
       title = `${catLabel} — ${subName}`;
