@@ -27,6 +27,8 @@ model Subcategory {
   description String?
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   products    Product[]
+
+  @@index([categoryId])
 }
 
 model Product {
@@ -46,6 +48,9 @@ model Product {
 
   category      Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
+
+  @@index([categoryId])
+  @@index([subcategoryId])
 }
 
 model Order {
@@ -68,6 +73,10 @@ model Order {
   shippingCost  Float?   @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model User {
