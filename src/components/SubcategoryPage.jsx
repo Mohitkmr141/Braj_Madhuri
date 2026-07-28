@@ -38,7 +38,7 @@ function useCartFlash() {
 
 // ── ProductDetailCard ────────────────────────────────────────────────────────
 
-function ProductDetailCard({ product, addToCart }) {
+function ProductDetailCard({ product, addToCart, priority = false }) {
   const displayTitle = product.title || "";
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "");
   const [flashing, flash] = useCartFlash();
@@ -91,8 +91,10 @@ function ProductDetailCard({ product, addToCart }) {
         <Image
           src={product.imageUrl}
           alt={displayTitle}
+          decoding="async"
           fill
-          sizes="(max-width: 700px) 100vw, 340px"
+          priority={priority}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           style={{ objectFit: "cover", opacity: product.stock === 0 ? 0.5 : 1 }}
         />
         {product.stock === 0 && (
@@ -510,11 +512,12 @@ export default function SubcategoryPage({
       {/* Product list */}
       {products.length > 0 ? (
         <div className="subcat-products-grid">
-          {products.map((product) => (
+          {products.map((product, index) => (
             <ProductDetailCard
               key={product.id}
               product={product}
               addToCart={addToCart}
+              priority={index < 4}
             />
           ))}
         </div>

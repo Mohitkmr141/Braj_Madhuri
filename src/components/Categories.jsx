@@ -159,12 +159,13 @@ export default function CategoryGalleries({
 
       <div className="image-grid">
         {visibleProducts.length > 0 ? (
-          visibleProducts.map((product) => (
+          visibleProducts.map((product, index) => (
             <ProductCard
               key={product.id}
               addToCart={addToCart}
               product={product}
               autoOpen={product.id === activeProductId}
+              priority={index < 4}
             />
           ))
         ) : (
@@ -187,7 +188,7 @@ export default function CategoryGalleries({
   );
 }
 
-function ProductCard({ product, addToCart, autoOpen }) {
+function ProductCard({ product, addToCart, autoOpen, priority = false }) {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(autoOpen || false);
   const initialColor = (product?.title || product?.fileName || "").includes("Pearl Choker") ? "Green" : ((product?.title || product?.fileName || "").includes("Long Kundan Haar") ? "Yellow" : ((product?.title || product?.fileName || "").includes("Small Haar") ? "Green" : ((product?.title || product?.fileName || "").includes("Enamael Pendants") ? "Orange" : ((product?.title || product?.fileName || "").includes("Lotus Mala") ? "Red" : ((product?.title || product?.fileName || "").includes("Heavy Kundan Mala Haar") ? "Orange" : ((product?.title || product?.fileName || "") === "Kundan Haar" ? "Pink" : "Pink"))))));
   const [selectedColor, setSelectedColor] = useState(initialColor);
@@ -245,6 +246,7 @@ function ProductCard({ product, addToCart, autoOpen }) {
           alt={displayTitle}
           decoding="async"
           fill
+          priority={priority}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           style={{ objectFit: "cover" }}
         />

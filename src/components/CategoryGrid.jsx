@@ -71,7 +71,7 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
       </div>
 
       <div className="category-grid">
-        {categoriesList.map((cat) => {
+        {categoriesList.map((cat, index) => {
           const imgSrc = cat.imageUrl;
           const isActive = activeCategory === cat.id;
           const isOpen = openSubcat === cat.id;
@@ -97,6 +97,7 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
                       alt={cat.label}
                       decoding="async"
                       fill
+                      priority={index < 4}
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
                       style={{ objectFit: "cover" }}
                     />

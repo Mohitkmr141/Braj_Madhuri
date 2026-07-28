@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import heroBanner from "../../public/header-banner.jpg";
 import SearchBar from "./SearchBar.jsx";
 import { useSession, signOut } from "next-auth/react";
@@ -176,11 +177,13 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
 
       {pathname === "/" && (
         <div className="bm-banner">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={heroBanner.src}
+          <Image
+            src={heroBanner}
             alt="The Braj Madhuri"
             className="bm-banner__img"
+            priority
+            placeholder="blur"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
 
           <div className="bm-banner__ham">
