@@ -6,6 +6,7 @@ import Image from "next/image";
 import "./CategoryGalleries.css";
 import CATEGORIES from "../data/categoriesData.js";
 import { useWishlist } from "../context/WishlistContext.jsx";
+import { useProducts } from "../context/ProductsContext.jsx";
 
 const formatFolderName = (name) => {
   const parts = name.split("/");
@@ -91,34 +92,20 @@ export default function CategoryGalleries({
   addToCart,
   onClearFilter,
 }) {
-  const [dbProducts, setDbProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { categories, isLoaded } = useProducts();
   const [sortOrder, setSortOrder] = useState("low-to-high");
-
-  useEffect(() => {
-    fetch('/api/products')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.categories) {
-          // Flatten categories to products
-          const flatProducts = data.categories.flatMap(c => 
-            c.products.map(p => ({
-              ...p,
-              categoryId: c.id,
-              categoryTitle: c.title,
-              categoryDesc: c.description,
-              sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null
-            }))
-          );
-          setDbProducts(flatProducts);
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
+  const dbProducts = useMemo(() => {
+    if (!categories) return [];
+    return categories.flatMap(c => 
+      c.products.map(p => ({
+        ...p,
+        categoryId: c.id,
+        categoryTitle: c.title,
+        categoryDesc: c.description,
+        sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null
+      }))
+    );
+  }, [categories]);
 
   const { products: visibleProducts, title, isAll } = useMemo(() => {
     const result = resolveFilter(filterFolder, searchQuery, dbProducts);
@@ -133,7 +120,7 @@ export default function CategoryGalleries({
     return result;
   }, [filterFolder, searchQuery, dbProducts, sortOrder]);
 
-  if (loading) {
+  if (!isLoaded) {
     return <section className="galleries-wrapper" id="collections"><div className="section-header"><h2 className="section-title">Loading Products...</h2></div></section>;
   }
 

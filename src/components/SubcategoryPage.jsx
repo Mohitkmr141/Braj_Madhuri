@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import "./SubcategoryPage.css";
 import { useWishlist } from "../context/WishlistContext.jsx";
+import { useProducts } from "../context/ProductsContext.jsx";
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 
@@ -423,40 +424,25 @@ export default function SubcategoryPage({
   onBack,
   onBackToCategory,
 }) {
-  const [dbProducts, setDbProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { categories, isLoaded } = useProducts();
   const [sortOrder, setSortOrder] = useState("low-to-high");
-  const [resolvedCatLabel, setResolvedCatLabel] = useState(catLabel);
+  
+  const dbCat = categories?.find(c => c.id === catId);
+  const resolvedCatLabel = dbCat?.title || catLabel;
+  
+  const dbProducts = useMemo(() => {
+    if (!categories) return [];
 
-  useEffect(() => {
-    fetch('/api/products')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.categories) {
-          const dbCat = data.categories.find(c => c.id === catId);
-          if (dbCat) {
-            setResolvedCatLabel(dbCat.title);
-          }
-
-          // Flatten categories to products
-          const flatProducts = data.categories.flatMap(c => 
-            c.products.map(p => ({
-              ...p,
-              categoryId: c.id,
-              categoryTitle: c.title,
-              categoryDesc: c.description,
-              sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null
-            }))
-          );
-          setDbProducts(flatProducts);
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, [catId]);
+    return categories.flatMap(c => 
+      c.products.map(p => ({
+        ...p,
+        categoryId: c.id,
+        categoryTitle: c.title,
+        categoryDesc: c.description,
+        sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null
+      }))
+    );
+  }, [categories, catId, resolvedCatLabel]);
 
   const products = useMemo(() => {
     const subcatProducts = resolveSubcategoryProducts(catId, subName, dbProducts);
@@ -471,7 +457,7 @@ export default function SubcategoryPage({
     return subcatProducts;
   }, [catId, subName, dbProducts, sortOrder]);
 
-  if (loading) {
+  if (!isLoaded) {
     return <section className="subcat-page"><div className="subcat-section-header"><h2 className="subcat-section-title">Loading...</h2></div></section>;
   }
 
