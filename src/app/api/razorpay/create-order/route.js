@@ -1,16 +1,42 @@
 import { NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 
+import { getPrisma } from '../../../../lib/prisma.js';
+
 export async function POST(request) {
   try {
-    const { amount } = await request.json();
+    const { cartItems, state } = await request.json();
 
-    if (!amount) {
+    if (!cartItems || !cartItems.length) {
       return NextResponse.json(
-        { success: false, error: 'Amount is required' },
+        { success: false, error: 'Cart items are required' },
         { status: 400 }
       );
     }
+
+    const prisma = getPrisma();
+    let calculatedCartTotal = 0;
+
+    // 1. Calculate actual cart total from database prices
+    for (const item of cartItems) {
+      const product = await prisma.product.findUnique({ where: { id: item.id } });
+      if (!product) {
+        return NextResponse.json({ success: false, error: `Product ${item.id} not found` }, { status: 400 });
+      }
+      calculatedCartTotal += (product.price || 0) * item.quantity;
+    }
+
+    // 2. Calculate shipping cost
+    let shippingCost = 0;
+    if (calculatedCartTotal < 999) {
+      if (state === "Delhi NCR") {
+        shippingCost = 79;
+      } else if (state === "Rest of India") {
+        shippingCost = 119;
+      }
+    }
+
+    const amount = calculatedCartTotal + shippingCost;
 
     // Initialize Razorpay
     const razorpay = new Razorpay({
