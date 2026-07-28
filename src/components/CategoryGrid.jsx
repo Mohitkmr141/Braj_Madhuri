@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import "./CategoryGrid.css";
 import CATEGORIES from "../data/categoriesData.js";
+import { useProducts } from "../context/ProductsContext.jsx";
 
 
 export default function CategoryGrid({ activeCategory, onExplore }) {
@@ -11,47 +12,41 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
   const [categoriesList, setCategoriesList] = useState(CATEGORIES);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  React.useEffect(() => {
-    fetch('/api/products')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.categories) {
-          // Merge DB subcategories into the static list
-          const merged = CATEGORIES.map(cat => {
-            const dbCat = data.categories.find(c => c.id === cat.id);
-            if (dbCat) {
-              const dbSubtitles = dbCat.subcategories ? dbCat.subcategories.map(s => s.title) : [];
-              const combinedSubcats = [...new Set([...cat.subcategories, ...dbSubtitles])];
-              // Prefer the dedicated category thumbnail; fall back to first product image
-              const thumb = dbCat.thumbnailUrl ||
-                (dbCat.products && dbCat.products.length > 0 ? dbCat.products[0].imageUrl : null);
-              return { ...cat, label: dbCat.title, subcategories: combinedSubcats, imageUrl: thumb };
-            }
-            return cat;
-          });
-          
-          // Append entirely new DB categories that don't exist in static list
-          const newDbCats = data.categories
-            .filter(c => !CATEGORIES.some(staticCat => staticCat.id === c.id))
-            .map(c => ({
-              id: c.id,
-              label: c.title,
-              emoji: "✨",
-              subcategories: c.subcategories ? c.subcategories.map(s => s.title) : [],
-              folderKeys: [],
-              subcategoryFolderMap: {},
-              imageUrl: c.products && c.products.length > 0 ? c.products[0].imageUrl : null
-            }));
+  const { categories, isLoaded: loadedFromContext } = useProducts();
 
-          setCategoriesList([...merged, ...newDbCats]);
+  React.useEffect(() => {
+    if (categories && categories.length > 0) {
+      const merged = CATEGORIES.map(cat => {
+        const dbCat = categories.find(c => c.id === cat.id);
+        if (dbCat) {
+          const dbSubtitles = dbCat.subcategories ? dbCat.subcategories.map(s => s.title) : [];
+          const combinedSubcats = [...new Set([...cat.subcategories, ...dbSubtitles])];
+          const thumb = dbCat.thumbnailUrl ||
+            (dbCat.products && dbCat.products.length > 0 ? dbCat.products[0].imageUrl : null);
+          return { ...cat, label: dbCat.title, subcategories: combinedSubcats, imageUrl: thumb };
         }
-        setIsLoaded(true);
-      })
-      .catch(err => {
-        console.error("Error fetching dynamic categories:", err);
-        setIsLoaded(true);
+        return cat;
       });
-  }, []);
+      
+      const newDbCats = categories
+        .filter(c => !CATEGORIES.some(staticCat => staticCat.id === c.id))
+        .map(c => ({
+          id: c.id,
+          label: c.title,
+          emoji: "✨",
+          subcategories: c.subcategories ? c.subcategories.map(s => s.title) : [],
+          folderKeys: [],
+          subcategoryFolderMap: {},
+          imageUrl: c.products && c.products.length > 0 ? c.products[0].imageUrl : null
+        }));
+
+      setCategoriesList([...merged, ...newDbCats]);
+      setIsLoaded(true);
+    } else if (loadedFromContext) {
+      // Data is loaded but empty
+      setIsLoaded(true);
+    }
+  }, [categories, loadedFromContext]);
 
   const handleCategoryClick = (cat) => {
     const subcats = cat.subcategories || [];

@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import "./SearchBar.css";
+import { useProducts } from "../context/ProductsContext.jsx";
 
 // Build a flat searchable list from the DB products
 function buildSearchIndex(dbProducts) {
@@ -38,25 +39,22 @@ export default function SearchBar({ onClose, initialQuery = "" }) {
   const inputRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Fetch search index data on mount
+  const { categories } = useProducts();
+
+  // Build search index when categories are available
   useEffect(() => {
-    fetch('/api/products')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success && data.categories) {
-          const flatProducts = data.categories.flatMap(c => 
-            c.products.map(p => ({
-              ...p,
-              categoryTitle: c.title,
-              categoryDesc: c.description,
-              sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null
-            }))
-          );
-          setSearchIndex(buildSearchIndex(flatProducts));
-        }
-      })
-      .catch(console.error);
-  }, []);
+    if (categories && categories.length > 0) {
+      const flatProducts = categories.flatMap(c => 
+        c.products.map(p => ({
+          ...p,
+          categoryTitle: c.title,
+          categoryDesc: c.description,
+          sizes: c.sizes && c.sizes.length > 0 ? c.sizes : null
+        }))
+      );
+      setSearchIndex(buildSearchIndex(flatProducts));
+    }
+  }, [categories]);
 
   // When a suggestion chip is clicked from the parent, update query + trigger search
   useEffect(() => {

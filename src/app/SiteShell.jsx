@@ -10,7 +10,9 @@ import { CartProvider } from "../context/CartContext.jsx";
 import { SessionProvider } from "next-auth/react";
 import { WishlistProvider } from "../context/WishlistContext.jsx";
 
-export default function SiteShell({ children }) {
+import { ProductsProvider } from "../context/ProductsContext.jsx";
+
+export default function SiteShell({ children, initialCategories }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [cartItems, setCartItems] = useState([]);
@@ -189,18 +191,20 @@ export default function SiteShell({ children }) {
 
   return (
     <SessionProvider>
-      <CartProvider value={contextValue}>
-        <WishlistProvider value={wishlistContextValue}>
-          <p className="visually-hidden" aria-live="polite">
-            {cartAnnouncement}
-          </p>
-          <Header cartCount={cartCount} cartTotal={cartTotal} wishlistCount={wishlistCount} />
-          {children}
-          <Footer />
-          <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
-          <FloatingWhatsApp />
-        </WishlistProvider>
-      </CartProvider>
+      <ProductsProvider initialCategories={initialCategories}>
+        <CartProvider value={contextValue}>
+          <WishlistProvider value={wishlistContextValue}>
+            <p className="visually-hidden" aria-live="polite">
+              {cartAnnouncement}
+            </p>
+            <Header cartCount={cartCount} cartTotal={cartTotal} wishlistCount={wishlistCount} />
+            {children}
+            <Footer />
+            <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
+            <FloatingWhatsApp />
+          </WishlistProvider>
+        </CartProvider>
+      </ProductsProvider>
     </SessionProvider>
   );
 }

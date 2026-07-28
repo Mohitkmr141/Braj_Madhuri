@@ -44,12 +44,36 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+import { getPrisma } from "../lib/prisma.js";
+
+async function fetchInitialCategories() {
+  try {
+    const prisma = getPrisma();
+    const categories = await prisma.category.findMany({
+      include: {
+        products: {
+          include: {
+            subcategory: true
+          }
+        },
+        subcategories: true,
+      },
+    });
+    return categories;
+  } catch (error) {
+    console.error("Failed to fetch initial products:", error);
+    return [];
+  }
+}
+
+export default async function RootLayout({ children }) {
+  const categories = await fetchInitialCategories();
+
   return (
     <html lang="en-IN">
       <body>
         <Suspense fallback={null}>
-          <SiteShell>{children}</SiteShell>
+          <SiteShell initialCategories={categories}>{children}</SiteShell>
         </Suspense>
       </body>
     </html>
