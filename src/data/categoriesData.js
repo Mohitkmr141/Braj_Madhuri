@@ -4,7 +4,7 @@
 const CATEGORIES = [
   {
     "id": "bhakti-combos",
-    "label": "Bhakti Combos",
+    "label": "Seva Combos",
     "emoji": "🎁",
     "folderKeys": [
       "Bhakti Combos"
