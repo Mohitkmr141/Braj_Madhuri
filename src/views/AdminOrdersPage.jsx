@@ -43,6 +43,8 @@ export default function AdminOrdersPage() {
   const [editingCategory, setEditingCategory] = useState(null);
   const [categoryForm, setCategoryForm] = useState({ title: "", description: "" });
 
+  const [productSearchQuery, setProductSearchQuery] = useState("");
+
   // Subcategory Modal State
   const [isSubcategoryModalOpen, setIsSubcategoryModalOpen] = useState(false);
   const [isSubcategorySaving, setIsSubcategorySaving] = useState(false);
@@ -646,9 +648,23 @@ export default function AdminOrdersPage() {
               ))}
             </div>
           </div>
-        ) : (
+        ) : activeTab === "inventory" ? (
           <div style={{ background: "#fff", borderRadius: "12px", boxShadow: "0 12px 32px rgba(0,0,0,0.04)", overflow: "hidden", border: "1px solid rgba(0,0,0,0.05)", padding: "20px" }}>
-            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <input
+                type="text"
+                placeholder="Search products by name or ID..."
+                value={productSearchQuery}
+                onChange={(e) => setProductSearchQuery(e.target.value)}
+                style={{
+                  padding: "10px 16px",
+                  borderRadius: "6px",
+                  border: "1px solid #ddd",
+                  width: "100%",
+                  maxWidth: "350px",
+                  fontSize: "14px"
+                }}
+              />
               <button 
                 onClick={() => handleOpenProductModal()}
                 style={{ background: "var(--maroon)", color: "#fff", border: "none", padding: "10px 20px", borderRadius: "6px", cursor: "pointer", fontWeight: "600" }}
@@ -669,7 +685,12 @@ export default function AdminOrdersPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {inventory.map((product) => (
+                  {inventory
+                    .filter(product => 
+                      product.title.toLowerCase().includes(productSearchQuery.toLowerCase()) || 
+                      product.id.toLowerCase().includes(productSearchQuery.toLowerCase())
+                    )
+                    .map((product) => (
                     <tr key={product.id} style={{ borderBottom: "1px solid rgba(0,0,0,0.05)" }}>
                       <td style={{ padding: "16px", fontSize: "13px", color: "#555" }}>
                         {product.id}
@@ -722,7 +743,7 @@ export default function AdminOrdersPage() {
               </table>
             </div>
           </div>
-        )}
+        ) : null}
 
         {isModalOpen && (
           <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "20px" }}>
