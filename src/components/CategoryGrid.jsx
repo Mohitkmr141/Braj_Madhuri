@@ -9,6 +9,7 @@ import CATEGORIES from "../data/categoriesData.js";
 export default function CategoryGrid({ activeCategory, onExplore }) {
   const [openSubcat, setOpenSubcat] = useState(null);
   const [categoriesList, setCategoriesList] = useState(CATEGORIES);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   React.useEffect(() => {
     fetch('/api/products')
@@ -44,8 +45,12 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
 
           setCategoriesList([...merged, ...newDbCats]);
         }
+        setIsLoaded(true);
       })
-      .catch(err => console.error("Error fetching dynamic categories:", err));
+      .catch(err => {
+        console.error("Error fetching dynamic categories:", err);
+        setIsLoaded(true);
+      });
   }, []);
 
   const handleCategoryClick = (cat) => {
@@ -89,7 +94,9 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
               >
                 {/* Circular image with golden ring */}
                 <div className="category-img-wrapper">
-                  {imgSrc ? (
+                  {!isLoaded ? (
+                    <div style={{ width: "100%", height: "100%", background: "#eee", borderRadius: "50%", animation: "pulse 1.5s infinite ease-in-out" }}></div>
+                  ) : imgSrc ? (
                     <Image
                       src={imgSrc}
                       alt={cat.label}
