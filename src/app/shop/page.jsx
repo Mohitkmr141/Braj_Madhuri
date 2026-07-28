@@ -1,10 +1,50 @@
 import { Suspense } from "react";
 import ShopPage from "../../views/ShopPage.jsx";
 
-export const metadata = {
-  title: "Shop Devotional Items",
-  description: "Browse our complete collection of pooja fragrances, mala, poshak, and more devotional items.",
-};
+import { getPrisma } from "../../lib/prisma.js";
+
+export async function generateMetadata({ searchParams }) {
+  // Extract search params (Next.js 15+ searchParams is a Promise)
+  const resolvedParams = await searchParams;
+  const categoryParam = resolvedParams?.category;
+  
+  if (categoryParam) {
+    // Parse "catId::SubName" if it's a subcategory
+    const isSubcategory = categoryParam.includes("::");
+    const catId = isSubcategory ? categoryParam.split("::")[0] : categoryParam;
+    
+    try {
+      const prisma = getPrisma();
+      const category = await prisma.category.findUnique({
+        where: { id: catId }
+      });
+      
+      if (category) {
+        const title = isSubcategory 
+          ? `${categoryParam.split("::")[1]} - ${category.title}` 
+          : category.title;
+          
+        return {
+          title: `${title} | Shop Devotional Items`,
+          description: category.description || `Browse our collection of ${title}.`,
+          openGraph: {
+            title: `${title} | The Braj Madhuri`,
+            description: category.description || `Browse our collection of ${title}.`,
+            images: category.thumbnailUrl ? [category.thumbnailUrl] : [],
+          },
+        };
+      }
+    } catch (e) {
+      console.error("Failed to fetch category for metadata:", e);
+    }
+  }
+
+  // Fallback default metadata
+  return {
+    title: "Shop Devotional Items | The Braj Madhuri",
+    description: "Browse our complete collection of pooja fragrances, mala, poshak, and more devotional items.",
+  };
+}
 
 export default function Page() {
   return (

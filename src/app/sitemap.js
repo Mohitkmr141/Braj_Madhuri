@@ -1,7 +1,9 @@
-export default function sitemap() {
+import { getPrisma } from '../lib/prisma.js';
+
+export default async function sitemap() {
   const baseUrl = "https://thebrajmadhuri.com";
 
-  return [
+  const defaultPages = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -33,4 +35,36 @@ export default function sitemap() {
       priority: 0.5,
     },
   ];
+
+  try {
+    const prisma = getPrisma();
+    const categories = await prisma.category.findMany({
+      include: {
+        subcategories: true,
+      },
+    });
+
+    const categoryPages = categories.flatMap(cat => {
+      const catUrl = {
+        url: `${baseUrl}/shop?category=${encodeURIComponent(cat.id)}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly",
+        priority: 0.8,
+      };
+
+      const subcatUrls = cat.subcategories.map(sub => ({
+        url: `${baseUrl}/shop?category=${encodeURIComponent(`${cat.id}::${sub.title}`)}`,
+        lastModified: new Date(),
+        changeFrequency: "weekly",
+        priority: 0.7,
+      }));
+
+      return [catUrl, ...subcatUrls];
+    });
+
+    return [...defaultPages, ...categoryPages];
+  } catch (error) {
+    console.error("Failed to generate sitemap:", error);
+    return defaultPages;
+  }
 }
