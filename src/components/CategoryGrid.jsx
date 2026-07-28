@@ -38,6 +38,7 @@ const THUMBNAIL_MAP = buildThumbnailMap();
 export default function CategoryGrid({ activeCategory, onExplore }) {
   const [openSubcat, setOpenSubcat] = useState(null);
   const [categoriesList, setCategoriesList] = useState(CATEGORIES);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   React.useEffect(() => {
     fetch('/api/products')
@@ -70,7 +71,8 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
           setCategoriesList([...merged, ...newDbCats]);
         }
       })
-      .catch(err => console.error("Error fetching dynamic categories:", err));
+      .catch(err => console.error("Error fetching dynamic categories:", err))
+      .finally(() => setIsDataLoaded(true));
   }, []);
 
   const handleCategoryClick = (cat) => {
@@ -140,7 +142,7 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
 
                 {/* Label below circle */}
                 <p className="category-name">
-                  {cat.label}
+                  {isDataLoaded ? cat.label : '\u00A0'}
                 </p>
               </button>
 
