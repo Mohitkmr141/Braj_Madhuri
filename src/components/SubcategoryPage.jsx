@@ -6,6 +6,7 @@ import Image from "next/image";
 import "./SubcategoryPage.css";
 import { useWishlist } from "../context/WishlistContext.jsx";
 import { useProducts } from "../context/ProductsContext.jsx";
+import { sortProducts } from "../utils/productHelpers.js";
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 
@@ -448,15 +449,7 @@ export default function SubcategoryPage({
 
   const products = useMemo(() => {
     const subcatProducts = resolveSubcategoryProducts(catId, subName, dbProducts);
-    
-    // Sort products based on sortOrder
-    if (sortOrder === "low-to-high") {
-      subcatProducts.sort((a, b) => (a.price || 0) - (b.price || 0));
-    } else if (sortOrder === "high-to-low") {
-      subcatProducts.sort((a, b) => (b.price || 0) - (a.price || 0));
-    }
-    
-    return subcatProducts;
+    return sortProducts(subcatProducts, sortOrder);
   }, [catId, subName, dbProducts, sortOrder]);
 
   if (!isLoaded) {
