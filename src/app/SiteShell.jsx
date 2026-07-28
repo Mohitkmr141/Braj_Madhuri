@@ -9,8 +9,8 @@ import FloatingWhatsApp from "../components/FloatingWhatsApp.jsx";
 import { CartProvider } from "../context/CartContext.jsx";
 import { SessionProvider } from "next-auth/react";
 import { WishlistProvider } from "../context/WishlistContext.jsx";
-
 import { ProductsProvider } from "../context/ProductsContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 
 export default function SiteShell({ children, initialCategories }) {
   const pathname = usePathname();
@@ -18,6 +18,7 @@ export default function SiteShell({ children, initialCategories }) {
   const [cartItems, setCartItems] = useState([]);
   const [wishlistItems, setWishlistItems] = useState([]);
   const [isClient, setIsClient] = useState(false);
+  const { addToast } = useToast();
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -42,22 +43,23 @@ export default function SiteShell({ children, initialCategories }) {
 
   const addToCart = useCallback((product) => {
     setCartItems((prev) => {
-      // Fallback if price is somehow passed instead of object (e.g. from an old component we missed)
       if (typeof product === 'number') {
         product = { id: `legacy-${Date.now()}`, title: 'Item', price: product, image: '', originalPrice: null };
       }
       
       const existing = prev.find((item) => item.id === product.id && item.size === product.size && item.color === product.color);
       if (existing) {
+        addToast(`Increased quantity of ${product.title || 'Item'}`);
         return prev.map((item) =>
           item.id === product.id && item.size === product.size && item.color === product.color
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
+      addToast(`${product.title || 'Item'} added to cart!`);
       return [...prev, { ...product, quantity: 1 }];
     });
-  }, []);
+  }, [addToast]);
 
   const updateQuantity = useCallback((id, size, quantity, color) => {
     setCartItems((prev) =>
@@ -103,15 +105,20 @@ export default function SiteShell({ children, initialCategories }) {
 
   const addToWishlist = useCallback((product) => {
     setWishlistItems((prev) => {
-      const existing = prev.find((item) => item.id === product.id && item.size === product.size);
+      const existing = prev.find((item) => item.id === product.id && item.size === product.size && item.color === product.color);
       if (existing) return prev;
+      addToast(`${product.title || 'Item'} added to wishlist!`);
       return [...prev, product];
     });
-  }, []);
+  }, [addToast]);
 
-  const removeFromWishlist = useCallback((id, size) => {
-    setWishlistItems((prev) => prev.filter((item) => !(item.id === id && item.size === size)));
-  }, []);
+  const removeFromWishlist = useCallback((productId, size) => {
+    setWishlistItems((prev) => {
+      const item = prev.find(i => i.id === productId && i.size === size);
+      if (item) addToast(`${item.title || 'Item'} removed from wishlist`, 'error');
+      return prev.filter((item) => !(item.id === productId && item.size === size));
+    });
+  }, [addToast]);
 
   const isInWishlist = useCallback((id, size) => {
     return wishlistItems.some((item) => item.id === id && item.size === size);

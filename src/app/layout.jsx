@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import SiteShell from "./SiteShell.jsx";
+import { ToastProvider } from "../context/ToastContext.jsx";
 import "../App.css";
 
 export const viewport = {
@@ -73,7 +74,9 @@ export default async function RootLayout({ children }) {
     <html lang="en-IN">
       <body>
         <Suspense fallback={null}>
-          <SiteShell initialCategories={categories}>{children}</SiteShell>
+          <ToastProvider>
+            <SiteShell initialCategories={categories}>{children}</SiteShell>
+          </ToastProvider>
         </Suspense>
       </body>
     </html>
