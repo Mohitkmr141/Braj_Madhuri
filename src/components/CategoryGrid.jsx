@@ -3,42 +3,12 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import "./CategoryGrid.css";
-import PRODUCT_IMAGE_MAP from "../data/productImages.js";
 import CATEGORIES from "../data/categoriesData.js";
 
-const THUMBNAIL_OVERRIDES = {
-  "bhakti-combos": "/images/images/Bhakti Combos/Nitya Sewa Kit.jpeg"
-};
-
-/**
- * Build a lookup: categoryId → first representative image URL.
- * For each category we try each folderKey in order and use the
- * first image found.
- */
-function buildThumbnailMap() {
-  const map = {};
-  CATEGORIES.forEach((cat) => {
-    if (THUMBNAIL_OVERRIDES[cat.id]) {
-      map[cat.id] = THUMBNAIL_OVERRIDES[cat.id];
-      return;
-    }
-    for (const key of cat.folderKeys) {
-      const images = PRODUCT_IMAGE_MAP[key];
-      if (images && images.length > 0) {
-        map[cat.id] = images[0].image;
-        break;
-      }
-    }
-  });
-  return map;
-}
-
-const THUMBNAIL_MAP = buildThumbnailMap();
 
 export default function CategoryGrid({ activeCategory, onExplore }) {
   const [openSubcat, setOpenSubcat] = useState(null);
   const [categoriesList, setCategoriesList] = useState(CATEGORIES);
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   React.useEffect(() => {
     fetch('/api/products')
@@ -51,7 +21,8 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
             if (dbCat) {
               const dbSubtitles = dbCat.subcategories ? dbCat.subcategories.map(s => s.title) : [];
               const combinedSubcats = [...new Set([...cat.subcategories, ...dbSubtitles])];
-              return { ...cat, label: dbCat.title, subcategories: combinedSubcats };
+              const thumb = dbCat.products && dbCat.products.length > 0 ? dbCat.products[0].imageUrl : null;
+              return { ...cat, label: dbCat.title, subcategories: combinedSubcats, imageUrl: thumb };
             }
             return cat;
           });
@@ -65,18 +36,19 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
               emoji: "✨",
               subcategories: c.subcategories ? c.subcategories.map(s => s.title) : [],
               folderKeys: [],
-              subcategoryFolderMap: {}
+              subcategoryFolderMap: {},
+              imageUrl: c.products && c.products.length > 0 ? c.products[0].imageUrl : null
             }));
 
           setCategoriesList([...merged, ...newDbCats]);
         }
       })
-      .catch(err => console.error("Error fetching dynamic categories:", err))
-      .finally(() => setIsDataLoaded(true));
+      .catch(err => console.error("Error fetching dynamic categories:", err));
   }, []);
 
   const handleCategoryClick = (cat) => {
-    if (cat.subcategories.length > 0) {
+    const subcats = cat.subcategories || [];
+    if (subcats.length > 0) {
       setOpenSubcat((prev) => (prev === cat.id ? null : cat.id));
     } else {
       onExplore?.(cat.id);
@@ -98,9 +70,10 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
 
       <div className="category-grid">
         {categoriesList.map((cat) => {
-          const imgSrc = THUMBNAIL_MAP[cat.id];
+          const imgSrc = cat.imageUrl;
           const isActive = activeCategory === cat.id;
           const isOpen = openSubcat === cat.id;
+          const subcats = cat.subcategories || [];
 
           return (
             <div key={cat.id} className="category-cell-wrap">
@@ -109,8 +82,8 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
                 type="button"
                 onClick={() => handleCategoryClick(cat)}
                 aria-pressed={isActive}
-                aria-haspopup={cat.subcategories.length > 0 ? "listbox" : undefined}
-                aria-expanded={cat.subcategories.length > 0 ? isOpen : undefined}
+                aria-haspopup={subcats.length > 0 ? "listbox" : undefined}
+                aria-expanded={subcats.length > 0 ? isOpen : undefined}
               >
                 {/* Circular image with golden ring */}
                 <div className="category-img-wrapper">
@@ -130,7 +103,7 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
                   )}
 
                   {/* Chevron badge on top-right of circle */}
-                  {cat.subcategories.length > 0 && (
+                  {subcats.length > 0 && (
                     <span
                       className={`category-chevron${isOpen ? " category-chevron--open" : ""}`}
                       aria-hidden="true"
@@ -142,12 +115,12 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
 
                 {/* Label below circle */}
                 <p className="category-name">
-                  {isDataLoaded ? cat.label : '\u00A0'}
+                  {cat.label || '\u00A0'}
                 </p>
               </button>
 
               {/* Subcategory dropdown */}
-              {cat.subcategories.length > 0 && isOpen && (
+              {subcats.length > 0 && isOpen && (
                 <ul
                   className="subcategory-list"
                   role="listbox"
@@ -169,7 +142,7 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
                       All {cat.label}
                     </button>
                   </li>
-                  {cat.subcategories.map((sub) => (
+                  {subcats.map((sub) => (
                     <li key={sub}>
                       <button
                         className="subcategory-item"

@@ -19,31 +19,12 @@ const formatCurrency = (value) =>
   }).format(value);
 
 /**
- * Build a mapping: categoryId → array of folderKeys
- * Also resolves the display label for a category id.
+ * Resolves the display label for a category id.
  */
-const CATEGORY_FOLDER_MAP = {};
 const CATEGORY_LABEL_MAP = {};
 CATEGORIES.forEach((cat) => {
   CATEGORY_LABEL_MAP[cat.id] = cat.label;
-
-  // Register top-level folderKeys
-  cat.folderKeys.forEach((key) => {
-    if (!CATEGORY_FOLDER_MAP[cat.id]) CATEGORY_FOLDER_MAP[cat.id] = new Set();
-    CATEGORY_FOLDER_MAP[cat.id].add(key);
-  });
-
-  // Also register all keys from subcategoryFolderMap so they are resolvable
-  if (cat.subcategoryFolderMap) {
-    Object.values(cat.subcategoryFolderMap).forEach((keys) => {
-      keys.forEach((key) => {
-        if (!CATEGORY_FOLDER_MAP[cat.id]) CATEGORY_FOLDER_MAP[cat.id] = new Set();
-        CATEGORY_FOLDER_MAP[cat.id].add(key);
-      });
-    });
-  }
 });
-
 
 /**
  * Given a filterFolder value, return the list of products to display.
@@ -62,25 +43,16 @@ function resolveFilter(filterFolder, searchQuery, allProducts) {
       const dbMatch = allProducts.find(p => p.categoryId === catId);
       const catLabel = dbMatch?.categoryTitle || CATEGORY_LABEL_MAP[catId] || catId;
       
-      const cat = CATEGORIES.find((c) => c.id === catId);
-      const subFolderKeys = cat?.subcategoryFolderMap?.[subName] ?? [];
-      const keySet = new Set(subFolderKeys);
-      
       products = allProducts.filter(p => {
-        const matchesFolder = keySet.has(p.folderName);
-        const matchesDb = p.categoryId === catId && p.subcategory?.title === subName;
-        return matchesFolder || matchesDb;
+        return p.categoryId === catId && p.subcategory?.title === subName;
       });
       
       title = `${catLabel} — ${subName}`;
       isAll = false;
     } else {
       // It's a top-level category id
-      const folders = CATEGORY_FOLDER_MAP[filterFolder] || new Set();
       products = allProducts.filter(p => {
-        const matchesFolder = folders.has(p.folderName);
-        const matchesDb = p.categoryId === filterFolder;
-        return matchesFolder || matchesDb;
+        return p.categoryId === filterFolder;
       });
       
       // Try to find a dynamic label from the products first
@@ -94,7 +66,7 @@ function resolveFilter(filterFolder, searchQuery, allProducts) {
     const query = searchQuery.trim().toLowerCase();
     
     products = products.filter(p => {
-      const imgTitle = (p.title || p.folderName).toLowerCase();
+      const imgTitle = (p.title || "").toLowerCase();
       const imgDesc = (p.description || p.categoryDesc || "").toLowerCase();
       return imgTitle.includes(query) || imgDesc.includes(query);
     });

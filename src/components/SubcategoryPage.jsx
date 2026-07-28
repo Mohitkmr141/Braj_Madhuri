@@ -4,7 +4,6 @@ import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import "./SubcategoryPage.css";
-import CATEGORIES from "../data/categoriesData.js";
 import { useWishlist } from "../context/WishlistContext.jsx";
 
 // ── helpers ─────────────────────────────────────────────────────────────────
@@ -16,23 +15,10 @@ const formatCurrency = (value) =>
     style: "currency",
   }).format(value);
 
-/** Resolve which image-map folder keys to show for a given catId + subcategory name */
-function resolveFolderKeys(catId, subName) {
-  const cat = CATEGORIES.find((c) => c.id === catId);
-  if (!cat) return [];
-  const map = cat.subcategoryFolderMap ?? {};
-  return map[subName] || [];
-}
-
 /** Build list of matching products for a subcategory from the DB products array */
 function resolveSubcategoryProducts(catId, subName, dbProducts) {
-  const folderKeys = resolveFolderKeys(catId, subName);
-  const keySet = new Set(folderKeys);
   return dbProducts.filter(p => {
-    // Match by folder name (legacy mapping) OR by DB subcategory title with matching category
-    const matchesFolder = keySet.has(p.folderName);
-    const matchesDbSubcategory = p.categoryId === catId && p.subcategory && p.subcategory.title === subName;
-    return matchesFolder || matchesDbSubcategory;
+    return p.categoryId === catId && p.subcategory && p.subcategory.title === subName;
   });
 }
 
@@ -49,11 +35,11 @@ function useCartFlash() {
 // ── ProductDetailCard ────────────────────────────────────────────────────────
 
 function ProductDetailCard({ product, addToCart }) {
-  const displayTitle = product.title || product.folderName;
+  const displayTitle = product.title || "";
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "");
   const [flashing, flash] = useCartFlash();
   const [isZoomed, setIsZoomed] = useState(false);
-  const initialColor = (product?.title || product?.folderName || "").includes("Pearl Choker") ? "Green" : ((product?.title || product?.folderName || "").includes("Long Kundan Haar") ? "Yellow" : ((product?.title || product?.folderName || "").includes("Small Haar") ? "Green" : ((product?.title || product?.folderName || "").includes("Enamael Pendants") ? "Orange" : ((product?.title || product?.folderName || "").includes("Lotus Mala") ? "Red" : ((product?.title || product?.folderName || "").includes("Heavy Kundan Mala Haar") ? "Orange" : ((product?.title || product?.folderName || "") === "Kundan Haar" ? "Pink" : "Pink"))))));
+  const initialColor = (product?.title || "").includes("Pearl Choker") ? "Green" : ((product?.title || "").includes("Long Kundan Haar") ? "Yellow" : ((product?.title || "").includes("Small Haar") ? "Green" : ((product?.title || "").includes("Enamael Pendants") ? "Orange" : ((product?.title || "").includes("Lotus Mala") ? "Red" : ((product?.title || "").includes("Heavy Kundan Mala Haar") ? "Orange" : ((product?.title || "") === "Kundan Haar" ? "Pink" : "Pink"))))));
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
 
