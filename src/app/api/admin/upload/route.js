@@ -23,6 +23,14 @@ export async function POST(request) {
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `product-images/${fileName}`;
 
+    if (!process.env.SUPABASE_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      return NextResponse.json({ success: false, error: 'Vercel configuration error: SUPABASE_URL is missing. Please add it to your Vercel Environment Variables and REDEPLOY.' }, { status: 500 });
+    }
+    
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return NextResponse.json({ success: false, error: 'Vercel configuration error: SUPABASE_SERVICE_ROLE_KEY is missing. Please add it to your Vercel Environment Variables and REDEPLOY.' }, { status: 500 });
+    }
+
     const supabase = getSupabase();
     const arrayBuffer = await file.arrayBuffer();
 
