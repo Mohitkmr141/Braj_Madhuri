@@ -10,9 +10,9 @@ export const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel, con
       <div className="confirm-dialog">
         <h3 className="confirm-dialog-title">{title}</h3>
         <p className="confirm-dialog-message">{message}</p>
-        <div className="confirm-dialog-actions">
-          <button className="btn-outline" onClick={onCancel}>{cancelText}</button>
-          <button className={isDangerous ? 'btn-danger' : 'btn-primary'} onClick={onConfirm}>
+        <div className="confirm-dialog-actions flex gap-2 justify-center">
+          <button className="btn btn-outline" onClick={onCancel}>{cancelText}</button>
+          <button className={`btn ${isDangerous ? 'btn-danger' : 'btn-primary'}`} onClick={onConfirm}>
             {confirmText}
           </button>
         </div>
@@ -256,9 +256,9 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
             </div>
           </div>
 
-          <div className="form-actions mt-4 flex justify-end">
-            <button type="button" className="btn-outline mr-2" onClick={onClose}>Cancel</button>
-            <button type="submit" className={`btn-primary ${saving || uploading ? 'btn-disabled' : ''}`} disabled={saving || uploading}>
+          <div className="form-actions mt-4 flex justify-end gap-2">
+            <button type="button" className="btn btn-outline mr-2" onClick={onClose}>Cancel</button>
+            <button type="submit" className={`btn btn-primary ${saving || uploading ? 'btn-disabled' : ''}`} disabled={saving || uploading}>
               {saving ? 'Saving...' : 'Save Product'}
             </button>
           </div>
@@ -340,9 +340,9 @@ export const CategoryModal = ({ isOpen, onClose, editingCategory, onSaved }) => 
             />
           </div>
           
-          <div className="form-actions mt-4 flex justify-end">
-            <button type="button" className="btn-outline mr-2" onClick={onClose}>Cancel</button>
-            <button type="submit" className={`btn-primary ${saving ? 'btn-disabled' : ''}`} disabled={saving}>
+          <div className="form-actions mt-4 flex justify-end gap-2">
+            <button type="button" className="btn btn-outline mr-2" onClick={onClose}>Cancel</button>
+            <button type="submit" className={`btn btn-primary ${saving ? 'btn-disabled' : ''}`} disabled={saving}>
               {saving ? 'Saving...' : 'Save Category'}
             </button>
           </div>
@@ -439,9 +439,9 @@ export const SubcategoryModal = ({ isOpen, onClose, editingSubcategory, categori
             />
           </div>
           
-          <div className="form-actions mt-4 flex justify-end">
-            <button type="button" className="btn-outline mr-2" onClick={onClose}>Cancel</button>
-            <button type="submit" className={`btn-primary ${saving ? 'btn-disabled' : ''}`} disabled={saving}>
+          <div className="form-actions mt-4 flex justify-end gap-2">
+            <button type="button" className="btn btn-outline mr-2" onClick={onClose}>Cancel</button>
+            <button type="submit" className={`btn btn-primary ${saving ? 'btn-disabled' : ''}`} disabled={saving}>
               {saving ? 'Saving...' : 'Save Subcategory'}
             </button>
           </div>

@@ -3,16 +3,16 @@
 
 :root {
   /* Core Colors */
-  --admin-maroon: #7c1a1a;
-  --admin-maroon-hover: #5d1212;
-  --admin-maroon-light: #fbf5f5;
+  --admin-maroon: #4A1521;
+  --admin-maroon-hover: #6A1E2F;
+  --admin-maroon-light: #FDFBF7;
   
-  --admin-bg: #f8fafc;
+  --admin-bg: #FDFBF7;
   --admin-surface: #ffffff;
   
   /* Text */
-  --text-main: #0f172a;
-  --text-secondary: #475569;
+  --text-main: #1F1A17;
+  --text-secondary: #6B5B53;
   --text-tertiary: #94a3b8;
   
   /* UI Elements */
