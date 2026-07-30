@@ -43,24 +43,27 @@ export default function AdminLayout() {
 
   if (!isAuthenticated) {
     return (
-      <div className="login-container">
-        <form onSubmit={handleLogin} className="login-form">
-          <h2 className="login-title">Admin Access</h2>
-          {error && <div className="error-message">{error}</div>}
-          <div className="form-group">
-            <input 
-              type="password" 
-              placeholder="Enter Master Password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
-              required 
-              className="form-input"
-            />
-          </div>
-          <button className="btn-primary admin-login-submit" type="submit">
-            Login to Dashboard
-          </button>
-        </form>
+      <div className="admin-login-wrapper" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--admin-bg)', padding: '24px' }}>
+        <div className="admin-card-padded" style={{ maxWidth: '440px', width: '100%', textAlign: 'center' }}>
+          <form onSubmit={handleLogin} className="login-form">
+            <h2 className="admin-title" style={{ marginBottom: '32px' }}>Admin Access</h2>
+            {error && <div className="status-badge cancelled" style={{ marginBottom: '24px', display: 'block', padding: '8px 12px' }}>{error}</div>}
+            <div className="form-group" style={{ marginBottom: '32px' }}>
+              <input 
+                type="password" 
+                placeholder="Enter Master Password" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required 
+                className="form-input"
+                style={{ textAlign: 'center', letterSpacing: '4px', fontSize: '18px', padding: '16px' }}
+              />
+            </div>
+            <button className="btn btn-primary" type="submit" style={{ width: '100%', padding: '14px', fontSize: '16px' }}>
+              Login to Dashboard
+            </button>
+          </form>
+        </div>
       </div>
     );
   }
