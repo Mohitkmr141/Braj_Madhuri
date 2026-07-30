@@ -1,8 +1,6 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { getPrisma } from '../../../../lib/prisma.js';
 
 export async function POST(request) {
   const cookieStore = await cookies();
@@ -12,6 +10,7 @@ export async function POST(request) {
   }
 
   try {
+    const prisma = getPrisma();
     const data = await request.json();
     const { title, description } = data;
 
@@ -51,6 +50,7 @@ export async function DELETE(request) {
   }
 
   try {
+    const prisma = getPrisma();
     const url = new URL(request.url);
     const id = url.searchParams.get("id");
     
@@ -80,6 +80,7 @@ export async function PUT(request) {
   }
 
   try {
+    const prisma = getPrisma();
     const data = await request.json();
     const { id, title, description } = data;
 

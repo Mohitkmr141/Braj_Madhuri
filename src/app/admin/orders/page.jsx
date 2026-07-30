@@ -1,10 +1,10 @@
 import React from "react";
-import AdminOrdersPage from "../../../views/AdminOrdersPage.jsx";
+import AdminLayout from "../../../views/admin/AdminLayout.jsx";
 
 export const metadata = {
-  title: "Admin Dashboard | Orders",
+  title: "Admin Dashboard | The Braj Madhuri",
 };
 
 export default function Page() {
-  return <AdminOrdersPage />;
+  return <AdminLayout />;
 }
