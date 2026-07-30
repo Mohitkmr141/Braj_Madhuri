@@ -7,6 +7,7 @@ import "./SubcategoryPage.css";
 import { useWishlist } from "../context/WishlistContext.jsx";
 import { useProducts } from "../context/ProductsContext.jsx";
 import { sortProducts } from "../utils/productHelpers.js";
+import { useScrollReveal } from "../hooks/useScrollReveal.jsx";
 
 // ── helpers ─────────────────────────────────────────────────────────────────
 
@@ -47,6 +48,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
   const initialColor = (product?.title || "").includes("Pearl Choker") ? "Green" : ((product?.title || "").includes("Long Kundan Haar") ? "Yellow" : ((product?.title || "").includes("Small Haar") ? "Green" : ((product?.title || "").includes("Enamael Pendants") ? "Orange" : ((product?.title || "").includes("Lotus Mala") ? "Red" : ((product?.title || "").includes("Heavy Kundan Mala Haar") ? "Orange" : ((product?.title || "") === "Kundan Haar" ? "Pink" : "Pink"))))));
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const revealRef = useScrollReveal();
 
   const isFav = isInWishlist(product.id, selectedSize);
 
@@ -86,7 +88,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
   };
 
   return (
-    <article className="subcat-product-card reveal" onClick={() => setIsZoomed(true)} style={{ cursor: 'pointer' }}>
+    <article ref={revealRef} className="subcat-product-card reveal" onClick={() => setIsZoomed(true)} style={{ cursor: 'pointer' }}>
       {/* ── Image panel ─────────────────────────────────────── */}
       <div className="subcat-img-panel">
         <Image

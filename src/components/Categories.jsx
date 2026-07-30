@@ -8,6 +8,7 @@ import CATEGORIES from "../data/categoriesData.js";
 import { useWishlist } from "../context/WishlistContext.jsx";
 import { useProducts } from "../context/ProductsContext.jsx";
 import { resolveFilter, sortProducts, formatFolderName, formatCurrency } from "../utils/productHelpers.js";
+import { useScrollReveal } from "../hooks/useScrollReveal.jsx";
 
 export default function CategoryGalleries({
   filterFolder,
@@ -110,6 +111,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
   const initialColor = (product?.title || product?.fileName || "").includes("Pearl Choker") ? "Green" : ((product?.title || product?.fileName || "").includes("Long Kundan Haar") ? "Yellow" : ((product?.title || product?.fileName || "").includes("Small Haar") ? "Green" : ((product?.title || product?.fileName || "").includes("Enamael Pendants") ? "Orange" : ((product?.title || product?.fileName || "").includes("Lotus Mala") ? "Red" : ((product?.title || product?.fileName || "").includes("Heavy Kundan Mala Haar") ? "Orange" : ((product?.title || product?.fileName || "") === "Kundan Haar" ? "Pink" : "Pink"))))));
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const revealRef = useScrollReveal();
 
   const isFav = isInWishlist(product?.id, product?.size);
 
@@ -150,7 +152,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
   };
 
   return (
-    <article className="image-card reveal" onClick={() => setIsQuickViewOpen(true)} style={{ cursor: 'pointer' }}>
+    <article ref={revealRef} className="image-card reveal" onClick={() => setIsQuickViewOpen(true)} style={{ cursor: 'pointer' }}>
       <div className="image-card-img-wrapper">
         {isOutOfStock ? (
           <span className="discount-badge" style={{ background: '#d32f2f', color: '#fff' }}>OUT OF STOCK</span>
