@@ -96,7 +96,18 @@ export default function ProductsTab() {
       </div>
 
       {loading ? (
-        <div className="loading-spinner">Loading inventory...</div>
+        <div className="skeleton-table-wrapper" style={{ marginTop: '24px' }}>
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="skeleton-row">
+              <div className="skeleton-cell" style={{ flex: '0.5' }}></div>
+              <div className="skeleton-cell" style={{ flex: '2' }}></div>
+              <div className="skeleton-cell" style={{ flex: '1.5' }}></div>
+              <div className="skeleton-cell" style={{ flex: '0.5' }}></div>
+              <div className="skeleton-cell" style={{ flex: '0.5' }}></div>
+              <div className="skeleton-cell" style={{ flex: '1' }}></div>
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="table-responsive">
           <table className="admin-table">

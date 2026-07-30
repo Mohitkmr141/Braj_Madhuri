@@ -453,7 +453,24 @@ export default function SubcategoryPage({
   }, [catId, subName, dbProducts, sortOrder]);
 
   if (!isLoaded) {
-    return <section className="subcat-page"><div className="subcat-section-header"><h2 className="subcat-section-title">Loading...</h2></div></section>;
+    return (
+      <section className="subcat-page">
+        <div className="subcat-section-header">
+          <h2 className="subcat-section-title">Loading...</h2>
+        </div>
+        <div className="subcat-products-grid" style={{ marginTop: '32px' }}>
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="skeleton-card">
+              <div className="skeleton-image"></div>
+              <div className="skeleton-text title"></div>
+              <div className="skeleton-text"></div>
+              <div className="skeleton-text short"></div>
+              <div className="skeleton-button skeleton"></div>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
   }
 
   return (

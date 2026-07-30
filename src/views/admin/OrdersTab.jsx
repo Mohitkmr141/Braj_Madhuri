@@ -129,7 +129,19 @@ const OrdersTab = () => {
       </div>
 
       {loading ? (
-        <div className="admin-loading-state">Loading orders...</div>
+        <div className="skeleton-table-wrapper" style={{ marginTop: '24px' }}>
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="skeleton-row">
+              <div className="skeleton-cell" style={{ flex: '0.5' }}></div>
+              <div className="skeleton-cell" style={{ flex: '1' }}></div>
+              <div className="skeleton-cell" style={{ flex: '1.5' }}></div>
+              <div className="skeleton-cell" style={{ flex: '1' }}></div>
+              <div className="skeleton-cell" style={{ flex: '1' }}></div>
+              <div className="skeleton-cell" style={{ flex: '0.5' }}></div>
+              <div className="skeleton-cell" style={{ flex: '1' }}></div>
+            </div>
+          ))}
+        </div>
       ) : orders.length === 0 ? (
         <div className="admin-empty-state">No orders found.</div>
       ) : (

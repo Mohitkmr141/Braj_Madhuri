@@ -122,7 +122,15 @@ export default function CategoriesTab() {
       </div>
 
       {loading ? (
-        <div className="loading-state">Loading categories...</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '24px' }}>
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="skeleton-card" style={{ height: '120px' }}>
+              <div className="skeleton-text title" style={{ width: '30%' }}></div>
+              <div className="skeleton-text" style={{ width: '80%' }}></div>
+              <div className="skeleton-text short"></div>
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="category-list">
           {categories.map(cat => (
