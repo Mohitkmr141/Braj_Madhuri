@@ -13,11 +13,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: var(--glass-bg-dark, rgba(74, 21, 33, 0.95));
+  background: var(--glass-bg-dark, rgb(74 21 33 / 95%));
   color: var(--ivory, #fff);
   padding: 14px 20px;
   border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 20%);
   pointer-events: auto;
   min-width: 280px;
   max-width: 380px;
@@ -58,7 +58,7 @@
 .toast-close {
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgb(255 255 255 / 70%);
   font-size: 1.2rem;
   cursor: pointer;
   padding: 0;
@@ -75,6 +75,7 @@
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -85,12 +86,13 @@
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .toast-container {
     bottom: 20px;
     right: 20px;

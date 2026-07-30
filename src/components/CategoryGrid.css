@@ -19,9 +19,11 @@
   align-items: start;
 }
 
-@media (max-width: 1100px) { .category-grid { grid-template-columns: repeat(5, 1fr); } }
-@media (max-width: 768px)  { .category-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
-@media (max-width: 480px)  { .category-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; } }
+@media (width <= 1100px) { .category-grid { grid-template-columns: repeat(5, 1fr); } }
+
+@media (width <= 768px)  { .category-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
+
+@media (width <= 480px)  { .category-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; } }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    CELL WRAPPER  (holds button + dropdown)
@@ -74,26 +76,23 @@
   /* Warm ivory base */
   background:
     radial-gradient(circle at 38% 35%,
-      rgba(255, 255, 255, 0.98) 0%,
-      rgba(255, 248, 230, 0.92) 45%,
-      rgba(245, 228, 195, 0.88) 100%
+      rgb(255 255 255 / 98%) 0%,
+      rgb(255 248 230 / 92%) 45%,
+      rgb(245 228 195 / 88%) 100%
     );
 
   /* Golden spinning ring via conic gradient border trick */
   outline: 3px solid transparent;
   box-shadow:
-    0 0 0 3px rgba(201, 150, 12, 0.55),   /* golden ring */
-    0 0 0 5.5px rgba(255, 255, 255, 0.9), /* white gap */
-    0 0 0 7px rgba(201, 150, 12, 0.18),   /* outer glow ring */
-    0 8px 28px rgba(120, 70, 10, 0.14),   /* depth shadow */
-    0 2px 8px rgba(120, 70, 10, 0.08);
-
+    0 0 0 3px rgb(201 150 12 / 55%),   /* golden ring */
+    0 0 0 5.5px rgb(255 255 255 / 90%), /* white gap */
+    0 0 0 7px rgb(201 150 12 / 18%),   /* outer glow ring */
+    0 8px 28px rgb(120 70 10 / 14%),   /* depth shadow */
+    0 2px 8px rgb(120 70 10 / 8%);
   padding: clamp(12%, 3vw, 18%);
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   transition:
     box-shadow 0.3s ease,
     transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -106,8 +105,8 @@
   inset: -10px;
   border-radius: 50%;
   background: radial-gradient(circle,
-    rgba(201, 150, 12, 0.18) 0%,
-    rgba(201, 150, 12, 0.06) 55%,
+    rgb(201 150 12 / 18%) 0%,
+    rgb(201 150 12 / 6%) 55%,
     transparent 75%
   );
   opacity: 0;
@@ -125,7 +124,7 @@
   right: 15%;
   height: 12px;
   border-radius: 50%;
-  background: rgba(80, 45, 10, 0.13);
+  background: rgb(80 45 10 / 13%);
   filter: blur(8px);
   pointer-events: none;
   z-index: 0;
@@ -134,11 +133,11 @@
 /* Hover — ring glows gold, aura appears */
 .category-cell:hover .category-img-wrapper {
   box-shadow:
-    0 0 0 3px rgba(212, 175, 55, 0.9),
-    0 0 0 5.5px rgba(255, 255, 255, 0.95),
-    0 0 0 8px rgba(212, 175, 55, 0.5),
-    0 0 40px 12px rgba(212, 175, 55, 0.45),
-    0 20px 50px rgba(120, 70, 10, 0.35);
+    0 0 0 3px rgb(212 175 55 / 90%),
+    0 0 0 5.5px rgb(255 255 255 / 95%),
+    0 0 0 8px rgb(212 175 55 / 50%),
+    0 0 40px 12px rgb(212 175 55 / 45%),
+    0 20px 50px rgb(120 70 10 / 35%);
 }
 
 .category-cell:hover .category-img-wrapper::before {
@@ -149,10 +148,10 @@
 .category-cell--active .category-img-wrapper {
   box-shadow:
     0 0 0 3.5px #c9972a,
-    0 0 0 6px rgba(255, 255, 255, 0.95),
-    0 0 0 9px rgba(201, 150, 12, 0.4),
-    0 0 28px 8px rgba(201, 150, 12, 0.28),
-    0 12px 32px rgba(120, 70, 10, 0.2);
+    0 0 0 6px rgb(255 255 255 / 95%),
+    0 0 0 9px rgb(201 150 12 / 40%),
+    0 0 28px 8px rgb(201 150 12 / 28%),
+    0 12px 32px rgb(120 70 10 / 20%);
 }
 
 .category-cell--active .category-img-wrapper::before {
@@ -162,7 +161,7 @@
 /* Zoom image on hover */
 .category-cell:hover .category-img-wrapper img {
   transform: scale(1.15);
-  filter: drop-shadow(0 8px 16px rgba(80, 45, 10, 0.3));
+  filter: drop-shadow(0 8px 16px rgb(80 45 10 / 30%));
 }
 
 /* ─── The actual image ─────────────────────────────────────────────────── */
@@ -173,7 +172,7 @@
   height: 100% !important;
   object-fit: contain;
   object-position: center;
-  filter: drop-shadow(0 4px 8px rgba(80, 45, 10, 0.14));
+  filter: drop-shadow(0 4px 8px rgb(80 45 10 / 14%));
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
 }
 
@@ -183,7 +182,7 @@
   line-height: 1;
   position: relative;
   z-index: 1;
-  filter: drop-shadow(0 2px 6px rgba(80, 45, 10, 0.18));
+  filter: drop-shadow(0 2px 6px rgb(80 45 10 / 18%));
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -191,7 +190,7 @@
 ═══════════════════════════════════════════════════════════════════════════ */
 .category-name {
   margin: 10px 0 0;
-  font-family: 'Inter', sans-serif;
+  font-family: Inter, sans-serif;
   font-size: clamp(9px, 1.1vw, 12px);
   font-weight: 600;
   color: #2e1a0a;
@@ -231,7 +230,7 @@
   height: 18px;
   border-radius: 50%;
   background: #fff8ed;
-  border: 1.5px solid rgba(201, 150, 12, 0.5);
+  border: 1.5px solid rgb(201 150 12 / 50%);
   font-size: 9px;
   line-height: 1;
   color: #8a6030;
@@ -274,11 +273,11 @@
   margin: 0;
   padding: 8px 0;
   background: #fffdf6;
-  border: 1.5px solid rgba(201, 150, 12, 0.32);
+  border: 1.5px solid rgb(201 150 12 / 32%);
   border-radius: 14px;
   box-shadow:
-    0 20px 50px rgba(57, 35, 17, 0.2),
-    0 4px 12px rgba(57, 35, 17, 0.08);
+    0 20px 50px rgb(57 35 17 / 20%),
+    0 4px 12px rgb(57 35 17 / 8%);
   animation: subcatFadeIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -296,7 +295,7 @@
   transform: translateX(-50%);
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-bottom: 8px solid rgba(201, 150, 12, 0.32);
+  border-bottom: 8px solid rgb(201 150 12 / 32%);
 }
 
 .subcategory-list::after {
@@ -315,7 +314,7 @@
   width: 100%;
   padding: 9px 18px;
   text-align: left;
-  font-family: 'Inter', sans-serif;
+  font-family: Inter, sans-serif;
   font-size: 12px;
   font-weight: 500;
   color: #3d2410;
@@ -328,7 +327,7 @@
 }
 
 .subcategory-item:hover {
-  background: rgba(201, 150, 12, 0.09);
+  background: rgb(201 150 12 / 9%);
   color: #8b5a0a;
   padding-left: 24px;
 }
@@ -340,12 +339,12 @@
   letter-spacing: 0.8px;
   color: #c9972a;
   padding-bottom: 10px;
-  border-bottom: 1px solid rgba(201, 150, 12, 0.18);
+  border-bottom: 1px solid rgb(201 150 12 / 18%);
   margin-bottom: 2px;
 }
 
 .subcategory-item--all:hover {
-  background: rgba(201, 150, 12, 0.07);
+  background: rgb(201 150 12 / 7%);
   color: #a07818;
   padding-left: 24px;
 }
@@ -359,7 +358,7 @@
   background: transparent;
   border: 1.5px solid #7a4f28;
   border-radius: 999px;
-  font-family: 'Inter', sans-serif;
+  font-family: Inter, sans-serif;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -374,7 +373,7 @@
   background: linear-gradient(135deg, #8b5a20, #c9972a);
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 6px 20px rgba(139, 90, 32, 0.35);
+  box-shadow: 0 6px 20px rgb(139 90 32 / 35%);
   transform: translateY(-2px);
 }
 
@@ -394,7 +393,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.82);
+  background: rgb(255 255 255 / 82%);
   border: none;
   border-radius: 50%;
   width: 32px;
@@ -419,7 +418,7 @@
   position: absolute;
   top: 8px;
   right: 10px;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgb(0 0 0 / 45%);
   color: #fff;
   font-size: 12px;
   padding: 2px 7px;
@@ -441,7 +440,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgb(255 255 255 / 55%);
   border: none;
   cursor: pointer;
   padding: 0;

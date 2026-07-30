@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   background: #fff;
-  border: 2px solid rgba(212, 175, 55, 0.4);
+  border: 2px solid rgb(212 175 55 / 40%);
   border-radius: 60px;
   padding: 0 10px 0 28px;
   gap: 12px;
@@ -19,7 +19,7 @@
 }
 
 .search-form:focus-within {
-  border-color: rgba(212, 175, 55, 0.8);
+  border-color: rgb(212 175 55 / 80%);
   box-shadow: var(--shadow-glow);
   transform: translateY(-2px);
 }
@@ -52,7 +52,7 @@
 }
 
 .search-input::placeholder {
-  color: rgba(122, 92, 64, 0.45);
+  color: rgb(122 92 64 / 45%);
   font-style: italic;
   font-size: 20px;
 }
@@ -69,7 +69,7 @@
   border-radius: 50px;
   height: 54px;
   padding: 0 28px;
-  font-family: 'Cinzel', Georgia, serif;
+  font-family: Cinzel, Georgia, serif;
   font-size: 15px;
   font-weight: 600;
   letter-spacing: 1px;
@@ -84,7 +84,7 @@
 .search-submit-btn:hover {
   background: linear-gradient(135deg, var(--maroon-light), var(--maroon));
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(74, 21, 33, 0.3);
+  box-shadow: 0 4px 16px rgb(74 21 33 / 30%);
 }
 
 .search-submit-btn svg {
@@ -93,7 +93,7 @@
 }
 
 .search-clear {
-  background: rgba(122, 92, 64, 0.1);
+  background: rgb(122 92 64 / 10%);
   border: none;
   cursor: pointer;
   font-size: 22px;
@@ -108,8 +108,9 @@
   justify-content: center;
   transition: background 0.15s, color 0.15s;
 }
+
 .search-clear:hover {
-  background: rgba(139, 26, 26, 0.12);
+  background: rgb(139 26 26 / 12%);
   color: #8b1a1a;
 }
 
@@ -120,9 +121,9 @@
   left: 0;
   right: 0;
   background: #fff;
-  border: 1.5px solid rgba(201, 151, 42, 0.3);
+  border: 1.5px solid rgb(201 151 42 / 30%);
   border-radius: 20px;
-  box-shadow: 0 16px 56px rgba(44, 26, 14, 0.2);
+  box-shadow: 0 16px 56px rgb(44 26 14 / 20%);
   list-style: none;
   padding: 8px 0;
   z-index: 2000;
@@ -142,7 +143,7 @@
   padding: 16px 24px;
   cursor: pointer;
   transition: background 0.12s;
-  border-bottom: 1px solid rgba(201, 151, 42, 0.07);
+  border-bottom: 1px solid rgb(201 151 42 / 7%);
 }
 
 .search-result-item:last-of-type {
@@ -159,7 +160,7 @@
   flex-shrink: 0;
   width: 40px;
   height: 40px;
-  background: rgba(201, 151, 42, 0.1);
+  background: rgb(201 151 42 / 10%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -175,7 +176,7 @@
 }
 
 .search-result-title {
-  font-family: 'Cinzel', Georgia, serif;
+  font-family: Cinzel, Georgia, serif;
   font-size: 16px;
   color: #2c1a0e;
   font-weight: 600;
@@ -193,7 +194,7 @@
 /* Highlighted match text */
 .search-result-title mark,
 .search-result-desc mark {
-  background: rgba(201, 151, 42, 0.28);
+  background: rgb(201 151 42 / 28%);
   color: #8b1a1a;
   border-radius: 3px;
   padding: 0 2px;
@@ -201,18 +202,18 @@
 }
 
 .search-result-price {
-  font-family: 'Cinzel', Georgia, serif;
+  font-family: Cinzel, Georgia, serif;
   font-size: 15px;
   color: #8b1a1a;
   font-weight: 700;
   flex-shrink: 0;
-  background: rgba(139, 26, 26, 0.07);
+  background: rgb(139 26 26 / 7%);
   padding: 4px 10px;
   border-radius: 20px;
 }
 
 .search-result-footer {
-  border-top: 1.5px solid rgba(201, 151, 42, 0.15);
+  border-top: 1.5px solid rgb(201 151 42 / 15%);
   padding: 14px 24px;
 }
 
@@ -220,7 +221,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-family: 'Cinzel', Georgia, serif;
+  font-family: Cinzel, Georgia, serif;
   font-size: 14px;
   color: #8b1a1a;
   letter-spacing: 0.5px;
@@ -236,9 +237,9 @@
   left: 0;
   right: 0;
   background: #fff;
-  border: 1.5px solid rgba(201, 151, 42, 0.3);
+  border: 1.5px solid rgb(201 151 42 / 30%);
   border-radius: 20px;
-  box-shadow: 0 16px 56px rgba(44, 26, 14, 0.2);
+  box-shadow: 0 16px 56px rgb(44 26 14 / 20%);
   padding: 24px 28px;
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 18px;
@@ -255,13 +256,13 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  background: rgb(255 255 255 / 14%);
+  border: 1.5px solid rgb(255 255 255 / 28%);
   border-radius: 24px;
   padding: 8px 18px;
   height: 38px;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgb(255 255 255 / 90%);
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 14px;
   font-style: italic;
@@ -271,8 +272,8 @@
 }
 
 .header-search-btn:hover {
-  background: rgba(255, 255, 255, 0.24);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: rgb(255 255 255 / 24%);
+  border-color: rgb(255 255 255 / 50%);
   color: #fff;
 }
 
@@ -287,9 +288,8 @@
   position: fixed;
   inset: 0;
   z-index: 1500;
-  background: rgba(20, 10, 4, 0.72);
+  background: rgb(20 10 4 / 72%);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -305,9 +305,9 @@
 
 /* Large heading above the search bar */
 .search-overlay__heading {
-  font-family: 'Cinzel', Georgia, serif;
+  font-family: Cinzel, Georgia, serif;
   font-size: clamp(20px, 4vw, 32px);
-  color: rgba(255, 255, 255, 0.9);
+  color: rgb(255 255 255 / 90%);
   font-weight: 600;
   margin-bottom: 28px;
   letter-spacing: 1px;
@@ -317,7 +317,7 @@
 .search-overlay__subheading {
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: clamp(14px, 2vw, 18px);
-  color: rgba(201, 151, 42, 0.85);
+  color: rgb(201 151 42 / 85%);
   font-style: italic;
   margin-bottom: 36px;
   text-align: center;
@@ -332,9 +332,8 @@
 }
 
 .search-overlay__close {
-  flex-shrink: 0;
-  background: rgba(255,255,255,0.12);
-  border: 1.5px solid rgba(255,255,255,0.3);
+  background: rgb(255 255 255 / 12%);
+  border: 1.5px solid rgb(255 255 255 / 30%);
   color: #fff;
   font-size: 22px;
   width: 48px;
@@ -348,8 +347,9 @@
   line-height: 1;
   flex-shrink: 0;
 }
+
 .search-overlay__close:hover {
-  background: rgba(255,255,255,0.22);
+  background: rgb(255 255 255 / 22%);
 }
 
 /* Quick-search suggestion chips below search bar */
@@ -363,9 +363,8 @@
 }
 
 .search-suggestion-chip {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(201, 151, 42, 0.4);
-  color: rgba(255,255,255,0.82);
+  background: rgb(255 255 255 / 10%);
+  color: rgb(255 255 255 / 82%);
   font-family: 'Cormorant Garamond', Georgia, serif;
   font-size: 15px;
   padding: 8px 18px;
@@ -376,13 +375,13 @@
 }
 
 .search-suggestion-chip:hover {
-  background: rgba(201, 151, 42, 0.25);
-  border-color: rgba(201, 151, 42, 0.7);
+  background: rgb(201 151 42 / 25%);
+  border-color: rgb(201 151 42 / 70%);
   color: #fff;
 }
 
 /* ─── MOBILE RESPONSIVE ─── */
-@media (max-width: 767px) {
+@media (width <= 767px) {
   .search-bar-wrapper { max-width: 100%; }
   .search-form { height: 60px; padding: 0 8px 0 20px; }
   .search-input { font-size: 18px; }

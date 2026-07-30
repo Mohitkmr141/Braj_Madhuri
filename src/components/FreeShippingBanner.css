@@ -7,12 +7,12 @@
   margin-bottom: 24px;
   position: relative;
   gap: 16px;
-  border: 1px solid rgba(232, 114, 26, 0.1);
+  border: 1px solid rgb(232 114 26 / 10%);
 }
 
 .shipping-banner--success {
   background-color: #edf7ed;
-  border-color: rgba(46, 125, 50, 0.1);
+  border-color: rgb(46 125 50 / 10%);
 }
 
 .shipping-banner-icon {
@@ -31,7 +31,7 @@
   color: var(--text, #2A1A0E);
   font-size: 15px;
   line-height: 1.4;
-  font-family: 'Inter', sans-serif;
+  font-family: Inter, sans-serif;
 }
 
 .shipping-banner-amount {

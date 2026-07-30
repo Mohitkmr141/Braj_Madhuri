@@ -18,7 +18,7 @@
   margin-bottom: 60px;
 }
 
-@media (min-width: 768px) {
+@media (width >= 768px) {
   .about-details__grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -26,18 +26,18 @@
 
 .about-card {
   background: var(--white);
-  border: 1px solid rgba(201, 151, 42, 0.15);
+  border: 1px solid rgb(201 151 42 / 15%);
   border-radius: 8px;
   padding: 40px 30px;
   text-align: center;
-  box-shadow: 0 6px 24px rgba(74, 44, 26, 0.04);
+  box-shadow: 0 6px 24px rgb(74 44 26 / 4%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .about-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 32px rgba(123, 27, 42, 0.08);
-  border-color: rgba(201, 151, 42, 0.35);
+  box-shadow: 0 12px 32px rgb(123 27 42 / 8%);
+  border-color: rgb(201 151 42 / 35%);
 }
 
 .about-card__icon {
@@ -47,7 +47,7 @@
 }
 
 .about-card__title {
-  font-family: 'Cinzel', serif;
+  font-family: Cinzel, serif;
   color: var(--maroon);
   font-size: 21px;
   margin-bottom: 14px;
@@ -67,9 +67,9 @@
   text-align: center;
   margin: 60px 0;
   padding: 40px 30px;
-  background: rgba(245, 237, 216, 0.3);
+  background: rgb(245 237 216 / 30%);
   border-radius: 8px;
-  border: 1px dashed rgba(201, 151, 42, 0.3);
+  border: 1px dashed rgb(201 151 42 / 30%);
 }
 
 .about-offerings__title {
@@ -89,15 +89,15 @@
 
 .offering-tag {
   background: var(--white);
-  border: 1px solid rgba(201, 151, 42, 0.25);
+  border: 1px solid rgb(201 151 42 / 25%);
   color: var(--text);
   padding: 8px 20px;
   border-radius: 999px;
-  font-family: 'Cinzel', serif;
+  font-family: Cinzel, serif;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 2%);
   transition: all 0.2s ease;
   cursor: default;
 }
@@ -135,6 +135,7 @@
   position: absolute;
   top: -15px;
   opacity: 0.25;
+
   /* font-family: serif; */
 }
 

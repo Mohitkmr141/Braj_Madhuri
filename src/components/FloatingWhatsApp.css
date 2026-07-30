@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+  box-shadow: 0 4px 12px rgb(37 211 102 / 40%);
   z-index: 99;
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
   animation: float-up 0.5s ease-out forwards;
@@ -18,7 +18,7 @@
 
 .floating-whatsapp:hover {
   transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.5);
+  box-shadow: 0 6px 16px rgb(37 211 102 / 50%);
   color: white;
 }
 
@@ -32,13 +32,14 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .floating-whatsapp {
     bottom: 20px;
     left: 20px;
