@@ -173,8 +173,9 @@ const OrdersTab = () => {
                     <td>
                       <div className="order-items-list">
                         {items.length > 0 ? items.map((item, index) => (
-                          <div key={index} className="order-item-line mb-1">
-                            {item.quantity}x {item.title || item.name} {item.size && `(${item.size})`}
+                          <div key={index} className="order-item-line mb-2">
+                            <span className="order-item-qty">{item.quantity}x</span>
+                            <span className="order-item-title">{item.title || item.name} {item.size && <span className="product-size">{item.size}</span>}</span>
                           </div>
                         )) : "No items"}
                       </div>
