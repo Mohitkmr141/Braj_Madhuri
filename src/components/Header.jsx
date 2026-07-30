@@ -256,8 +256,7 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
           >
             <div className="bm-cart">
               <span className="bm-cart__icon" aria-hidden="true">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" />
+                <Image src="/cart-icon.png" alt="Cart" width={24} height={24} className="bm-cart__icon-img" />
               </span>
               <span className="bm-cart__label">
                 {cartCount > 0 ? `INR ${cartTotal.toLocaleString("en-IN")}` : "Cart"}
@@ -355,8 +354,7 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
             >
               <div className="bm-cart" style={{ padding: "4px 8px", minHeight: "auto" }}>
                 <span className="bm-cart__icon" aria-hidden="true">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" style={{ width: "16px", height: "16px" }} />
+                  <Image src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" width={16} height={16} />
                 </span>
               </div>
               {cartCount > 0 && (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 import FloatingCart from "../components/FloatingCart.jsx";
@@ -14,7 +14,6 @@ import { useToast } from "../context/ToastContext.jsx";
 
 export default function SiteShell({ children, initialCategories }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [cartItems, setCartItems] = useState([]);
   const [wishlistItems, setWishlistItems] = useState([]);
   const [isClient, setIsClient] = useState(false);
@@ -166,35 +165,17 @@ export default function SiteShell({ children, initialCategories }) {
       }
     };
 
-    // Initial observation
-    document.querySelectorAll(".reveal").forEach(observeElement);
-
-    // Watch for dynamic additions
-    const mutationObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (node.nodeType === 1) { // ELEMENT_NODE
-            if (node.classList.contains("reveal")) {
-              setTimeout(() => observeElement(node), 100);
-            }
-            // Find nested .reveal elements
-            const nestedReveals = node.querySelectorAll(".reveal");
-            if (nestedReveals.length > 0) {
-              setTimeout(() => nestedReveals.forEach(observeElement), 100);
-            }
-          }
-        });
-      });
-    });
-
-    mutationObserver.observe(document.body, { childList: true, subtree: true });
+    // Give the DOM a tiny bit of time to render dynamic content before attaching observer
+    const initTimer = setTimeout(() => {
+      document.querySelectorAll(".reveal").forEach(observeElement);
+    }, 150);
 
     return () => {
+      clearTimeout(initTimer);
       observer.disconnect();
-      mutationObserver.disconnect();
       timers.forEach((timer) => window.clearTimeout(timer));
     };
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   return (
     <SessionProvider>
