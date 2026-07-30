@@ -106,15 +106,15 @@ export default function CategoriesTab() {
 
   return (
     <div className="tab-pane">
-      <div className="toolbar">
+      <div className="admin-toolbar">
         <button 
-          className="btn btn-success" 
+          className="btn btn-primary" 
           onClick={() => { setEditingCategory(null); setIsCategoryModalOpen(true); }}
         >
           + Add New Category
         </button>
         <button 
-          className="btn btn-info"
+          className="btn btn-outline"
           onClick={() => { setEditingSubcategory(null); setIsSubcategoryModalOpen(true); }}
         >
           + Add New Subcategory
@@ -132,9 +132,9 @@ export default function CategoriesTab() {
                   <h3>{cat.title}</h3>
                   <p>{cat.description}</p>
                 </div>
-                <div className="category-actions">
-                  <button className="btn btn-edit" onClick={() => handleEditCategory(cat)}>Edit</button>
-                  <button className="btn btn-danger" onClick={() => handleDeleteCategory(cat.id)}>Delete</button>
+                <div className="category-actions flex flex-col gap-2">
+                  <button className="btn btn-outline btn-sm" onClick={() => handleEditCategory(cat)}>Edit</button>
+                  <button className="btn btn-danger btn-sm" onClick={() => handleDeleteCategory(cat.id)}>Delete</button>
                 </div>
               </div>
 
@@ -146,8 +146,8 @@ export default function CategoriesTab() {
                         <h4>{sub.title}</h4>
                         <p>{sub.description}</p>
                       </div>
-                      <div className="subcategory-actions">
-                        <button className="btn btn-edit btn-sm" onClick={() => handleEditSubcategory(sub)}>Edit</button>
+                      <div className="subcategory-actions flex gap-2">
+                        <button className="btn btn-outline btn-sm" onClick={() => handleEditSubcategory(sub)}>Edit</button>
                         <button className="btn btn-danger btn-sm" onClick={() => handleDeleteSubcategory(sub.id)}>Delete</button>
                       </div>
                     </div>

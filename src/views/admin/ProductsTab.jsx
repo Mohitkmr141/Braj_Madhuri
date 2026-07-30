@@ -80,17 +80,17 @@ export default function ProductsTab() {
 
   return (
     <div className="admin-inventory">
-      <div className="inventory-header">
+      <div className="admin-toolbar">
         <div className="search-bar">
           <input
             type="text"
             placeholder="Search by ID or Name"
             value={productSearchQuery}
             onChange={(e) => setProductSearchQuery(e.target.value)}
-            className="search-input"
+            className="admin-search-input"
           />
         </div>
-        <button className="add-btn" onClick={() => handleOpenModal()}>
+        <button className="btn btn-primary" onClick={() => handleOpenModal()}>
           + Add New Product
         </button>
       </div>
@@ -128,15 +128,15 @@ export default function ProductsTab() {
                       {product.stock || 0}
                     </td>
                     <td>
-                      <div className="action-buttons">
+                      <div className="action-button-group vertical">
                         <button
-                          className="btn-edit"
+                          className="btn btn-outline btn-sm"
                           onClick={() => handleOpenModal(product)}
                         >
                           Edit
                         </button>
                         <button
-                          className="btn-delete"
+                          className="btn btn-danger btn-sm"
                           onClick={() => handleDeleteProduct(product.id)}
                         >
                           Delete

@@ -90,9 +90,11 @@ export default function CategoryImagesTab() {
 
   return (
     <div className="tab-pane">
-      <div className="section-header">
-        <h2>Category Images</h2>
-        <p className="subtitle">Upload dedicated thumbnails for your categories.</p>
+      <div className="admin-toolbar">
+        <div>
+          <h2 className="font-semibold text-maroon" style={{margin:0, fontSize: '20px'}}>Category Images</h2>
+          <p className="text-muted text-sm" style={{margin:'4px 0 0 0'}}>Upload dedicated thumbnails for your categories.</p>
+        </div>
       </div>
 
       {loading ? (
@@ -111,7 +113,7 @@ export default function CategoryImagesTab() {
               <div className="cat-image-info">
                 <h3>{cat.title}</h3>
                 <div className="cat-image-actions">
-                  <label className="btn btn-primary btn-sm upload-label">
+                  <label className="cat-image-upload-label">
                     {catImageUploading === cat.id ? 'Uploading...' : 'Upload'}
                     <input
                       type="file"
