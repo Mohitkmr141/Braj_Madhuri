@@ -43,6 +43,9 @@ export const metadata = {
   icons: {
     icon: "/Logo.jpeg",
   },
+  alternates: {
+    canonical: "https://thebrajmadhuri.com",
+  },
 };
 
 import { getPrisma } from "../lib/prisma.js";
@@ -70,8 +73,36 @@ async function fetchInitialCategories() {
 export default async function RootLayout({ children }) {
   const categories = await fetchInitialCategories();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://thebrajmadhuri.com/#organization",
+        "name": "The Braj Madhuri",
+        "url": "https://thebrajmadhuri.com",
+        "logo": "https://thebrajmadhuri.com/Logo.jpeg"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://thebrajmadhuri.com/#website",
+        "url": "https://thebrajmadhuri.com",
+        "name": "The Braj Madhuri",
+        "publisher": {
+          "@id": "https://thebrajmadhuri.com/#organization"
+        }
+      }
+    ]
+  };
+
   return (
     <html lang="en-IN">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body>
         <Suspense fallback={null}>
           <ToastProvider>
