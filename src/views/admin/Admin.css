@@ -729,6 +729,20 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .admin-container {
+    padding: 12px 12px 80px 12px;
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  .admin-inner {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
   .admin-header {
     flex-direction: column;
     align-items: stretch;
@@ -737,6 +751,11 @@ body {
     top: 12px;
     gap: 16px;
     margin-bottom: 24px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    box-sizing: border-box;
   }
   
   .admin-header-left {
@@ -744,20 +763,31 @@ body {
     flex-direction: column;
     gap: 16px;
     align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
-  
-  .admin-container {
-    padding: 12px 12px 80px 12px;
+
+  .admin-title {
+    font-size: 24px;
+    word-break: break-word;
   }
   
   .admin-toolbar {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
   
   .admin-search-input {
+    width: 100%;
     max-width: 100%;
+    box-sizing: border-box;
   }
   
   .pagination {
@@ -767,22 +797,36 @@ body {
 
   /* Tabs Scrollable smoothly on mobile */
   .admin-tabs {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
     flex-wrap: nowrap;
+    box-sizing: border-box;
     padding-bottom: 2px;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
+    -webkit-overflow-scrolling: touch;
   }
   .admin-tabs::-webkit-scrollbar {
     display: none;
+  }
+
+  .admin-logout-btn {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
   }
 
   /* Modals */
   .modal-content, .modal-content-sm {
     padding: 24px;
     border-radius: 16px;
-    margin: 16px;
+    margin: 16px auto;
     width: calc(100% - 32px);
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   /* Categories Mobile */
@@ -815,13 +859,19 @@ body {
     background: transparent;
     box-shadow: none;
     padding: 0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   .admin-table {
     display: block;
-    width: 100%;
-    min-width: 0;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
     border: none;
+    box-sizing: border-box;
   }
 
   .admin-table thead {
@@ -832,6 +882,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
   }
 
   .admin-table tr {
@@ -843,6 +896,9 @@ body {
     border: 1px solid var(--border-light);
     padding: 0;
     overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .admin-table td {
@@ -853,6 +909,10 @@ body {
     text-align: left;
     align-items: flex-start;
     gap: 4px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    word-break: break-word;
   }
 
   .admin-table td::before {
@@ -888,13 +948,22 @@ body {
   
   .filter-bar {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
     overflow-x: auto;
     padding-bottom: 8px;
     flex-wrap: nowrap;
     -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    box-sizing: border-box;
+  }
+  .filter-bar::-webkit-scrollbar {
+    display: none;
   }
   .filter-chip {
     white-space: nowrap;
+    flex-shrink: 0;
   }
 }
 
