@@ -139,22 +139,25 @@ export async function DELETE(request) {
 
   const prisma = getPrisma();
   try {
-    const url = new URL(request.url);
-    const id = url.searchParams.get("id");
-    
-    if (!id) {
-      return NextResponse.json({ success: false, error: 'Product ID is required' }, { status: 400 });
+    const { productIds } = await request.json();
+
+    if (!Array.isArray(productIds) || productIds.length === 0) {
+      return NextResponse.json({ success: false, error: "Invalid or empty product IDs" }, { status: 400 });
     }
 
-    await prisma.product.delete({
-      where: { id }
+    const result = await prisma.product.deleteMany({
+      where: {
+        id: {
+          in: productIds
+        }
+      }
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, message: `Successfully deleted ${result.count} products.` });
   } catch (error) {
-    console.error('Error deleting product:', error);
+    console.error('Error deleting products:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to delete product' },
+      { success: false, error: 'Failed to delete products' },
       { status: 500 }
     );
   }

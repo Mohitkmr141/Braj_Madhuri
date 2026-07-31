@@ -19,6 +19,8 @@ export default function ProductsTab() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [confirmDialog, setConfirmDialog] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchInventory = useCallback(async () => {
     setLoading(true);
@@ -55,16 +57,52 @@ export default function ProductsTab() {
       onConfirm: async () => {
         setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
         try {
-          const res = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
+          const res = await fetch('/api/admin/products', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productIds: [id] })
+          });
           const data = await res.json();
           if (data.success) {
-            toast.success('Product deleted successfully!');
+            toast.success(data.message || 'Product deleted successfully!');
             fetchInventory();
           } else {
             toast.error('Failed to delete product: ' + data.error);
           }
         } catch {
           toast.error('Error deleting product.');
+        }
+      },
+    });
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedProducts.length === 0) return;
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Delete Products',
+      message: `Are you sure you want to delete ${selectedProducts.length} product(s)? This action cannot be undone.`,
+      onConfirm: async () => {
+        setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
+        setIsDeleting(true);
+        try {
+          const res = await fetch('/api/admin/products', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productIds: selectedProducts })
+          });
+          const data = await res.json();
+          if (data.success) {
+            toast.success(data.message || 'Products deleted successfully!');
+            setSelectedProducts([]);
+            fetchInventory();
+          } else {
+            toast.error('Failed to delete products: ' + data.error);
+          }
+        } catch {
+          toast.error('Error deleting products.');
+        } finally {
+          setIsDeleting(false);
         }
       },
     });
@@ -90,9 +128,21 @@ export default function ProductsTab() {
             className="admin-search-input"
           />
         </div>
-        <button className="btn btn-primary" onClick={() => handleOpenModal()}>
-          + Add New Product
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          {selectedProducts.length > 0 && (
+            <button 
+              className="btn btn-primary"
+              style={{ backgroundColor: '#dc3545', borderColor: '#dc3545' }}
+              onClick={handleDeleteSelected}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : `Delete Selected (${selectedProducts.length})`}
+            </button>
+          )}
+          <button className="btn btn-primary" onClick={() => handleOpenModal()}>
+            + Add New Product
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -113,6 +163,20 @@ export default function ProductsTab() {
           <table className="admin-table">
             <thead>
               <tr>
+                <th style={{ width: '40px' }}>
+                  <input 
+                    type="checkbox"
+                    style={{ cursor: 'pointer' }}
+                    checked={filteredInventory.length > 0 && selectedProducts.length === filteredInventory.length}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedProducts(filteredInventory.map(p => p.id));
+                      } else {
+                        setSelectedProducts([]);
+                      }
+                    }}
+                  />
+                </th>
                 <th>Product ID</th>
                 <th>Name</th>
                 <th>Category</th>
@@ -125,6 +189,20 @@ export default function ProductsTab() {
               {filteredInventory.length > 0 ? (
                 filteredInventory.map((product) => (
                   <tr key={product.id}>
+                    <td>
+                      <input 
+                        type="checkbox"
+                        style={{ cursor: 'pointer' }}
+                        checked={selectedProducts.includes(product.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedProducts(prev => [...prev, product.id]);
+                          } else {
+                            setSelectedProducts(prev => prev.filter(id => id !== product.id));
+                          }
+                        }}
+                      />
+                    </td>
                     <td data-label="Product ID">{product.id}</td>
                     <td data-label="Name">
                       {product.title}
