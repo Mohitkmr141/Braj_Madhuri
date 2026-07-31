@@ -83,16 +83,48 @@ export async function DELETE(request) {
 
     const prisma = getPrisma();
     
-    // Perform bulk deletion
-    const result = await prisma.order.deleteMany({
-      where: {
-        id: {
-          in: orderIds
-        }
-      }
+    // 1. Fetch orders to get cart items for restocking
+    const ordersToDelete = await prisma.order.findMany({
+      where: { id: { in: orderIds } },
+      select: { cartItems: true }
     });
 
-    return NextResponse.json({ success: true, message: `Successfully deleted ${result.count} orders.`, count: result.count });
+    // 2. Aggregate quantities to restock
+    const restockMap = {};
+    for (const order of ordersToDelete) {
+      let items = [];
+      try {
+        items = typeof order.cartItems === 'string' ? JSON.parse(order.cartItems) : order.cartItems;
+      } catch (e) {
+        items = [];
+      }
+      
+      if (Array.isArray(items)) {
+        for (const item of items) {
+          if (item.id && item.quantity) {
+            restockMap[item.id] = (restockMap[item.id] || 0) + parseInt(item.quantity, 10);
+          }
+        }
+      }
+    }
+
+    // 3. Perform bulk deletion and restock in a transaction
+    await prisma.$transaction(async (tx) => {
+      // Restock products (using updateMany so it doesn't fail if product was deleted)
+      for (const [productId, quantity] of Object.entries(restockMap)) {
+        await tx.product.updateMany({
+          where: { id: productId },
+          data: { stock: { increment: quantity } }
+        });
+      }
+
+      // Perform bulk deletion
+      await tx.order.deleteMany({
+        where: { id: { in: orderIds } }
+      });
+    });
+
+    return NextResponse.json({ success: true, message: `Successfully deleted ${ordersToDelete.length} orders and restocked items.`, count: ordersToDelete.length });
   } catch (error) {
     console.error('Error deleting orders:', error);
     return NextResponse.json(
