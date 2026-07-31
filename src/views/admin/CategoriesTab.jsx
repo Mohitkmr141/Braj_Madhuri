@@ -20,7 +20,7 @@ export default function CategoriesTab() {
   const fetchCategories = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/products');
+      const res = await fetch(`/api/admin/products?_t=${Date.now()}`);
       const data = await res.json();
       if (data.success) {
         setCategories(data.categories || []);

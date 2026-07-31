@@ -25,7 +25,7 @@ export default function ProductsTab() {
   const fetchInventory = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/products');
+      const res = await fetch(`/api/admin/products?_t=${Date.now()}`);
       const data = await res.json();
       if (data.success) {
         setInventory(data.products);
@@ -65,6 +65,7 @@ export default function ProductsTab() {
           const data = await res.json();
           if (data.success) {
             toast.success(data.message || 'Product deleted successfully!');
+            setSelectedProducts(prev => prev.filter(pId => pId !== id));
             fetchInventory();
           } else {
             toast.error('Failed to delete product: ' + data.error);

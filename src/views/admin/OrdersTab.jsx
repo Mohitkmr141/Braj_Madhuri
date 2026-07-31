@@ -48,20 +48,13 @@ const OrdersTab = () => {
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({
-        page: String(currentPage),
-        limit: '25',
-      });
-      if (searchQuery.trim()) params.set('search', searchQuery.trim());
-      if (statusFilter) params.set('status', statusFilter);
-      
-      const res = await fetch(`/api/admin/orders?${params}`);
+      const res = await fetch(`/api/admin/orders?page=${currentPage}&limit=25&search=${searchQuery}&status=${statusFilter}&_t=${Date.now()}`);
       const data = await res.json();
       if (data.success) {
         setOrders(data.orders);
         setTotalPages(data.pagination.totalPages);
         setTotalOrders(data.pagination.totalOrders);
-        setSelectedOrders([]); // Clear selection when fetching new page
+        setSelectedOrders(prev => prev.filter(id => data.orders.some(o => o.id === id)));
       } else {
         toast.error(data.error || 'Failed to fetch orders.');
       }
@@ -114,7 +107,7 @@ const OrdersTab = () => {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(data.message || 'Orders deleted successfully');
+        toast.success(data.message || 'Orders deleted successfully!');
         setSelectedOrders([]);
         fetchOrders();
       } else {
