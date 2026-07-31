@@ -170,19 +170,19 @@ const OrdersTab = () => {
 
                 return (
                   <tr key={order.id}>
-                    <td><span className="awb-badge">{order.orderNumber}</span></td>
-                    <td>{formatDate(order.createdAt)}</td>
-                    <td>
+                    <td data-label="Order ID"><span className="awb-badge">{order.orderNumber}</span></td>
+                    <td data-label="Date">{formatDate(order.createdAt)}</td>
+                    <td data-label="Customer">
                       <div className="font-medium">{order.customerName || 'N/A'}</div>
                       <div className="text-sm text-muted mt-1">
                         {order.address}, {order.city} - {order.pincode}
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Contact">
                       <div>{order.phone || 'N/A'}</div>
                       <div className="text-sm text-muted mt-1">{order.email || 'N/A'}</div>
                     </td>
-                    <td>
+                    <td data-label="Items">
                       <div className="order-items-list">
                         {items.length > 0 ? items.map((item, index) => (
                           <div key={index} className="order-item-line mb-2">
@@ -192,13 +192,13 @@ const OrdersTab = () => {
                         )) : "No items"}
                       </div>
                     </td>
-                    <td className="font-medium">{formatCurrency(order.totalAmount)}</td>
-                    <td>
+                    <td data-label="Total" className="font-medium">{formatCurrency(order.totalAmount)}</td>
+                    <td data-label="Status">
                       <span className={`status-badge ${order.status?.toLowerCase() || 'pending'}`}>
                         {order.status}
                       </span>
                     </td>
-                    <td>
+                    <td data-label="Actions">
                       {!order.shiprocketOrderId ? (
                         <div className="text-muted text-sm italic">Not Synced</div>
                       ) : (

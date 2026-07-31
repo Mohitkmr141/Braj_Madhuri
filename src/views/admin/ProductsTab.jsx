@@ -125,20 +125,20 @@ export default function ProductsTab() {
               {filteredInventory.length > 0 ? (
                 filteredInventory.map((product) => (
                   <tr key={product.id}>
-                    <td>{product.id}</td>
-                    <td>
+                    <td data-label="Product ID">{product.id}</td>
+                    <td data-label="Name">
                       {product.title}
                       {product.size && <span className="product-size"> ({product.size})</span>}
                     </td>
-                    <td>
+                    <td data-label="Category">
                       {product.category?.title || "Unknown"}
                       {product.subcategory?.title && <span className="product-subcategory"> - {product.subcategory.title}</span>}
                     </td>
-                    <td>{formatCurrency(product.price)}</td>
-                    <td className={product.stock > 0 ? 'text-success' : 'text-danger'}>
+                    <td data-label="Price">{formatCurrency(product.price)}</td>
+                    <td data-label="Current Stock" className={product.stock > 0 ? 'text-success' : 'text-danger'}>
                       {product.stock || 0}
                     </td>
-                    <td>
+                    <td data-label="Actions">
                       <div className="action-button-group vertical">
                         <button
                           className="btn btn-outline btn-sm"
