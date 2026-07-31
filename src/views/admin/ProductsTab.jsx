@@ -167,7 +167,7 @@ export default function ProductsTab() {
                   <input 
                     type="checkbox"
                     style={{ cursor: 'pointer' }}
-                    checked={filteredInventory.length > 0 && selectedProducts.length === filteredInventory.length}
+                    checked={filteredInventory.length > 0 && filteredInventory.every(p => selectedProducts.includes(p.id))}
                     onChange={(e) => {
                       if (e.target.checked) {
                         setSelectedProducts(filteredInventory.map(p => p.id));

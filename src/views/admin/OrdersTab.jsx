@@ -192,7 +192,7 @@ const OrdersTab = () => {
                   <input 
                     type="checkbox"
                     style={{ cursor: 'pointer' }}
-                    checked={orders.length > 0 && selectedOrders.length === orders.length}
+                    checked={orders.length > 0 && orders.every(o => selectedOrders.includes(o.id))}
                     onChange={(e) => {
                       if (e.target.checked) {
                         setSelectedOrders(orders.map(o => o.id));
@@ -218,6 +218,10 @@ const OrdersTab = () => {
                 try {
                   items = typeof order.cartItems === 'string' ? JSON.parse(order.cartItems) : order.cartItems;
                 } catch {
+                  items = [];
+                }
+                
+                if (!Array.isArray(items)) {
                   items = [];
                 }
 
