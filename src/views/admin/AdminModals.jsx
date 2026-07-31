@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 export const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel, confirmText = 'Delete', cancelText = 'Cancel', isDangerous = true }) => {
   if (!isOpen) return null;
   return (
-    <div className="confirm-dialog-overlay">
+    <div className="modal-overlay">
       <div className="confirm-dialog">
         <h3 className="confirm-dialog-title">{title}</h3>
         <p className="confirm-dialog-message">{message}</p>
