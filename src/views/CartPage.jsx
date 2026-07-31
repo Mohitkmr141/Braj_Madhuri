@@ -31,10 +31,17 @@ export default function CartPage() {
     return (
       <div className="cart-page-wrapper">
         <div className="cart-empty reveal">
+          <div className="cart-empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+          </div>
           <h1 className="cart-empty-title">Your Cart is Empty</h1>
-          <p className="cart-empty-subtitle">Looks like you haven&apos;t added anything to your cart yet.</p>
+          <p className="cart-empty-subtitle">Looks like you haven&apos;t added anything to your cart yet. Discover our premium collections.</p>
           <Link href="/shop" className="cart-empty-btn">
-            Continue Shopping
+            Explore Collection
           </Link>
         </div>
       </div>
