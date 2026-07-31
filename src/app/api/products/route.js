@@ -1,7 +1,7 @@
 import { getPrisma } from '../../../lib/prisma.js';
 import { NextResponse } from 'next/server';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // Cache the response for 60 seconds to improve load speeds
 
 
 
