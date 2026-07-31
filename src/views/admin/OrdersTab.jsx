@@ -31,6 +31,8 @@ const OrdersTab = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
   const [actionLoading, setActionLoading] = useState(null);
+  const [selectedOrders, setSelectedOrders] = useState([]);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -59,6 +61,7 @@ const OrdersTab = () => {
         setOrders(data.orders);
         setTotalPages(data.pagination.totalPages);
         setTotalOrders(data.pagination.totalOrders);
+        setSelectedOrders([]); // Clear selection when fetching new page
       } else {
         toast.error(data.error || 'Failed to fetch orders.');
       }
@@ -98,6 +101,32 @@ const OrdersTab = () => {
     }
   };
 
+  const handleDeleteSelected = async () => {
+    if (selectedOrders.length === 0) return;
+    if (!confirm(`Are you sure you want to delete ${selectedOrders.length} order(s)? This action cannot be undone.`)) return;
+
+    setIsDeleting(true);
+    try {
+      const res = await fetch('/api/admin/orders', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderIds: selectedOrders })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(data.message || 'Orders deleted successfully');
+        setSelectedOrders([]);
+        fetchOrders();
+      } else {
+        toast.error(`Failed to delete orders: ${data.error}`);
+      }
+    } catch (err) {
+      toast.error('Network error while deleting orders.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="admin-content-card">
       <div className="admin-card-header">
@@ -125,6 +154,16 @@ const OrdersTab = () => {
               {s || 'All'}
             </button>
           ))}
+          {selectedOrders.length > 0 && (
+            <button 
+              className="btn btn-primary"
+              style={{ backgroundColor: '#dc3545', borderColor: '#dc3545', padding: '6px 12px', fontSize: '14px', marginLeft: 'auto' }}
+              onClick={handleDeleteSelected}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : `Delete Selected (${selectedOrders.length})`}
+            </button>
+          )}
         </div>
       </div>
 
@@ -149,6 +188,20 @@ const OrdersTab = () => {
           <table className="admin-table">
             <thead>
               <tr>
+                <th style={{ width: '40px' }}>
+                  <input 
+                    type="checkbox"
+                    style={{ cursor: 'pointer' }}
+                    checked={orders.length > 0 && selectedOrders.length === orders.length}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedOrders(orders.map(o => o.id));
+                      } else {
+                        setSelectedOrders([]);
+                      }
+                    }}
+                  />
+                </th>
                 <th>Order ID</th>
                 <th>Date</th>
                 <th>Customer</th>
@@ -170,6 +223,20 @@ const OrdersTab = () => {
 
                 return (
                   <tr key={order.id}>
+                    <td>
+                      <input 
+                        type="checkbox"
+                        style={{ cursor: 'pointer' }}
+                        checked={selectedOrders.includes(order.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedOrders(prev => [...prev, order.id]);
+                          } else {
+                            setSelectedOrders(prev => prev.filter(id => id !== order.id));
+                          }
+                        }}
+                      />
+                    </td>
                     <td data-label="Order ID"><span className="awb-badge">{order.orderNumber}</span></td>
                     <td data-label="Date">{formatDate(order.createdAt)}</td>
                     <td data-label="Customer">

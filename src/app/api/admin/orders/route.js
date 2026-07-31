@@ -65,3 +65,39 @@ export async function GET(request) {
     );
   }
 }
+
+export async function DELETE(request) {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('admin_session');
+  
+  if (!session || session.value !== 'authenticated') {
+    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  }
+
+  try {
+    const { orderIds } = await request.json();
+
+    if (!Array.isArray(orderIds) || orderIds.length === 0) {
+      return NextResponse.json({ success: false, error: "Invalid or empty order IDs" }, { status: 400 });
+    }
+
+    const prisma = getPrisma();
+    
+    // Perform bulk deletion
+    const result = await prisma.order.deleteMany({
+      where: {
+        id: {
+          in: orderIds
+        }
+      }
+    });
+
+    return NextResponse.json({ success: true, message: `Successfully deleted ${result.count} orders.`, count: result.count });
+  } catch (error) {
+    console.error('Error deleting orders:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to delete orders' },
+      { status: 500 }
+    );
+  }
+}
