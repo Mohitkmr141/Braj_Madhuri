@@ -32,7 +32,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
     imageUrl: '',
     description: '',
     size: '',
-    subheading: ''
+    subheading: '',
+    colors: ''
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -49,7 +50,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
         imageUrl: editingProduct.imageUrl || '',
         description: editingProduct.description || '',
         size: editingProduct.size || '',
-        subheading: editingProduct.subheading || ''
+        subheading: editingProduct.subheading || '',
+        colors: Array.isArray(editingProduct.colors) ? editingProduct.colors.join(', ') : ''
       });
     } else {
       setProductForm({
@@ -62,7 +64,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
         imageUrl: '',
         description: '',
         size: '',
-        subheading: ''
+        subheading: '',
+        colors: ''
       });
     }
   }, [editingProduct]);
@@ -98,6 +101,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
       const url = '/api/admin/products';
       const method = editingProduct ? 'PUT' : 'POST';
       const body = { ...productForm };
+      body.colors = (productForm.colors || '').split(',').map(c => c.trim()).filter(Boolean);
       if (editingProduct) body.id = editingProduct.id;
       const res = await fetch(url, {
         method,
@@ -245,13 +249,23 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
           </div>
 
           <div className="form-row">
-            <div className="form-col" style={{flex: 1}}>
+            <div className="form-col" style={{flex: 1, marginRight: '10px'}}>
               <label className="form-label">Description</label>
               <textarea 
                 className="form-textarea" 
                 rows="4" 
                 value={productForm.description} 
                 onChange={e => setProductForm({...productForm, description: e.target.value})} 
+              />
+            </div>
+            <div className="form-col" style={{flex: 1}}>
+              <label className="form-label">Colors (comma-separated)</label>
+              <textarea 
+                className="form-textarea" 
+                rows="4"
+                placeholder="e.g. Red, Green, Blue" 
+                value={productForm.colors} 
+                onChange={e => setProductForm({...productForm, colors: e.target.value})} 
               />
             </div>
           </div>
