@@ -268,38 +268,48 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
 
         {/* Options Row */}
         {(hasColors || hasParsedSizes) && (
-          <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+          <div style={{ display: 'flex', gap: '12px', marginTop: '16px', marginBottom: '4px' }}>
             {hasColors && (
-              <div style={{ flex: 1 }}>
-                <label htmlFor={`color-select-${product.id}`} style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "var(--text-main)", fontWeight: "600", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Color</label>
-                <select 
-                  id={`color-select-${product.id}`}
-                  value={selectedColor} 
-                  onChange={(e) => { e.stopPropagation(); setSelectedColor(e.target.value); }}
-                  onClick={(e) => e.stopPropagation()}
-                  style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border-light)", background: "#fbfbfb", cursor: "pointer", fontSize: "12px", outline: "none", color: "var(--text-main)" }}
-                >
-                  {product.colors.map(color => (
-                    <option key={color} value={color}>{color}</option>
-                  ))}
-                </select>
+              <div style={{ flex: 1, position: 'relative' }}>
+                <label htmlFor={`color-select-${product.id}`} style={{ display: 'block', marginBottom: '6px', fontSize: '11px', color: '#777', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Color</label>
+                <div style={{ position: 'relative' }}>
+                  <select 
+                    id={`color-select-${product.id}`}
+                    value={selectedColor} 
+                    onChange={(e) => { e.stopPropagation(); setSelectedColor(e.target.value); }}
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ appearance: 'none', WebkitAppearance: 'none', width: '100%', padding: '8px 28px 8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontSize: '13px', color: '#111827', outline: 'none', transition: 'all 0.2s ease', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}
+                    onMouseOver={(e) => e.target.style.borderColor = '#d1d5db'}
+                    onMouseOut={(e) => e.target.style.borderColor = '#e5e7eb'}
+                  >
+                    {product.colors.map(color => (
+                      <option key={color} value={color}>{color}</option>
+                    ))}
+                  </select>
+                  <svg style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9ca3af' }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
               </div>
             )}
 
             {hasParsedSizes && (
-              <div style={{ flex: 1 }}>
-                <label htmlFor={`size-select-card-${product.id}`} style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "var(--text-main)", fontWeight: "600", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Size</label>
-                <select 
-                  id={`size-select-card-${product.id}`}
-                  value={selectedSize} 
-                  onChange={(e) => { e.stopPropagation(); setSelectedSize(e.target.value); }}
-                  onClick={(e) => e.stopPropagation()}
-                  style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border-light)", background: "#fbfbfb", cursor: "pointer", fontSize: "12px", outline: "none", color: "var(--text-main)" }}
-                >
-                  {parsedSizes.map(size => (
-                    <option key={size} value={size}>{size}</option>
-                  ))}
-                </select>
+              <div style={{ flex: 1, position: 'relative' }}>
+                <label htmlFor={`size-select-card-${product.id}`} style={{ display: 'block', marginBottom: '6px', fontSize: '11px', color: '#777', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Size</label>
+                <div style={{ position: 'relative' }}>
+                  <select 
+                    id={`size-select-card-${product.id}`}
+                    value={selectedSize} 
+                    onChange={(e) => { e.stopPropagation(); setSelectedSize(e.target.value); }}
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ appearance: 'none', WebkitAppearance: 'none', width: '100%', padding: '8px 28px 8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontSize: '13px', color: '#111827', outline: 'none', transition: 'all 0.2s ease', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}
+                    onMouseOver={(e) => e.target.style.borderColor = '#d1d5db'}
+                    onMouseOut={(e) => e.target.style.borderColor = '#e5e7eb'}
+                  >
+                    {parsedSizes.map(size => (
+                      <option key={size} value={size}>{size}</option>
+                    ))}
+                  </select>
+                  <svg style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9ca3af' }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
               </div>
             )}
           </div>
