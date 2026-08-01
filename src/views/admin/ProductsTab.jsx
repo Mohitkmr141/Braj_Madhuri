@@ -251,7 +251,7 @@ export default function ProductsTab() {
         <ProductModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          product={editingProduct}
+          editingProduct={editingProduct}
           categories={categories}
           onSaved={() => {
             setIsModalOpen(false);
