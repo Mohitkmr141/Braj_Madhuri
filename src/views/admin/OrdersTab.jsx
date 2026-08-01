@@ -256,6 +256,7 @@ const OrdersTab = () => {
                               {item.size && <span className="product-size" style={{marginLeft: '6px', fontWeight: 'bold'}}>Size: {item.size}</span>}
                               {item.color && <span className="product-color" style={{marginLeft: '6px', fontWeight: 'bold'}}>| Color: {item.color}</span>}
                             </span>
+                          </div>
                         )) : "No items"}
                       </div>
                     </td>
