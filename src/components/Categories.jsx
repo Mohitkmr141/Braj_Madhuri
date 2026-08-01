@@ -274,39 +274,43 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
                 ) : null}
               </div>
 
-              <p className="quick-view-description">
+              <p className="quick-view-description" style={{ display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {displayDesc}
               </p>
 
-              {hasParsedSizes && (
-                <div style={{ marginBottom: "15px" }}>
-                  <label htmlFor={`size-select-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Size:</label>
-                  <select 
-                    id={`size-select-${product.id}`} 
-                    value={selectedSize} 
-                    onChange={(e) => setSelectedSize(e.target.value)}
-                    style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
-                  >
-                    {parsedSizes.map(size => (
-                      <option key={size} value={size}>{size}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
+              {(hasColors || hasParsedSizes) && (
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                  {hasColors && (
+                    <div style={{ flex: 1 }}>
+                      <label htmlFor={`color-select-${product.id}`} style={{ display: "block", marginBottom: "5px", fontSize: "12px", fontWeight: "600", textTransform: 'uppercase', letterSpacing: '0.05em', color: "var(--text-main)" }}>Color</label>
+                      <select 
+                        id={`color-select-${product.id}`} 
+                        value={selectedColor} 
+                        onChange={(e) => setSelectedColor(e.target.value)}
+                        style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid var(--border-light)", background: "#fbfbfb", cursor: "pointer", fontSize: "13px", outline: "none" }}
+                      >
+                        {product.colors.map(color => (
+                          <option key={color} value={color}>{color}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
-              {hasColors && (
-                <div style={{ marginBottom: "15px" }}>
-                  <label htmlFor={`color-select-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
-                  <select 
-                    id={`color-select-${product.id}`} 
-                    value={selectedColor} 
-                    onChange={(e) => setSelectedColor(e.target.value)}
-                    style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
-                  >
-                    {product.colors.map(color => (
-                      <option key={color} value={color}>{color}</option>
-                    ))}
-                  </select>
+                  {hasParsedSizes && (
+                    <div style={{ flex: 1 }}>
+                      <label htmlFor={`size-select-${product.id}`} style={{ display: "block", marginBottom: "5px", fontSize: "12px", fontWeight: "600", textTransform: 'uppercase', letterSpacing: '0.05em', color: "var(--text-main)" }}>Size</label>
+                      <select 
+                        id={`size-select-${product.id}`} 
+                        value={selectedSize} 
+                        onChange={(e) => setSelectedSize(e.target.value)}
+                        style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid var(--border-light)", background: "#fbfbfb", cursor: "pointer", fontSize: "13px", outline: "none" }}
+                      >
+                        {parsedSizes.map(size => (
+                          <option key={size} value={size}>{size}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
               )}
 

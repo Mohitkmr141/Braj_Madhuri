@@ -260,44 +260,48 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
 
         {/* Description */}
         {(product.description || product.categoryDesc) && (
-          <p className="subcat-description">
+          <p className="subcat-description" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {product.description && <span>{product.description}</span>}
             {!product.description && product.categoryDesc && <span>{product.categoryDesc}</span>}
           </p>
         )}
 
-        {hasColors && (
-          <div style={{ marginTop: "12px" }}>
-            <label htmlFor={`color-select-${product.id}`} style={{ display: "block", marginBottom: "4px", fontSize: "13px", color: "var(--text-main)", fontWeight: "500" }}>Color:</label>
-            <select 
-              id={`color-select-${product.id}`}
-              value={selectedColor} 
-              onChange={(e) => { e.stopPropagation(); setSelectedColor(e.target.value); }}
-              onClick={(e) => e.stopPropagation()}
-              style={{ width: "100%", padding: "6px", borderRadius: "4px", border: "1px solid var(--border-light)", background: "#fff", cursor: "pointer", fontSize: "13px" }}
-            >
-              {product.colors.map(color => (
-                <option key={color} value={color}>{color}</option>
-              ))}
-            </select>
-          </div>
-        )}
+        {/* Options Row */}
+        {(hasColors || hasParsedSizes) && (
+          <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+            {hasColors && (
+              <div style={{ flex: 1 }}>
+                <label htmlFor={`color-select-${product.id}`} style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "var(--text-main)", fontWeight: "600", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Color</label>
+                <select 
+                  id={`color-select-${product.id}`}
+                  value={selectedColor} 
+                  onChange={(e) => { e.stopPropagation(); setSelectedColor(e.target.value); }}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border-light)", background: "#fbfbfb", cursor: "pointer", fontSize: "12px", outline: "none", color: "var(--text-main)" }}
+                >
+                  {product.colors.map(color => (
+                    <option key={color} value={color}>{color}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
-        {/* Sizes */}
-        {hasParsedSizes && (
-          <div style={{ marginTop: "12px" }}>
-            <label htmlFor={`size-select-card-${product.id}`} style={{ display: "block", marginBottom: "4px", fontSize: "13px", color: "var(--text-main)", fontWeight: "500" }}>Size:</label>
-            <select 
-              id={`size-select-card-${product.id}`}
-              value={selectedSize} 
-              onChange={(e) => { e.stopPropagation(); setSelectedSize(e.target.value); }}
-              onClick={(e) => e.stopPropagation()}
-              style={{ width: "100%", padding: "6px", borderRadius: "4px", border: "1px solid var(--border-light)", background: "#fff", cursor: "pointer", fontSize: "13px" }}
-            >
-              {parsedSizes.map(size => (
-                <option key={size} value={size}>{size}</option>
-              ))}
-            </select>
+            {hasParsedSizes && (
+              <div style={{ flex: 1 }}>
+                <label htmlFor={`size-select-card-${product.id}`} style={{ display: "block", marginBottom: "4px", fontSize: "12px", color: "var(--text-main)", fontWeight: "600", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Size</label>
+                <select 
+                  id={`size-select-card-${product.id}`}
+                  value={selectedSize} 
+                  onChange={(e) => { e.stopPropagation(); setSelectedSize(e.target.value); }}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ width: "100%", padding: "6px 8px", borderRadius: "6px", border: "1px solid var(--border-light)", background: "#fbfbfb", cursor: "pointer", fontSize: "12px", outline: "none", color: "var(--text-main)" }}
+                >
+                  {parsedSizes.map(size => (
+                    <option key={size} value={size}>{size}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         )}
 
