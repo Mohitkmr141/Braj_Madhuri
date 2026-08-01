@@ -96,6 +96,13 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
 
   const handleSave = async (e) => {
     e.preventDefault();
+    const isSaveAndAnother = e.nativeEvent.submitter?.value === 'save-another';
+
+    if (productForm.originalPrice && Number(productForm.price) > Number(productForm.originalPrice)) {
+      toast.error('Price cannot be greater than Original Price');
+      return;
+    }
+
     setSaving(true);
     try {
       const url = '/api/admin/products';
@@ -112,7 +119,13 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
       if (data.success) {
         toast.success(editingProduct ? 'Product updated!' : 'Product created!');
         onSaved();
-        onClose();
+        if (isSaveAndAnother) {
+          setProductForm({
+            title: '', categoryId: '', subcategoryId: '', price: '', originalPrice: '', stock: '10', imageUrl: '', description: '', size: '', subheading: '', colors: ''
+          });
+        } else {
+          onClose();
+        }
       } else {
         toast.error('Failed to save product: ' + data.error);
       }
@@ -134,7 +147,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
         
         <form className="modal-form" onSubmit={handleSave}>
           <div className="form-row">
-            <div className="form-col" style={{flex: 1, marginRight: '10px'}}>
+            <div className="form-col">
               <label className="form-label">Title *</label>
               <input 
                 type="text" 
@@ -144,7 +157,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                 onChange={e => setProductForm({...productForm, title: e.target.value})} 
               />
             </div>
-            <div className="form-col" style={{flex: 1}}>
+            <div className="form-col">
               <label className="form-label">Category *</label>
               <select 
                 className="form-select" 
@@ -161,7 +174,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
           </div>
 
           <div className="form-row">
-            <div className="form-col" style={{flex: 1}}>
+            <div className="form-col">
               <label className="form-label">Subcategory</label>
               <select 
                 className="form-select" 
@@ -178,31 +191,41 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
           </div>
 
           <div className="form-row">
-            <div className="form-col" style={{flex: 1, marginRight: '10px'}}>
+            <div className="form-col">
               <label className="form-label">Price *</label>
               <input 
                 type="number" 
                 className="form-input" 
                 required 
+                min="0"
+                step="0.01"
                 value={productForm.price} 
                 onChange={e => setProductForm({...productForm, price: e.target.value})} 
               />
             </div>
-            <div className="form-col" style={{flex: 1, marginRight: '10px'}}>
+            <div className="form-col">
               <label className="form-label">Original Price</label>
               <input 
                 type="number" 
                 className="form-input" 
+                min="0"
+                step="0.01"
                 value={productForm.originalPrice} 
                 onChange={e => setProductForm({...productForm, originalPrice: e.target.value})} 
               />
+              {productForm.originalPrice && productForm.price && Number(productForm.originalPrice) > Number(productForm.price) && (
+                <span style={{color: '#10b981', fontSize: '0.85rem', marginTop: '4px', display: 'block', fontWeight: '500'}}>
+                  {Math.round(((Number(productForm.originalPrice) - Number(productForm.price)) / Number(productForm.originalPrice)) * 100)}% off
+                </span>
+              )}
             </div>
-            <div className="form-col" style={{flex: 1}}>
+            <div className="form-col">
               <label className="form-label">Stock *</label>
               <input 
                 type="number" 
                 className="form-input" 
                 required 
+                min="0"
                 value={productForm.stock} 
                 onChange={e => setProductForm({...productForm, stock: e.target.value})} 
               />
@@ -210,7 +233,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
           </div>
 
           <div className="form-row">
-            <div className="form-col" style={{flex: 1}}>
+            <div className="form-col">
               <label className="form-label">Product Image</label>
               <input 
                 type="file" 
@@ -228,7 +251,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
           </div>
 
           <div className="form-row">
-            <div className="form-col" style={{flex: 1, marginRight: '10px'}}>
+            <div className="form-col">
               <label className="form-label">Subheading</label>
               <input 
                 type="text" 
@@ -237,7 +260,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                 onChange={e => setProductForm({...productForm, subheading: e.target.value})} 
               />
             </div>
-            <div className="form-col" style={{flex: 1}}>
+            <div className="form-col">
               <label className="form-label">Size</label>
               <input 
                 type="text" 
@@ -249,7 +272,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
           </div>
 
           <div className="form-row">
-            <div className="form-col" style={{flex: 1, marginRight: '10px'}}>
+            <div className="form-col">
               <label className="form-label">Description</label>
               <textarea 
                 className="form-textarea" 
@@ -258,7 +281,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                 onChange={e => setProductForm({...productForm, description: e.target.value})} 
               />
             </div>
-            <div className="form-col" style={{flex: 1}}>
+            <div className="form-col">
               <label className="form-label">Colors (comma-separated)</label>
               <textarea 
                 className="form-textarea" 
@@ -272,7 +295,19 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
 
           <div className="form-actions mt-4 flex justify-end gap-2">
             <button type="button" className="btn btn-outline mr-2" onClick={onClose}>Cancel</button>
-            <button type="submit" className={`btn btn-primary ${saving || uploading ? 'btn-disabled' : ''}`} disabled={saving || uploading}>
+            {!editingProduct && (
+              <button 
+                type="submit" 
+                name="submit_action" 
+                value="save-another"
+                className={`btn btn-secondary ${saving || uploading ? 'btn-disabled' : ''}`} 
+                disabled={saving || uploading}
+                style={{backgroundColor: '#e5e7eb', color: '#374151', border: 'none'}}
+              >
+                Save & Add Another
+              </button>
+            )}
+            <button type="submit" name="submit_action" value="save" className={`btn btn-primary ${saving || uploading ? 'btn-disabled' : ''}`} disabled={saving || uploading}>
               {saving ? 'Saving...' : 'Save Product'}
             </button>
           </div>

@@ -422,6 +422,24 @@ body {
 /* =========================================
    7. Forms & Inputs
    ========================================= */
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.form-col {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+}
+
 .form-group {
   margin-bottom: 20px;
 }
