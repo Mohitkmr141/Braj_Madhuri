@@ -94,9 +94,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
     }
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    const isSaveAndAnother = e.nativeEvent.submitter?.value === 'save-another';
+  const handleSave = async (e, stayOpen = false) => {
+    if (e && e.preventDefault) e.preventDefault();
 
     if (productForm.originalPrice && Number(productForm.price) > Number(productForm.originalPrice)) {
       toast.error('Price cannot be greater than Original Price');
@@ -119,7 +118,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
       if (data.success) {
         toast.success(editingProduct ? 'Product updated!' : 'Product created!');
         onSaved();
-        if (isSaveAndAnother) {
+        if (stayOpen) {
           setProductForm({
             title: '', categoryId: '', subcategoryId: '', price: '', originalPrice: '', stock: '10', imageUrl: '', description: '', size: '', subheading: '', colors: ''
           });
@@ -295,21 +294,27 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
 
           <div className="form-actions mt-4 flex justify-end gap-2">
             <button type="button" className="btn btn-outline mr-2" onClick={onClose}>Cancel</button>
+            <button type="submit" className={`btn btn-primary ${saving || uploading ? 'btn-disabled' : ''}`} disabled={saving || uploading}>
+              {saving ? 'Saving...' : 'Save Product'}
+            </button>
             {!editingProduct && (
               <button 
-                type="submit" 
-                name="submit_action" 
-                value="save-another"
+                type="button" 
                 className={`btn btn-secondary ${saving || uploading ? 'btn-disabled' : ''}`} 
                 disabled={saving || uploading}
+                onClick={(e) => {
+                  const form = e.currentTarget.closest('form');
+                  if (form && !form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                  }
+                  handleSave(e, true);
+                }}
                 style={{backgroundColor: '#e5e7eb', color: '#374151', border: 'none'}}
               >
                 Save & Add Another
               </button>
             )}
-            <button type="submit" name="submit_action" value="save" className={`btn btn-primary ${saving || uploading ? 'btn-disabled' : ''}`} disabled={saving || uploading}>
-              {saving ? 'Saving...' : 'Save Product'}
-            </button>
           </div>
         </form>
       </div>
