@@ -42,7 +42,12 @@ function useCartFlash() {
 
 function ProductDetailCard({ product, addToCart, priority = false }) {
   const displayTitle = product.title || "";
-  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || "");
+  
+  const hasSizes = typeof product?.size === 'string' && product.size.trim().length > 0;
+  const parsedSizes = hasSizes ? product.size.split(',').map(s => s.trim()).filter(Boolean) : (product.sizes || []);
+  const hasParsedSizes = parsedSizes.length > 0;
+  const initialSize = hasParsedSizes ? parsedSizes[0] : (product.size || "");
+  const [selectedSize, setSelectedSize] = useState(initialSize);
   const [flashing, flash] = useCartFlash();
   const [isZoomed, setIsZoomed] = useState(false);
   const hasColors = Array.isArray(product?.colors) && product.colors.length > 0;
@@ -65,7 +70,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
       image: product.imageUrl,
       price: product.price ?? 250,
       originalPrice: product.originalPrice,
-      size: selectedSize,
+      size: hasParsedSizes ? selectedSize : product.size,
       color: hasColors ? selectedColor : undefined
     });
     flash("btn");
@@ -162,23 +167,20 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
                 {!product.description && product.categoryDesc && <span>{product.categoryDesc}</span>}
               </p>
 
-              {product.sizes && product.sizes.length > 0 && (
-                <>
-                  <p className="subcat-sizes-label" style={{ marginTop: 'auto' }}>Available Sizes</p>
-                  <div className="subcat-sizes">
-                    {product.sizes.map((size) => (
-                      <button
-                        key={size}
-                        type="button"
-                        className={`subcat-size-btn${selectedSize === size ? " subcat-size-btn--active" : ""}`}
-                        onClick={(e) => { e.stopPropagation(); setSelectedSize(size); }}
-                        aria-pressed={selectedSize === size}
-                      >
-                        {size}
-                      </button>
+              {hasParsedSizes && (
+                <div style={{ marginBottom: "15px" }}>
+                  <label htmlFor={`size-select-zoom-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Size:</label>
+                  <select 
+                    id={`size-select-zoom-${product.id}`}
+                    value={selectedSize} 
+                    onChange={(e) => setSelectedSize(e.target.value)}
+                    style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
+                  >
+                    {parsedSizes.map(size => (
+                      <option key={size} value={size}>{size}</option>
                     ))}
-                  </div>
-                </>
+                  </select>
+                </div>
               )}
 
               {hasColors && (
@@ -265,13 +267,14 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
         )}
 
         {hasColors && (
-          <div style={{ margin: "15px 0" }}>
-            <label htmlFor={`color-select-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
+          <div style={{ marginTop: "12px" }}>
+            <label htmlFor={`color-select-${product.id}`} style={{ display: "block", marginBottom: "4px", fontSize: "13px", color: "var(--text-main)", fontWeight: "500" }}>Color:</label>
             <select 
               id={`color-select-${product.id}`}
               value={selectedColor} 
-              onChange={(e) => setSelectedColor(e.target.value)}
-              style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
+              onChange={(e) => { e.stopPropagation(); setSelectedColor(e.target.value); }}
+              onClick={(e) => e.stopPropagation()}
+              style={{ width: "100%", padding: "6px", borderRadius: "4px", border: "1px solid var(--border-light)", background: "#fff", cursor: "pointer", fontSize: "13px" }}
             >
               {product.colors.map(color => (
                 <option key={color} value={color}>{color}</option>
@@ -281,23 +284,21 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
         )}
 
         {/* Sizes */}
-        {product.sizes && product.sizes.length > 0 && (
-          <>
-            <p className="subcat-sizes-label">Available Sizes</p>
-            <div className="subcat-sizes">
-              {product.sizes.map((size) => (
-                <button
-                  key={size}
-                  type="button"
-                  className={`subcat-size-btn${selectedSize === size ? " subcat-size-btn--active" : ""}`}
-                  onClick={(e) => { e.stopPropagation(); setSelectedSize(size); }}
-                  aria-pressed={selectedSize === size}
-                >
-                  {size}
-                </button>
+        {hasParsedSizes && (
+          <div style={{ marginTop: "12px" }}>
+            <label htmlFor={`size-select-card-${product.id}`} style={{ display: "block", marginBottom: "4px", fontSize: "13px", color: "var(--text-main)", fontWeight: "500" }}>Size:</label>
+            <select 
+              id={`size-select-card-${product.id}`}
+              value={selectedSize} 
+              onChange={(e) => { e.stopPropagation(); setSelectedSize(e.target.value); }}
+              onClick={(e) => e.stopPropagation()}
+              style={{ width: "100%", padding: "6px", borderRadius: "4px", border: "1px solid var(--border-light)", background: "#fff", cursor: "pointer", fontSize: "13px" }}
+            >
+              {parsedSizes.map(size => (
+                <option key={size} value={size}>{size}</option>
               ))}
-            </div>
-          </>
+            </select>
+          </div>
         )}
 
         {/* Add to Cart */}

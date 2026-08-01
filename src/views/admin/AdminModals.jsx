@@ -260,10 +260,11 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
               />
             </div>
             <div className="form-col">
-              <label className="form-label">Size</label>
+              <label className="form-label">Sizes (comma-separated)</label>
               <input 
                 type="text" 
                 className="form-input" 
+                placeholder="e.g. 0, 1, 2 or S, M, L"
                 value={productForm.size} 
                 onChange={e => setProductForm({...productForm, size: e.target.value})} 
               />

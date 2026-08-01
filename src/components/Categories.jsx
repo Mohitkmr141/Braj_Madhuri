@@ -111,6 +111,13 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
   const hasColors = Array.isArray(product?.colors) && product.colors.length > 0;
   const initialColor = hasColors ? product.colors[0] : "";
   const [selectedColor, setSelectedColor] = useState(initialColor);
+
+  const hasSizes = typeof product?.size === 'string' && product.size.trim().length > 0;
+  const parsedSizes = hasSizes ? product.size.split(',').map(s => s.trim()).filter(Boolean) : (product.sizes || []);
+  const hasParsedSizes = parsedSizes.length > 0;
+  const initialSize = hasParsedSizes ? parsedSizes[0] : (product.size || "");
+  const [selectedSize, setSelectedSize] = useState(initialSize);
+
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const revealRef = useScrollReveal();
 
@@ -146,7 +153,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
         image: product.imageUrl,
         price: product.price ?? 250,
         originalPrice: product.originalPrice,
-        size: product.size,
+        size: hasParsedSizes ? selectedSize : product.size,
         color: hasColors ? selectedColor : undefined
       });
     }
@@ -217,7 +224,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
               image: product.imageUrl,
               price: product.price ?? 250,
               originalPrice: product.originalPrice,
-              size: product.size,
+              size: hasParsedSizes ? selectedSize : product.size,
               color: hasColors ? selectedColor : undefined
             }); 
           }}
@@ -271,11 +278,27 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
                 {displayDesc}
               </p>
 
+              {hasParsedSizes && (
+                <div style={{ marginBottom: "15px" }}>
+                  <label htmlFor={`size-select-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Size:</label>
+                  <select 
+                    id={`size-select-${product.id}`} 
+                    value={selectedSize} 
+                    onChange={(e) => setSelectedSize(e.target.value)}
+                    style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
+                  >
+                    {parsedSizes.map(size => (
+                      <option key={size} value={size}>{size}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               {hasColors && (
                 <div style={{ marginBottom: "15px" }}>
-                  <label htmlFor="color-select" style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
+                  <label htmlFor={`color-select-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
                   <select 
-                    id="color-select" 
+                    id={`color-select-${product.id}`} 
                     value={selectedColor} 
                     onChange={(e) => setSelectedColor(e.target.value)}
                     style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
@@ -301,7 +324,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
                       image: product.imageUrl,
                       price: product.price ?? 250,
                       originalPrice: product.originalPrice,
-                      size: product.size,
+                      size: hasParsedSizes ? selectedSize : product.size,
                       color: hasColors ? selectedColor : undefined
                     });
                     setIsQuickViewOpen(false);
