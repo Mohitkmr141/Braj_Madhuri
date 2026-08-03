@@ -43,15 +43,36 @@ function useCartFlash() {
 function ProductDetailCard({ product, addToCart, priority = false }) {
   const displayTitle = product.title || "";
   
-  const hasSizes = typeof product?.size === 'string' && product.size.trim().length > 0;
-  const parsedSizes = hasSizes ? product.size.split(',').map(s => s.trim()).filter(Boolean) : (product.sizes || []);
+  // Extract sizes from product.size or variants
+  const parsedSizes = useMemo(() => {
+    let list = typeof product?.size === 'string' && product.size.trim().length > 0 
+      ? product.size.split(',').map(s => s.trim()).filter(Boolean) 
+      : (product.sizes || []);
+    if (list.length === 0 && Array.isArray(product?.variants)) {
+      const vSizes = product.variants.map(v => v.size ? v.size.trim() : '').filter(Boolean);
+      list = Array.from(new Set(vSizes));
+    }
+    return list;
+  }, [product?.size, product?.sizes, product?.variants]);
+
   const hasParsedSizes = parsedSizes.length > 0;
-  const initialSize = hasParsedSizes ? parsedSizes[0] : (product.size || "");
+  const initialSize = hasParsedSizes ? parsedSizes[0] : (product?.size || "");
   const [selectedSize, setSelectedSize] = useState(initialSize);
   const [flashing, flash] = useCartFlash();
   const [isZoomed, setIsZoomed] = useState(false);
-  const hasColors = Array.isArray(product?.colors) && product.colors.length > 0;
-  const initialColor = hasColors ? product.colors[0] : "";
+
+  // Extract colors from product.colors or variants
+  const parsedColors = useMemo(() => {
+    let list = Array.isArray(product?.colors) && product.colors.length > 0 ? product.colors : [];
+    if (list.length === 0 && Array.isArray(product?.variants)) {
+      const vColors = product.variants.map(v => v.color ? v.color.trim() : '').filter(Boolean);
+      list = Array.from(new Set(vColors));
+    }
+    return list;
+  }, [product?.colors, product?.variants]);
+
+  const hasColors = parsedColors.length > 0;
+  const initialColor = hasColors ? parsedColors[0] : "";
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const revealRef = useScrollReveal();
@@ -72,21 +93,63 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
 
   const activeVariant = useMemo(() => {
     if (!Array.isArray(product.variants) || product.variants.length === 0) return null;
-    // Find a variant that matches the currently selected size and color.
-    // If a variant field is empty/falsy, it matches any selection.
-    return product.variants.find(v => {
-      const matchSize = !v.size || v.size === selectedSize;
-      const matchColor = !v.color || v.color === selectedColor;
+    
+    const selS = selectedSize ? selectedSize.trim().toLowerCase() : '';
+    const selC = selectedColor ? selectedColor.trim().toLowerCase() : '';
+
+    const matches = product.variants.filter(v => {
+      const vS = v.size ? v.size.trim().toLowerCase() : '';
+      const vC = v.color ? v.color.trim().toLowerCase() : '';
+      const matchSize = !vS || (selS && vS === selS);
+      const matchColor = !vC || (selC && vC === selC);
       return matchSize && matchColor;
     });
+
+    if (matches.length === 0) return null;
+
+    // Prefer exact match (both size and color match) over wildcard
+    const exactMatch = matches.find(v => {
+      const vS = v.size ? v.size.trim().toLowerCase() : '';
+      const vC = v.color ? v.color.trim().toLowerCase() : '';
+      return (vS === selS) && (vC === selC);
+    });
+
+    return exactMatch || matches[0];
   }, [product.variants, selectedSize, selectedColor]);
 
-  const displayPrice = activeVariant?.price ?? product.price ?? 250;
-  const displayOriginalPrice = activeVariant?.originalPrice ?? product.originalPrice;
-  const displayStock = activeVariant ? Number(activeVariant.stock) : product.stock;
+  // Safe numeric extraction
+  const displayPrice = useMemo(() => {
+    if (activeVariant && activeVariant.price !== undefined && activeVariant.price !== null && activeVariant.price !== '') {
+      const p = parseFloat(activeVariant.price);
+      if (!isNaN(p)) return p;
+    }
+    const baseP = parseFloat(product.price);
+    return !isNaN(baseP) ? baseP : 250;
+  }, [activeVariant, product.price]);
+
+  const displayOriginalPrice = useMemo(() => {
+    if (activeVariant && activeVariant.originalPrice !== undefined && activeVariant.originalPrice !== null && activeVariant.originalPrice !== '') {
+      const op = parseFloat(activeVariant.originalPrice);
+      if (!isNaN(op)) return op;
+    }
+    if (product.originalPrice !== undefined && product.originalPrice !== null && product.originalPrice !== '') {
+      const baseOp = parseFloat(product.originalPrice);
+      if (!isNaN(baseOp)) return baseOp;
+    }
+    return null;
+  }, [activeVariant, product.originalPrice]);
+
+  const displayStock = useMemo(() => {
+    if (activeVariant && activeVariant.stock !== undefined && activeVariant.stock !== null && activeVariant.stock !== '') {
+      const st = parseInt(activeVariant.stock, 10);
+      if (!isNaN(st)) return st;
+    }
+    const baseSt = parseInt(product.stock, 10);
+    return !isNaN(baseSt) ? baseSt : 0;
+  }, [activeVariant, product.stock]);
 
   const discount =
-    displayOriginalPrice && displayPrice
+    displayOriginalPrice && displayPrice && displayOriginalPrice > displayPrice
       ? Math.round((1 - displayPrice / displayOriginalPrice) * 100)
       : null;
 
@@ -258,7 +321,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
                     onChange={(e) => setSelectedColor(e.target.value)}
                     style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
                   >
-                    {product.colors.map(color => (
+                    {parsedColors.map(color => (
                       <option key={color} value={color}>{color}</option>
                     ))}
                   </select>
@@ -346,7 +409,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
                     onMouseOver={(e) => e.target.style.borderColor = '#d1d5db'}
                     onMouseOut={(e) => e.target.style.borderColor = '#e5e7eb'}
                   >
-                    {product.colors.map(color => (
+                    {parsedColors.map(color => (
                       <option key={color} value={color}>{color}</option>
                     ))}
                   </select>

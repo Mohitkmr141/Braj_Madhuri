@@ -44,6 +44,20 @@ export async function GET() {
   }
 }
 
+function sanitizeVariants(variants) {
+  if (!Array.isArray(variants)) return [];
+  return variants.map((v, i) => ({
+    id: v.id || `${Date.now()}-${i}`,
+    size: v.size ? String(v.size).trim() : '',
+    color: v.color ? String(v.color).trim() : '',
+    price: parseFloat(v.price) || 0,
+    originalPrice: (v.originalPrice !== undefined && v.originalPrice !== '' && v.originalPrice !== null) 
+      ? parseFloat(v.originalPrice) 
+      : null,
+    stock: parseInt(v.stock, 10) || 0,
+  }));
+}
+
 export async function POST(request) {
   const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
@@ -70,7 +84,7 @@ export async function POST(request) {
         stock: parseInt(data.stock, 10) || 0,
         colors: Array.isArray(data.colors) ? data.colors : [],
         images: Array.isArray(data.images) ? data.images : [],
-        variants: Array.isArray(data.variants) ? data.variants : [],
+        variants: sanitizeVariants(data.variants),
         imageUrl: data.imageUrl || null,
         description: data.description || null,
         size: data.size || null,
@@ -116,7 +130,7 @@ export async function PUT(request) {
         stock: parseInt(data.stock, 10),
         colors: Array.isArray(data.colors) ? data.colors : [],
         images: Array.isArray(data.images) ? data.images : [],
-        variants: Array.isArray(data.variants) ? data.variants : [],
+        variants: sanitizeVariants(data.variants),
         imageUrl: data.imageUrl || null,
         description: data.description || null,
         size: data.size || null,
