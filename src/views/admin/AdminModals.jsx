@@ -33,7 +33,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
     description: '',
     size: '',
     subheading: '',
-    colors: ''
+    colors: '',
+    images: []
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -51,7 +52,10 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
         description: editingProduct.description || '',
         size: editingProduct.size || '',
         subheading: editingProduct.subheading || '',
-        colors: Array.isArray(editingProduct.colors) ? editingProduct.colors.join(', ') : ''
+        colors: Array.isArray(editingProduct.colors) ? editingProduct.colors.join(', ') : '',
+        images: Array.isArray(editingProduct.images) && editingProduct.images.length > 0 
+          ? editingProduct.images 
+          : (editingProduct.imageUrl ? [editingProduct.imageUrl] : [])
       });
     } else {
       setProductForm({
@@ -65,7 +69,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
         description: '',
         size: '',
         subheading: '',
-        colors: ''
+        colors: '',
+        images: []
       });
     }
   }, [editingProduct]);
@@ -73,25 +78,45 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
   if (!isOpen) return null;
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.success) {
-        setProductForm(prev => ({ ...prev, imageUrl: data.url }));
-        toast.success('Image uploaded!');
-      } else {
-        toast.error('Upload failed: ' + data.error);
+      const newImageUrls = [];
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success) {
+          newImageUrls.push(data.url);
+        } else {
+          toast.error(`Upload failed for ${file.name}: ` + data.error);
+        }
+      }
+      
+      if (newImageUrls.length > 0) {
+        setProductForm(prev => {
+          const updatedImages = [...prev.images, ...newImageUrls];
+          return { ...prev, images: updatedImages, imageUrl: updatedImages[0] || '' };
+        });
+        toast.success(`Uploaded ${newImageUrls.length} image(s)!`);
       }
     } catch {
-      toast.error('Error uploading image');
+      toast.error('Error uploading image(s)');
     } finally {
       setUploading(false);
+      // Reset input so the same files can be selected again if needed
+      e.target.value = null;
     }
+  };
+
+  const removeImage = (index) => {
+    setProductForm(prev => {
+      const newImages = [...prev.images];
+      newImages.splice(index, 1);
+      return { ...prev, images: newImages, imageUrl: newImages[0] || '' };
+    });
   };
 
   const handleSave = async (e, stayOpen = false) => {
@@ -120,7 +145,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
         onSaved();
         if (stayOpen) {
           setProductForm({
-            title: '', categoryId: '', subcategoryId: '', price: '', originalPrice: '', stock: '10', imageUrl: '', description: '', size: '', subheading: '', colors: ''
+            title: '', categoryId: '', subcategoryId: '', price: '', originalPrice: '', stock: '10', imageUrl: '', description: '', size: '', subheading: '', colors: '', images: []
           });
         } else {
           onClose();
@@ -233,17 +258,32 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
 
           <div className="form-row">
             <div className="form-col">
-              <label className="form-label">Product Image</label>
+              <label className="form-label">Product Images</label>
               <input 
                 type="file" 
                 className="form-input" 
                 accept="image/*" 
+                multiple
                 onChange={handleImageUpload} 
               />
-              {uploading && <p>Uploading...</p>}
-              {productForm.imageUrl && (
-                <div className="product-image-preview mt-2">
-                  <img src={productForm.imageUrl} alt="Preview" style={{maxHeight: '100px'}} />
+              {uploading && <p className="text-sm mt-1 text-gray-500">Uploading images...</p>}
+              
+              {productForm.images && productForm.images.length > 0 && (
+                <div className="product-image-preview mt-3" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  {productForm.images.map((img, idx) => (
+                    <div key={idx} style={{ position: 'relative', width: '80px', height: '80px', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
+                      <img src={img} alt={`Preview ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <button 
+                        type="button" 
+                        onClick={() => removeImage(idx)}
+                        style={{ position: 'absolute', top: 2, right: 2, background: 'rgba(255,0,0,0.8)', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        title="Remove image"
+                      >
+                        &times;
+                      </button>
+                      {idx === 0 && <span style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.6)', color: '#fff', fontSize: '10px', textAlign: 'center', padding: '2px 0' }}>Main</span>}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

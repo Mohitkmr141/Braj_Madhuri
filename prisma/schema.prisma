@@ -45,6 +45,7 @@ model Product {
   originalPrice Float?
   size          String?
   colors        String[]  @default([])
+  images        String[]  @default([])
   stock         Int       @default(10)
 
   category      Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)

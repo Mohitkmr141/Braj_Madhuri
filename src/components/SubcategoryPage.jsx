@@ -55,6 +55,18 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
   const [selectedColor, setSelectedColor] = useState(initialColor);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const revealRef = useScrollReveal();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const allImages = Array.isArray(product.images) && product.images.length > 0 
+    ? product.images 
+    : (product.imageUrl ? [product.imageUrl] : []);
+  const mainImage = allImages[0] || '';
+
+  useEffect(() => {
+    if (!isZoomed) {
+      setCurrentImageIndex(0);
+    }
+  }, [isZoomed, product.id]);
 
   const isFav = isInWishlist(product.id, selectedSize);
 
@@ -67,7 +79,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
     addToCart({
       id: product.id,
       title: displayTitle,
-      image: product.imageUrl,
+      image: mainImage,
       price: product.price ?? 250,
       originalPrice: product.originalPrice,
       size: hasParsedSizes ? selectedSize : product.size,
@@ -84,7 +96,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
       addToWishlist({
         id: product.id,
         title: displayTitle,
-        image: product.imageUrl,
+        image: mainImage,
         price: product.price ?? 250,
         originalPrice: product.originalPrice,
         size: selectedSize,
@@ -97,15 +109,21 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
     <article ref={revealRef} className="subcat-product-card reveal" onClick={() => setIsZoomed(true)} style={{ cursor: 'pointer' }}>
       {/* ── Image panel ─────────────────────────────────────── */}
       <div className="subcat-img-panel">
-        <Image
-          src={product.imageUrl}
-          alt={displayTitle}
+        {mainImage ? (
+          <Image
+            src={mainImage}
+            alt={displayTitle}
           decoding="async"
           fill
           priority={priority}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          style={{ objectFit: "cover", opacity: product.stock === 0 ? 0.5 : 1 }}
-        />
+            style={{ objectFit: "cover", opacity: product.stock === 0 ? 0.5 : 1 }}
+          />
+        ) : (
+          <div style={{ width: '100%', height: '100%', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ color: '#aaa' }}>No Image</span>
+          </div>
+        )}
         {product.stock === 0 && (
           <div className="stock-badge stock-badge--soldout">Sold Out</div>
         )}
@@ -129,16 +147,51 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
             <button className="quick-view-close" type="button" onClick={() => setIsZoomed(false)} aria-label="Close zoom">
               &times;
             </button>
-            <div className="quick-view-image-panel">
+            <div className="quick-view-image-panel" style={{ position: "relative" }}>
               <div style={{ position: "relative", width: "100%", height: "100%", minHeight: "300px" }}>
-                <Image
-                  src={product.imageUrl}
-                  alt={displayTitle}
-                  fill
-                  sizes="(max-width: 900px) 100vw, 50vw"
-                  style={{ objectFit: "contain" }}
-                />
+                {allImages.length > 0 ? (
+                  <Image
+                    src={allImages[currentImageIndex]}
+                    alt={`${displayTitle} - Image ${currentImageIndex + 1}`}
+                    fill
+                    sizes="(max-width: 900px) 100vw, 50vw"
+                    style={{ objectFit: "contain" }}
+                  />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ color: '#aaa' }}>No Image</span>
+                  </div>
+                )}
               </div>
+              
+              {allImages.length > 1 && (
+                <>
+                  <button 
+                    className="slideshow-nav-btn slideshow-prev" 
+                    onClick={(e) => { e.stopPropagation(); setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length); }}
+                    aria-label="Previous image"
+                  >
+                    &#10094;
+                  </button>
+                  <button 
+                    className="slideshow-nav-btn slideshow-next" 
+                    onClick={(e) => { e.stopPropagation(); setCurrentImageIndex((prev) => (prev + 1) % allImages.length); }}
+                    aria-label="Next image"
+                  >
+                    &#10095;
+                  </button>
+                  <div className="slideshow-dots">
+                    {allImages.map((_, idx) => (
+                      <button
+                        key={idx}
+                        className={`slideshow-dot ${idx === currentImageIndex ? 'active' : ''}`}
+                        onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(idx); }}
+                        aria-label={`Go to image ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
             <div className="quick-view-info-panel">
               <h3 className="quick-view-title">{displayTitle}</h3>
