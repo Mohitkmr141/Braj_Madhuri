@@ -46,6 +46,7 @@ model Product {
   size          String?
   colors        String[]  @default([])
   images        String[]  @default([])
+  variants      Json?     @default("[]")
   stock         Int       @default(10)
 
   category      Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)

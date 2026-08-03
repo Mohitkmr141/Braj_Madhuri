@@ -70,9 +70,24 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
 
   const isFav = isInWishlist(product.id, selectedSize);
 
+  const activeVariant = useMemo(() => {
+    if (!Array.isArray(product.variants) || product.variants.length === 0) return null;
+    // Find a variant that matches the currently selected size and color.
+    // If a variant field is empty/falsy, it matches any selection.
+    return product.variants.find(v => {
+      const matchSize = !v.size || v.size === selectedSize;
+      const matchColor = !v.color || v.color === selectedColor;
+      return matchSize && matchColor;
+    });
+  }, [product.variants, selectedSize, selectedColor]);
+
+  const displayPrice = activeVariant?.price ?? product.price ?? 250;
+  const displayOriginalPrice = activeVariant?.originalPrice ?? product.originalPrice;
+  const displayStock = activeVariant ? Number(activeVariant.stock) : product.stock;
+
   const discount =
-    product.originalPrice && product.price
-      ? Math.round((1 - product.price / product.originalPrice) * 100)
+    displayOriginalPrice && displayPrice
+      ? Math.round((1 - displayPrice / displayOriginalPrice) * 100)
       : null;
 
   const handleAddToCart = () => {
@@ -80,8 +95,8 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
       id: product.id,
       title: displayTitle,
       image: mainImage,
-      price: product.price ?? 250,
-      originalPrice: product.originalPrice,
+      price: displayPrice,
+      originalPrice: displayOriginalPrice,
       size: hasParsedSizes ? selectedSize : product.size,
       color: hasColors ? selectedColor : undefined
     });
@@ -97,8 +112,8 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
         id: product.id,
         title: displayTitle,
         image: mainImage,
-        price: product.price ?? 250,
-        originalPrice: product.originalPrice,
+        price: displayPrice,
+        originalPrice: displayOriginalPrice,
         size: selectedSize,
         color: hasColors ? selectedColor : undefined
       });
@@ -117,18 +132,18 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
           fill
           priority={priority}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            style={{ objectFit: "cover", opacity: product.stock === 0 ? 0.5 : 1 }}
+            style={{ objectFit: "cover", opacity: displayStock === 0 ? 0.5 : 1 }}
           />
         ) : (
           <div style={{ width: '100%', height: '100%', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ color: '#aaa' }}>No Image</span>
           </div>
         )}
-        {product.stock === 0 && (
+        {displayStock === 0 && (
           <div className="stock-badge stock-badge--soldout">Sold Out</div>
         )}
-        {product.stock > 0 && product.stock <= 3 && (
-          <div className="stock-badge stock-badge--low">Only {product.stock} Left!</div>
+        {displayStock > 0 && displayStock <= 3 && (
+          <div className="stock-badge stock-badge--low">Only {displayStock} Left!</div>
         )}
         <button 
           className={`wishlist-toggle-btn ${isFav ? 'active' : ''}`}
@@ -202,12 +217,10 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
               )}
               
               <div className="quick-view-price-row">
-                {product.price !== undefined && (
-                  <span className="quick-view-price">{formatCurrency(product.price)}</span>
-                )}
-                {product.originalPrice && (
+                <span className="quick-view-price">{formatCurrency(displayPrice)}</span>
+                {displayOriginalPrice && (
                   <span className="quick-view-original-price">
-                    {formatCurrency(product.originalPrice)}
+                    {formatCurrency(displayOriginalPrice)}
                   </span>
                 )}
                 {discount && (
@@ -256,14 +269,14 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
                 <button
                   className="add-cart-btn gallery-cart-btn quick-view-atc"
                   type="button"
-                  disabled={product.stock === 0}
+                  disabled={displayStock === 0}
                   onClick={() => {
                     handleAddToCart();
                     setIsZoomed(false);
                   }}
-                  style={{ flex: 1, opacity: product.stock === 0 ? 0.5 : 1, cursor: product.stock === 0 ? 'not-allowed' : 'pointer' }}
+                  style={{ flex: 1, opacity: displayStock === 0 ? 0.5 : 1, cursor: displayStock === 0 ? 'not-allowed' : 'pointer' }}
                 >
-                  {product.stock === 0 ? 'Sold Out' : 'Add To Cart'}
+                  {displayStock === 0 ? 'Sold Out' : 'Add To Cart'}
                 </button>
                 <button 
                   className={`wishlist-quick-btn ${isFav ? 'active' : ''}`}
@@ -298,12 +311,10 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
 
         {/* Pricing */}
         <div className="subcat-pricing">
-          {product.price !== undefined && (
-            <span className="subcat-price">{formatCurrency(product.price)}</span>
-          )}
-          {product.originalPrice && (
+          <span className="subcat-price">{formatCurrency(displayPrice)}</span>
+          {displayOriginalPrice && (
             <span className="subcat-original-price">
-              {formatCurrency(product.originalPrice)}
+              {formatCurrency(displayOriginalPrice)}
             </span>
           )}
           {discount && (
@@ -371,12 +382,12 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
         {/* Add to Cart */}
         <button
           type="button"
-          className={`subcat-atc-btn${flashing === "btn" ? " subcat-atc-btn--added" : ""}${product.stock === 0 ? " subcat-atc-btn--disabled" : ""}`}
-          onClick={(e) => { e.stopPropagation(); if (product.stock > 0) handleAddToCart(); }}
-          disabled={product.stock === 0}
-          aria-label={product.stock === 0 ? `${displayTitle} is sold out` : `Add ${displayTitle} to cart`}
+          className={`subcat-atc-btn${flashing === "btn" ? " subcat-atc-btn--added" : ""}${displayStock === 0 ? " subcat-atc-btn--disabled" : ""}`}
+          onClick={(e) => { e.stopPropagation(); if (displayStock > 0) handleAddToCart(); }}
+          disabled={displayStock === 0}
+          aria-label={displayStock === 0 ? `${displayTitle} is sold out` : `Add ${displayTitle} to cart`}
         >
-          {product.stock === 0 ? (
+          {displayStock === 0 ? (
             <>Sold Out</>
           ) : flashing === "btn" ? (
             <>

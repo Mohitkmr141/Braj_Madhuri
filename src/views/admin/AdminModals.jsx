@@ -34,7 +34,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
     size: '',
     subheading: '',
     colors: '',
-    images: []
+    images: [],
+    variants: []
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -55,7 +56,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
         colors: Array.isArray(editingProduct.colors) ? editingProduct.colors.join(', ') : '',
         images: Array.isArray(editingProduct.images) && editingProduct.images.length > 0 
           ? editingProduct.images 
-          : (editingProduct.imageUrl ? [editingProduct.imageUrl] : [])
+          : (editingProduct.imageUrl ? [editingProduct.imageUrl] : []),
+        variants: Array.isArray(editingProduct.variants) ? editingProduct.variants : []
       });
     } else {
       setProductForm({
@@ -70,7 +72,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
         size: '',
         subheading: '',
         colors: '',
-        images: []
+        images: [],
+        variants: []
       });
     }
   }, [editingProduct]);
@@ -119,6 +122,29 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
     });
   };
 
+  const addVariant = () => {
+    setProductForm(prev => ({
+      ...prev,
+      variants: [...prev.variants, { id: Date.now().toString(), size: '', color: '', price: '', originalPrice: '', stock: '10' }]
+    }));
+  };
+
+  const updateVariant = (index, field, value) => {
+    setProductForm(prev => {
+      const newVariants = [...prev.variants];
+      newVariants[index] = { ...newVariants[index], [field]: value };
+      return { ...prev, variants: newVariants };
+    });
+  };
+
+  const removeVariant = (index) => {
+    setProductForm(prev => {
+      const newVariants = [...prev.variants];
+      newVariants.splice(index, 1);
+      return { ...prev, variants: newVariants };
+    });
+  };
+
   const handleSave = async (e, stayOpen = false) => {
     if (e && e.preventDefault) e.preventDefault();
 
@@ -145,7 +171,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
         onSaved();
         if (stayOpen) {
           setProductForm({
-            title: '', categoryId: '', subcategoryId: '', price: '', originalPrice: '', stock: '10', imageUrl: '', description: '', size: '', subheading: '', colors: '', images: []
+            title: '', categoryId: '', subcategoryId: '', price: '', originalPrice: '', stock: '10', imageUrl: '', description: '', size: '', subheading: '', colors: '', images: [], variants: []
           });
         } else {
           onClose();
@@ -330,6 +356,49 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                 value={productForm.colors} 
                 onChange={e => setProductForm({...productForm, colors: e.target.value})} 
               />
+            </div>
+          </div>
+
+          <div className="form-row" style={{ marginTop: '20px' }}>
+            <div className="form-col" style={{ flex: '1 1 100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <label className="form-label" style={{ margin: 0 }}>Product Variants (Specific Size/Color Pricing)</label>
+                <button type="button" onClick={addVariant} className="btn btn-secondary" style={{ padding: '4px 12px', fontSize: '0.85rem' }}>+ Add Variant</button>
+              </div>
+              
+              {productForm.variants.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {productForm.variants.map((variant, idx) => (
+                    <div key={variant.id || idx} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', background: '#f9fafb', padding: '12px', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Size</label>
+                        <input type="text" className="form-input" placeholder="e.g. M" value={variant.size} onChange={(e) => updateVariant(idx, 'size', e.target.value)} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Color</label>
+                        <input type="text" className="form-input" placeholder="e.g. Red" value={variant.color} onChange={(e) => updateVariant(idx, 'color', e.target.value)} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Price *</label>
+                        <input type="number" className="form-input" required min="0" step="0.01" value={variant.price} onChange={(e) => updateVariant(idx, 'price', e.target.value)} />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Orig. Price</label>
+                        <input type="number" className="form-input" min="0" step="0.01" value={variant.originalPrice} onChange={(e) => updateVariant(idx, 'originalPrice', e.target.value)} />
+                      </div>
+                      <div style={{ width: '80px' }}>
+                        <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Stock *</label>
+                        <input type="number" className="form-input" required min="0" value={variant.stock} onChange={(e) => updateVariant(idx, 'stock', e.target.value)} />
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '22px' }}>
+                        <button type="button" onClick={() => removeVariant(idx)} style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px' }} title="Remove variant">&times;</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ fontSize: '13px', color: '#6b7280', fontStyle: 'italic' }}>No variants added. The base price and stock above will be used for all sizes and colors.</p>
+              )}
             </div>
           </div>
 
