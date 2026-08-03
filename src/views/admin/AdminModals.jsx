@@ -117,15 +117,17 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
   const removeImage = (index) => {
     setProductForm(prev => {
       const newImages = [...prev.images];
+      const removedUrl = newImages[index];
       newImages.splice(index, 1);
-      return { ...prev, images: newImages, imageUrl: newImages[0] || '' };
+      const updatedVariants = prev.variants.map(v => v.image === removedUrl ? { ...v, image: '' } : v);
+      return { ...prev, images: newImages, imageUrl: newImages[0] || '', variants: updatedVariants };
     });
   };
 
   const addVariant = () => {
     setProductForm(prev => ({
       ...prev,
-      variants: [...prev.variants, { id: Date.now().toString(), size: '', color: '', price: '', originalPrice: '', stock: '10' }]
+      variants: [...prev.variants, { id: Date.now().toString(), size: '', color: '', price: '', originalPrice: '', stock: '10', image: '' }]
     }));
   };
 
@@ -143,6 +145,60 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
       newVariants.splice(index, 1);
       return { ...prev, variants: newVariants };
     });
+  };
+
+  const duplicateVariant = (index) => {
+    setProductForm(prev => {
+      const newVariants = [...prev.variants];
+      const cloned = { ...newVariants[index], id: Date.now().toString() + Math.random() };
+      newVariants.splice(index + 1, 0, cloned);
+      return { ...prev, variants: newVariants };
+    });
+  };
+
+  const generateCombinations = () => {
+    const sizes = (productForm.size || '').split(',').map(s => s.trim()).filter(Boolean);
+    const colors = (productForm.colors || '').split(',').map(c => c.trim()).filter(Boolean);
+    
+    if (sizes.length === 0 && colors.length === 0) {
+      toast.error('Please enter sizes or colors in the fields above first.');
+      return;
+    }
+
+    const combinations = [];
+    const safeSizes = sizes.length > 0 ? sizes : [''];
+    const safeColors = colors.length > 0 ? colors : [''];
+
+    safeSizes.forEach(size => {
+      safeColors.forEach(color => {
+        const exists = productForm.variants.some(v => 
+          (v.size || '').trim().toLowerCase() === size.toLowerCase() && 
+          (v.color || '').trim().toLowerCase() === color.toLowerCase()
+        );
+        if (!exists) {
+          combinations.push({
+            id: Date.now().toString() + Math.random(),
+            size,
+            color,
+            price: productForm.price || '',
+            originalPrice: productForm.originalPrice || '',
+            stock: productForm.stock || '10',
+            image: ''
+          });
+        }
+      });
+    });
+
+    if (combinations.length === 0) {
+      toast.error('All combinations for these sizes and colors already exist!');
+      return;
+    }
+
+    setProductForm(prev => ({
+      ...prev,
+      variants: [...prev.variants, ...combinations]
+    }));
+    toast.success(`Generated ${combinations.length} new variant(s)!`);
   };
 
   const handleSave = async (e, stayOpen = false) => {
@@ -363,38 +419,68 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
             <div className="form-col" style={{ flex: '1 1 100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <label className="form-label" style={{ margin: 0 }}>Product Variants (Specific Size/Color Pricing)</label>
-                <button type="button" onClick={addVariant} className="btn btn-secondary" style={{ padding: '4px 12px', fontSize: '0.85rem' }}>+ Add Variant</button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button type="button" onClick={generateCombinations} className="btn" style={{ padding: '4px 12px', fontSize: '0.85rem', background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db' }}>🪄 Generate Combinations</button>
+                  <button type="button" onClick={addVariant} className="btn btn-secondary" style={{ padding: '4px 12px', fontSize: '0.85rem' }}>+ Add Variant</button>
+                </div>
               </div>
               
               {productForm.variants.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {productForm.variants.map((variant, idx) => (
-                    <div key={variant.id || idx} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', background: '#f9fafb', padding: '12px', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Size</label>
-                        <input type="text" className="form-input" placeholder="e.g. M" value={variant.size} onChange={(e) => updateVariant(idx, 'size', e.target.value)} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Color</label>
-                        <input type="text" className="form-input" placeholder="e.g. Red" value={variant.color} onChange={(e) => updateVariant(idx, 'color', e.target.value)} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Price *</label>
-                        <input type="number" className="form-input" required min="0" step="0.01" value={variant.price} onChange={(e) => updateVariant(idx, 'price', e.target.value)} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Orig. Price</label>
-                        <input type="number" className="form-input" min="0" step="0.01" value={variant.originalPrice} onChange={(e) => updateVariant(idx, 'originalPrice', e.target.value)} />
-                      </div>
-                      <div style={{ width: '80px' }}>
-                        <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }}>Stock *</label>
-                        <input type="number" className="form-input" required min="0" value={variant.stock} onChange={(e) => updateVariant(idx, 'stock', e.target.value)} />
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '22px' }}>
-                        <button type="button" onClick={() => removeVariant(idx)} style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px' }} title="Remove variant">&times;</button>
-                      </div>
-                    </div>
-                  ))}
+                <div style={{ overflowX: 'auto', border: '1px solid #e5e7eb', borderRadius: '6px' }}>
+                  <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', fontSize: '13px' }}>
+                    <thead style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+                      <tr>
+                        <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500' }}>Image</th>
+                        <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500' }}>Size</th>
+                        <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500' }}>Color</th>
+                        <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500' }}>Price *</th>
+                        <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500' }}>Orig. Price</th>
+                        <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500', width: '80px' }}>Stock *</th>
+                        <th style={{ padding: '8px 12px', textAlign: 'center', color: '#6b7280', fontWeight: '500', width: '80px' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {productForm.variants.map((variant, idx) => (
+                        <tr key={variant.id || idx} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                          <td style={{ padding: '8px 12px' }}>
+                            <select 
+                              style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }}
+                              value={variant.image || ''} 
+                              onChange={(e) => updateVariant(idx, 'image', e.target.value)}
+                            >
+                              <option value="">None</option>
+                              {productForm.images?.map((img, imgIdx) => (
+                                <option key={img} value={img}>Image {imgIdx + 1}</option>
+                              ))}
+                            </select>
+                          </td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <input type="text" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} placeholder="M" value={variant.size} onChange={(e) => updateVariant(idx, 'size', e.target.value)} />
+                          </td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <input type="text" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} placeholder="Red" value={variant.color} onChange={(e) => updateVariant(idx, 'color', e.target.value)} />
+                          </td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} required min="0" step="0.01" value={variant.price} onChange={(e) => updateVariant(idx, 'price', e.target.value)} />
+                          </td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} min="0" step="0.01" value={variant.originalPrice} onChange={(e) => updateVariant(idx, 'originalPrice', e.target.value)} />
+                          </td>
+                          <td style={{ padding: '8px 12px' }}>
+                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} required min="0" value={variant.stock} onChange={(e) => updateVariant(idx, 'stock', e.target.value)} />
+                          </td>
+                          <td style={{ padding: '8px 12px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                            <button type="button" onClick={() => duplicateVariant(idx)} style={{ color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }} title="Duplicate variant">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                            <button type="button" onClick={() => removeVariant(idx)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }} title="Remove variant">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               ) : (
                 <p style={{ fontSize: '13px', color: '#6b7280', fontStyle: 'italic' }}>No variants added. The base price and stock above will be used for all sizes and colors.</p>

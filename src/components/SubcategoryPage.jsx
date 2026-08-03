@@ -78,17 +78,6 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
   const revealRef = useScrollReveal();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const allImages = Array.isArray(product.images) && product.images.length > 0 
-    ? product.images 
-    : (product.imageUrl ? [product.imageUrl] : []);
-  const mainImage = allImages[0] || '';
-
-  useEffect(() => {
-    if (!isZoomed) {
-      setCurrentImageIndex(0);
-    }
-  }, [isZoomed, product.id]);
-
   const isFav = isInWishlist(product.id, selectedSize);
 
   const activeVariant = useMemo(() => {
@@ -116,6 +105,36 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
 
     return exactMatch || matches[0];
   }, [product.variants, selectedSize, selectedColor]);
+
+  const allImages = useMemo(() => {
+    return Array.isArray(product.images) && product.images.length > 0 
+      ? product.images 
+      : (product.imageUrl ? [product.imageUrl] : []);
+  }, [product.images, product.imageUrl]);
+
+  const mainImage = useMemo(() => {
+    if (activeVariant && activeVariant.image) {
+      return activeVariant.image;
+    }
+    return allImages[0] || '';
+  }, [activeVariant, allImages]);
+
+  useEffect(() => {
+    if (activeVariant && activeVariant.image) {
+      const idx = allImages.indexOf(activeVariant.image);
+      if (idx !== -1) {
+        setCurrentImageIndex(idx);
+      }
+    }
+  }, [activeVariant, allImages]);
+
+  useEffect(() => {
+    if (!isZoomed) {
+      if (!(activeVariant && activeVariant.image)) {
+        setCurrentImageIndex(0);
+      }
+    }
+  }, [isZoomed, product.id, activeVariant]);
 
   // Safe numeric extraction
   const displayPrice = useMemo(() => {

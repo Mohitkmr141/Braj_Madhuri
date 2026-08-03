@@ -44,6 +44,14 @@ export async function GET() {
   }
 }
 
+function sanitizeColors(colors) {
+  if (Array.isArray(colors)) return colors;
+  if (typeof colors === 'string') {
+    return colors.split(',').map(c => c.trim()).filter(Boolean);
+  }
+  return [];
+}
+
 function sanitizeVariants(variants) {
   if (!Array.isArray(variants)) return [];
   return variants.map((v, i) => ({
@@ -55,6 +63,7 @@ function sanitizeVariants(variants) {
       ? parseFloat(v.originalPrice) 
       : null,
     stock: parseInt(v.stock, 10) || 0,
+    image: v.image ? String(v.image).trim() : '',
   }));
 }
 
@@ -82,7 +91,7 @@ export async function POST(request) {
         price: parseFloat(data.price) || 0,
         originalPrice: parseFloat(data.originalPrice) || parseFloat(data.price) || 0,
         stock: parseInt(data.stock, 10) || 0,
-        colors: Array.isArray(data.colors) ? data.colors : [],
+        colors: sanitizeColors(data.colors),
         images: Array.isArray(data.images) ? data.images : [],
         variants: sanitizeVariants(data.variants),
         imageUrl: data.imageUrl || null,
@@ -128,7 +137,7 @@ export async function PUT(request) {
         price: parseFloat(data.price),
         originalPrice: parseFloat(data.originalPrice) || parseFloat(data.price),
         stock: parseInt(data.stock, 10),
-        colors: Array.isArray(data.colors) ? data.colors : [],
+        colors: sanitizeColors(data.colors),
         images: Array.isArray(data.images) ? data.images : [],
         variants: sanitizeVariants(data.variants),
         imageUrl: data.imageUrl || null,
