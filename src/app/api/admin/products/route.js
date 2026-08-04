@@ -52,19 +52,33 @@ function sanitizeColors(colors) {
   return [];
 }
 
-function sanitizeVariants(variants) {
+function sanitizeVariants(variants, basePrice, baseOriginalPrice) {
   if (!Array.isArray(variants)) return [];
-  return variants.map((v, i) => ({
-    id: v.id || `${Date.now()}-${i}`,
-    size: v.size ? String(v.size).trim() : '',
-    color: v.color ? String(v.color).trim() : '',
-    price: (v.price !== undefined && v.price !== '' && v.price !== null) ? parseFloat(v.price) : null,
-    originalPrice: (v.originalPrice !== undefined && v.originalPrice !== '' && v.originalPrice !== null) 
-      ? parseFloat(v.originalPrice) 
-      : null,
-    stock: parseInt(v.stock, 10) || 0,
-    image: v.image ? String(v.image).trim() : '',
-  }));
+  const parsedBase = parseFloat(basePrice);
+  const parsedBaseOrig = parseFloat(baseOriginalPrice);
+
+  return variants.map((v, i) => {
+    let p = (v.price !== undefined && v.price !== '' && v.price !== null) ? parseFloat(v.price) : null;
+    let op = (v.originalPrice !== undefined && v.originalPrice !== '' && v.originalPrice !== null) ? parseFloat(v.originalPrice) : null;
+
+    // Normalize prices matching base price to null for dynamic inheritance
+    if (!isNaN(parsedBase) && p === parsedBase) {
+      p = null;
+    }
+    if (!isNaN(parsedBaseOrig) && op === parsedBaseOrig) {
+      op = null;
+    }
+
+    return {
+      id: v.id || `${Date.now()}-${i}`,
+      size: v.size ? String(v.size).trim() : '',
+      color: v.color ? String(v.color).trim() : '',
+      price: p,
+      originalPrice: op,
+      stock: parseInt(v.stock, 10) || 0,
+      image: v.image ? String(v.image).trim() : '',
+    };
+  });
 }
 
 export async function POST(request) {
@@ -93,7 +107,7 @@ export async function POST(request) {
         stock: parseInt(data.stock, 10) || 0,
         colors: sanitizeColors(data.colors),
         images: Array.isArray(data.images) ? data.images : [],
-        variants: sanitizeVariants(data.variants),
+        variants: sanitizeVariants(data.variants, data.price, data.originalPrice),
         imageUrl: data.imageUrl || null,
         description: data.description || null,
         size: data.size || null,
@@ -139,7 +153,7 @@ export async function PUT(request) {
         stock: parseInt(data.stock, 10),
         colors: sanitizeColors(data.colors),
         images: Array.isArray(data.images) ? data.images : [],
-        variants: sanitizeVariants(data.variants),
+        variants: sanitizeVariants(data.variants, data.price, data.originalPrice),
         imageUrl: data.imageUrl || null,
         description: data.description || null,
         size: data.size || null,

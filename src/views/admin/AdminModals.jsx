@@ -468,10 +468,10 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                             <input type="text" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} placeholder="Red" value={variant.color ?? ''} onChange={(e) => updateVariant(idx, 'color', e.target.value)} />
                           </td>
                           <td style={{ padding: '8px 12px' }}>
-                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} min="0" step="0.01" placeholder="Inherit" value={variant.price ?? ''} onChange={(e) => updateVariant(idx, 'price', e.target.value)} />
+                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} min="0" step="0.01" placeholder={productForm.price ? `Base (₹${productForm.price})` : "Base"} value={variant.price ?? ''} onChange={(e) => updateVariant(idx, 'price', e.target.value)} />
                           </td>
                           <td style={{ padding: '8px 12px' }}>
-                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} min="0" step="0.01" placeholder="Inherit" value={variant.originalPrice ?? ''} onChange={(e) => updateVariant(idx, 'originalPrice', e.target.value)} />
+                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} min="0" step="0.01" placeholder={productForm.originalPrice ? `Base (₹${productForm.originalPrice})` : "Base"} value={variant.originalPrice ?? ''} onChange={(e) => updateVariant(idx, 'originalPrice', e.target.value)} />
                           </td>
                           <td style={{ padding: '8px 12px' }}>
                             <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} required min="0" value={variant.stock ?? ''} onChange={(e) => updateVariant(idx, 'stock', e.target.value)} />
