@@ -82,6 +82,7 @@ const OrdersTab = () => {
         toast.error(`Failed: ${data.error}`);
       } else {
         toast.success('Action successful!');
+        if (data.data?.track_url) window.open(data.data.track_url, '_blank');
         if (data.data?.manifest_url) openPdf(data.data.manifest_url);
         if (data.data?.label_url) openPdf(data.data.label_url);
         if (data.data?.invoice_url) openPdf(data.data.invoice_url);

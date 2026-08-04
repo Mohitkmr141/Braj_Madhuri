@@ -113,7 +113,9 @@ export default function ProductsTab() {
     const q = productSearchQuery.toLowerCase();
     return (
       (product.title && product.title.toLowerCase().includes(q)) ||
-      (product.id && String(product.id).toLowerCase().includes(q))
+      (product.id && String(product.id).toLowerCase().includes(q)) ||
+      (product.category?.title && product.category.title.toLowerCase().includes(q)) ||
+      (product.subcategory?.title && product.subcategory.title.toLowerCase().includes(q))
     );
   });
 
@@ -237,7 +239,7 @@ export default function ProductsTab() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center">
+                  <td colSpan="7" className="text-center" style={{ padding: '24px' }}>
                     No products found.
                   </td>
                 </tr>
