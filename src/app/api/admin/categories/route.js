@@ -2,6 +2,28 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { getPrisma } from '../../../../lib/prisma.js';
 
+export const dynamic = 'force-dynamic';
+
+export async function GET() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('admin_session');
+  if (!session || session.value !== 'authenticated') {
+    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  }
+
+  try {
+    const prisma = getPrisma();
+    const categories = await prisma.category.findMany({
+      orderBy: { title: 'asc' },
+      include: { subcategories: true },
+    });
+    return NextResponse.json({ success: true, categories });
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return NextResponse.json({ success: false, error: 'Failed to fetch categories' }, { status: 500 });
+  }
+}
+
 export async function POST(request) {
   const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
