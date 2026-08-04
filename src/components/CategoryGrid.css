@@ -286,6 +286,78 @@
   to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 }
 
+/* ── Mobile: prevent dropdown from going off either edge of screen ──────── */
+@media (width <= 768px) {
+  .subcategory-list {
+    /* Reset absolute centering; instead anchor to left edge of the cell-wrap */
+    left: auto;
+    right: auto;
+    transform: none;
+    animation: subcatFadeInMobile 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Position relative to the category-cell-wrap using a negative left margin
+       to center it, but clamped so it never escapes the viewport */
+    width: 190px;
+    /* Shift left by half the dropdown width minus half the cell width so it
+       'centres' under the cell, but we use JS-free CSS viewport clamping     */
+    left: 50%;
+    transform: translateX(-50%);
+    /* The key fix: ensure the rendered box never exits the screen */
+    max-width: calc(100vw - 24px);
+  }
+
+  /* For cells in the FIRST column of a 3-col grid: anchor to left */
+  .category-cell-wrap:nth-child(3n + 1) .subcategory-list {
+    left: 0;
+    transform: none;
+    animation: subcatFadeInLeft 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* For cells in the LAST column of a 3-col grid: anchor to right */
+  .category-cell-wrap:nth-child(3n) .subcategory-list {
+    left: auto;
+    right: 0;
+    transform: none;
+    animation: subcatFadeInRight 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
+@media (width <= 480px) {
+  .subcategory-list {
+    width: 175px;
+    min-width: 150px;
+    font-size: 11px;
+  }
+
+  /* 3-col layout: first column items anchor left */
+  .category-cell-wrap:nth-child(3n + 1) .subcategory-list {
+    left: 0;
+    right: auto;
+    transform: none;
+  }
+
+  /* 3-col layout: last column items anchor right */
+  .category-cell-wrap:nth-child(3n) .subcategory-list {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+}
+
+@keyframes subcatFadeInMobile {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.95); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+@keyframes subcatFadeInLeft {
+  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes subcatFadeInRight {
+  from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 /* Arrow pointer */
 .subcategory-list::before {
   content: "";
@@ -307,6 +379,23 @@
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
   border-bottom: 7px solid #fffdf6;
+}
+
+/* Arrow pointer — left-anchored (1st column on mobile) */
+@media (width <= 768px) {
+  .category-cell-wrap:nth-child(3n + 1) .subcategory-list::before,
+  .category-cell-wrap:nth-child(3n + 1) .subcategory-list::after {
+    left: 24px;
+    transform: none;
+  }
+
+  /* Arrow pointer — right-anchored (last column on mobile) */
+  .category-cell-wrap:nth-child(3n) .subcategory-list::before,
+  .category-cell-wrap:nth-child(3n) .subcategory-list::after {
+    left: auto;
+    right: 24px;
+    transform: none;
+  }
 }
 
 .subcategory-item {
