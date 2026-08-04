@@ -62,25 +62,78 @@ export async function POST(request) {
 
     // ── DB transaction: stock check → decrement → create order ───────────────
     const result = await prisma.$transaction(async (tx) => {
-      // 1. Check stock for all items
+      // 1. Check stock for all items (checks base stock; variant stock is best-effort)
       for (const item of cartItems) {
         const product = await tx.product.findUnique({ where: { id: item.id } });
         if (!product) {
           throw new Error(`Product "${item.title}" not found.`);
         }
-        if (product.stock < item.quantity) {
+
+        // If a specific variant is selected, check variant stock
+        if (item.size || item.color) {
+          const variants = Array.isArray(product.variants) ? product.variants : [];
+          const matchedVariant = variants.find(v => {
+            const vS = (v.size || '').trim().toLowerCase();
+            const vC = (v.color || '').trim().toLowerCase();
+            const iS = (item.size || '').trim().toLowerCase();
+            const iC = (item.color || '').trim().toLowerCase();
+            return (!vS || vS === iS) && (!vC || vC === iC);
+          });
+          if (matchedVariant) {
+            const variantStock = parseInt(matchedVariant.stock, 10) || 0;
+            if (variantStock < item.quantity) {
+              throw new Error(
+                `Insufficient stock for "${item.title}" (${[item.size, item.color].filter(Boolean).join(', ')}). Only ${variantStock} left.`
+              );
+            }
+          } else if (product.stock < item.quantity) {
+            throw new Error(
+              `Insufficient stock for "${item.title}". Only ${product.stock} left.`
+            );
+          }
+        } else if (product.stock < item.quantity) {
           throw new Error(
             `Insufficient stock for "${item.title}". Only ${product.stock} left.`
           );
         }
       }
 
-      // 2. Decrement stock
+      // 2. Decrement stock (base product + variant if applicable)
       for (const item of cartItems) {
-        await tx.product.update({
-          where: { id: item.id },
-          data: { stock: { decrement: item.quantity } },
-        });
+        const product = await tx.product.findUnique({ where: { id: item.id } });
+        let updatedVariants = Array.isArray(product.variants) ? [...product.variants] : [];
+
+        if ((item.size || item.color) && updatedVariants.length > 0) {
+          // Decrement the matching variant's stock
+          let variantMatched = false;
+          updatedVariants = updatedVariants.map(v => {
+            const vS = (v.size || '').trim().toLowerCase();
+            const vC = (v.color || '').trim().toLowerCase();
+            const iS = (item.size || '').trim().toLowerCase();
+            const iC = (item.color || '').trim().toLowerCase();
+            if ((!vS || vS === iS) && (!vC || vC === iC)) {
+              variantMatched = true;
+              const newStock = Math.max(0, (parseInt(v.stock, 10) || 0) - item.quantity);
+              return { ...v, stock: newStock };
+            }
+            return v;
+          });
+
+          await tx.product.update({
+            where: { id: item.id },
+            data: {
+              // Also decrement base stock for overall inventory tracking
+              stock: { decrement: item.quantity },
+              // Save updated variant stocks back to the JSON field
+              ...(variantMatched ? { variants: updatedVariants } : {}),
+            },
+          });
+        } else {
+          await tx.product.update({
+            where: { id: item.id },
+            data: { stock: { decrement: item.quantity } },
+          });
+        }
       }
 
       // 3. Generate unique Order Number (timestamp + random suffix for collision safety)

@@ -84,7 +84,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.id]);
 
-  const isFav = isInWishlist(product.id, selectedSize);
+  const isFav = isInWishlist(product.id, selectedSize, hasColors ? selectedColor : undefined);
 
   const activeVariant = useMemo(() => {
     if (!Array.isArray(product.variants) || product.variants.length === 0) return null;
@@ -202,7 +202,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
   const handleToggleWishlist = (e) => {
     e.stopPropagation();
     if (isFav) {
-      removeFromWishlist(product.id, selectedSize);
+      removeFromWishlist(product.id, selectedSize, hasColors ? selectedColor : undefined);
     } else {
       addToWishlist({
         id: product.id,
