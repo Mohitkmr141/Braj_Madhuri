@@ -180,8 +180,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
             id: Date.now().toString() + Math.random(),
             size,
             color,
-            price: productForm.price || '',
-            originalPrice: productForm.originalPrice || '',
+            price: '',
+            originalPrice: '',
             stock: productForm.stock || '10',
             image: ''
           });
@@ -420,6 +420,13 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <label className="form-label" style={{ margin: 0 }}>Product Variants (Specific Size/Color Pricing)</label>
                 <div style={{ display: 'flex', gap: '8px' }}>
+                  <button type="button" onClick={() => {
+                    setProductForm(prev => ({
+                      ...prev,
+                      variants: prev.variants.map(v => ({ ...v, price: prev.price, originalPrice: prev.originalPrice }))
+                    }));
+                    toast.success('Synced variant prices with base price!');
+                  }} className="btn" style={{ padding: '4px 12px', fontSize: '0.85rem', background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db' }}>🔄 Sync Prices</button>
                   <button type="button" onClick={generateCombinations} className="btn" style={{ padding: '4px 12px', fontSize: '0.85rem', background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db' }}>🪄 Generate Combinations</button>
                   <button type="button" onClick={addVariant} className="btn btn-secondary" style={{ padding: '4px 12px', fontSize: '0.85rem' }}>+ Add Variant</button>
                 </div>
@@ -433,7 +440,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                         <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500' }}>Image</th>
                         <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500' }}>Size</th>
                         <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500' }}>Color</th>
-                        <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500' }}>Price *</th>
+                        <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500' }}>Price</th>
                         <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500' }}>Orig. Price</th>
                         <th style={{ padding: '8px 12px', textAlign: 'left', color: '#6b7280', fontWeight: '500', width: '80px' }}>Stock *</th>
                         <th style={{ padding: '8px 12px', textAlign: 'center', color: '#6b7280', fontWeight: '500', width: '80px' }}>Actions</th>
@@ -461,10 +468,10 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                             <input type="text" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} placeholder="Red" value={variant.color ?? ''} onChange={(e) => updateVariant(idx, 'color', e.target.value)} />
                           </td>
                           <td style={{ padding: '8px 12px' }}>
-                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} required min="0" step="0.01" value={variant.price ?? ''} onChange={(e) => updateVariant(idx, 'price', e.target.value)} />
+                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} min="0" step="0.01" placeholder="Inherit" value={variant.price ?? ''} onChange={(e) => updateVariant(idx, 'price', e.target.value)} />
                           </td>
                           <td style={{ padding: '8px 12px' }}>
-                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} min="0" step="0.01" value={variant.originalPrice ?? ''} onChange={(e) => updateVariant(idx, 'originalPrice', e.target.value)} />
+                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} min="0" step="0.01" placeholder="Inherit" value={variant.originalPrice ?? ''} onChange={(e) => updateVariant(idx, 'originalPrice', e.target.value)} />
                           </td>
                           <td style={{ padding: '8px 12px' }}>
                             <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} required min="0" value={variant.stock ?? ''} onChange={(e) => updateVariant(idx, 'stock', e.target.value)} />

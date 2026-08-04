@@ -58,7 +58,7 @@ function sanitizeVariants(variants) {
     id: v.id || `${Date.now()}-${i}`,
     size: v.size ? String(v.size).trim() : '',
     color: v.color ? String(v.color).trim() : '',
-    price: parseFloat(v.price) || 0,
+    price: (v.price !== undefined && v.price !== '' && v.price !== null) ? parseFloat(v.price) : null,
     originalPrice: (v.originalPrice !== undefined && v.originalPrice !== '' && v.originalPrice !== null) 
       ? parseFloat(v.originalPrice) 
       : null,
