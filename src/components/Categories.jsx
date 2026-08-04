@@ -189,6 +189,13 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
     return !isNaN(baseSt) ? baseSt : 0;
   }, [activeVariant, product?.stock]);
 
+  const displayImage = useMemo(() => {
+    if (activeVariant && activeVariant.image) {
+      return activeVariant.image;
+    }
+    return product.imageUrl;
+  }, [activeVariant, product.imageUrl]);
+
   const isFav = isInWishlist(product?.id, selectedSize, hasColors ? selectedColor : undefined);
 
   // If the autoOpen prop changes (e.g. user navigates), update the state
@@ -218,7 +225,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
       addToWishlist({
         id: product.id,
         title: displayTitle,
-        image: product.imageUrl,
+        image: displayImage,
         price: displayPrice,
         originalPrice: displayOriginalPrice,
         size: selectedSize,
@@ -237,7 +244,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
         ) : null}
 
         <Image
-          src={product.imageUrl}
+          src={displayImage}
           alt={displayTitle}
           decoding="async"
           fill
@@ -287,7 +294,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
             addToCart?.({
               id: product.id,
               title: displayTitle,
-              image: product.imageUrl,
+              image: displayImage,
               price: displayPrice,
               originalPrice: displayOriginalPrice,
               size: hasParsedSizes ? selectedSize : product.size,
@@ -308,7 +315,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
             <div className="quick-view-image-panel">
               <div style={{ position: "relative", width: "100%", height: "100%", minHeight: "300px" }}>
                 <Image
-                  src={product.imageUrl}
+                  src={displayImage}
                   alt={displayTitle}
                   fill
                   sizes="(max-width: 900px) 100vw, 50vw"
@@ -399,7 +406,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
                     addToCart?.({
                       id: product.id,
                       title: displayTitle,
-                      image: product.imageUrl,
+                      image: displayImage,
                       price: displayPrice,
                       originalPrice: displayOriginalPrice,
                       size: hasParsedSizes ? selectedSize : product.size,
