@@ -108,20 +108,88 @@ export default function CategoryGalleries({
 
 function ProductCard({ product, addToCart, autoOpen, priority = false }) {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(autoOpen || false);
-  const hasColors = Array.isArray(product?.colors) && product.colors.length > 0;
-  const initialColor = hasColors ? product.colors[0] : "";
-  const [selectedColor, setSelectedColor] = useState(initialColor);
-
-  const hasSizes = typeof product?.size === 'string' && product.size.trim().length > 0;
-  const parsedSizes = hasSizes ? product.size.split(',').map(s => s.trim()).filter(Boolean) : (product.sizes || []);
+  
+  const parsedSizes = useMemo(() => {
+    let list = typeof product?.size === 'string' && product.size.trim().length > 0 
+      ? product.size.split(',').map(s => s.trim()).filter(Boolean) 
+      : (product.sizes || []);
+    if (list.length === 0 && Array.isArray(product?.variants)) {
+      const vSizes = product.variants.map(v => v.size ? v.size.trim() : '').filter(Boolean);
+      list = Array.from(new Set(vSizes));
+    }
+    return list;
+  }, [product?.size, product?.sizes, product?.variants]);
   const hasParsedSizes = parsedSizes.length > 0;
-  const initialSize = hasParsedSizes ? parsedSizes[0] : (product.size || "");
-  const [selectedSize, setSelectedSize] = useState(initialSize);
+  const [selectedSize, setSelectedSize] = useState(() => hasParsedSizes ? parsedSizes[0] : (product?.size || ""));
+
+  const parsedColors = useMemo(() => {
+    let list = Array.isArray(product?.colors) && product.colors.length > 0 ? product.colors : [];
+    if (list.length === 0 && Array.isArray(product?.variants)) {
+      const vColors = product.variants.map(v => v.color ? v.color.trim() : '').filter(Boolean);
+      list = Array.from(new Set(vColors));
+    }
+    return list;
+  }, [product?.colors, product?.variants]);
+  const hasColors = parsedColors.length > 0;
+  const [selectedColor, setSelectedColor] = useState(() => hasColors ? parsedColors[0] : "");
 
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const revealRef = useScrollReveal();
 
-  const isFav = isInWishlist(product?.id, product?.size);
+  const activeVariant = useMemo(() => {
+    if (!Array.isArray(product?.variants) || product.variants.length === 0) return null;
+    
+    const selS = selectedSize ? selectedSize.trim().toLowerCase() : '';
+    const selC = selectedColor ? selectedColor.trim().toLowerCase() : '';
+
+    const matches = product.variants.filter(v => {
+      const vS = v.size ? v.size.trim().toLowerCase() : '';
+      const vC = v.color ? v.color.trim().toLowerCase() : '';
+      const matchSize = !vS || (selS && vS === selS);
+      const matchColor = !vC || (selC && vC === selC);
+      return matchSize && matchColor;
+    });
+
+    if (matches.length === 0) return null;
+    const exactMatch = matches.find(v => {
+      const vS = v.size ? v.size.trim().toLowerCase() : '';
+      const vC = v.color ? v.color.trim().toLowerCase() : '';
+      return (vS === selS) && (vC === selC);
+    });
+    return exactMatch || matches[0];
+  }, [product?.variants, selectedSize, selectedColor]);
+
+  const displayPrice = useMemo(() => {
+    if (activeVariant && activeVariant.price !== undefined && activeVariant.price !== null && activeVariant.price !== '') {
+      const p = parseFloat(activeVariant.price);
+      if (!isNaN(p)) return p;
+    }
+    const baseP = parseFloat(product?.price);
+    return !isNaN(baseP) ? baseP : 250;
+  }, [activeVariant, product?.price]);
+
+  const displayOriginalPrice = useMemo(() => {
+    if (activeVariant && activeVariant.originalPrice !== undefined && activeVariant.originalPrice !== null && activeVariant.originalPrice !== '') {
+      const op = parseFloat(activeVariant.originalPrice);
+      if (!isNaN(op)) return op;
+    }
+    if (product?.originalPrice !== undefined && product?.originalPrice !== null && product?.originalPrice !== '') {
+      const baseOp = parseFloat(product.originalPrice);
+      if (!isNaN(baseOp)) return baseOp;
+    }
+    return null;
+  }, [activeVariant, product?.originalPrice]);
+
+  const displayStock = useMemo(() => {
+    if (activeVariant && activeVariant.stock !== undefined && activeVariant.stock !== null && activeVariant.stock !== '') {
+      const st = parseInt(activeVariant.stock, 10);
+      if (!isNaN(st)) return st;
+    }
+    const baseSt = parseInt(product?.stock, 10);
+    return !isNaN(baseSt) ? baseSt : 0;
+  }, [activeVariant, product?.stock]);
+
+  const isFav = isInWishlist(product?.id, selectedSize, hasColors ? selectedColor : undefined);
 
   // If the autoOpen prop changes (e.g. user navigates), update the state
   useEffect(() => {
@@ -134,26 +202,26 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
   }
 
   const discount =
-    product.originalPrice && product.price
-      ? Math.round((1 - product.price / product.originalPrice) * 100)
+    displayOriginalPrice && displayPrice
+      ? Math.round((1 - displayPrice / displayOriginalPrice) * 100)
       : null;
 
   const displayTitle = product.title || formatFolderName(product.folderName);
   const displayDesc = product.description || product.categoryDesc || formatFolderName(product.folderName);
-  const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0;
+  const isOutOfStock = displayStock <= 0;
 
   const handleToggleWishlist = (e) => {
     e.stopPropagation();
     if (isFav) {
-      removeFromWishlist(product.id, product.size);
+      removeFromWishlist(product.id, selectedSize, hasColors ? selectedColor : undefined);
     } else {
       addToWishlist({
         id: product.id,
         title: displayTitle,
         image: product.imageUrl,
-        price: product.price ?? 250,
-        originalPrice: product.originalPrice,
-        size: hasParsedSizes ? selectedSize : product.size,
+        price: displayPrice,
+        originalPrice: displayOriginalPrice,
+        size: selectedSize,
         color: hasColors ? selectedColor : undefined
       });
     }
@@ -201,12 +269,10 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
           {displayDesc}
         </p>
         <div className="item-pricing">
-          {product.price !== null && (
-            <span className="item-price">{formatCurrency(product.price)}</span>
-          )}
-          {product.originalPrice !== null && (
+          <span className="item-price">{formatCurrency(displayPrice)}</span>
+          {displayOriginalPrice !== null && (
             <span className="item-original-price">
-              {formatCurrency(product.originalPrice)}
+              {formatCurrency(displayOriginalPrice)}
             </span>
           )}
         </div>
@@ -222,8 +288,8 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
               id: product.id,
               title: displayTitle,
               image: product.imageUrl,
-              price: product.price ?? 250,
-              originalPrice: product.originalPrice,
+              price: displayPrice,
+              originalPrice: displayOriginalPrice,
               size: hasParsedSizes ? selectedSize : product.size,
               color: hasColors ? selectedColor : undefined
             }); 
@@ -259,12 +325,10 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
               )}
               
               <div className="quick-view-price-row">
-                {product.price !== null && (
-                  <span className="quick-view-price">{formatCurrency(product.price)}</span>
-                )}
-                {product.originalPrice !== null && (
+                <span className="quick-view-price">{formatCurrency(displayPrice)}</span>
+                {displayOriginalPrice !== null && (
                   <span className="quick-view-original-price">
-                    {formatCurrency(product.originalPrice)}
+                    {formatCurrency(displayOriginalPrice)}
                   </span>
                 )}
                 {isOutOfStock ? (
@@ -292,7 +356,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
                           onMouseOver={(e) => e.target.style.borderColor = '#d1d5db'}
                           onMouseOut={(e) => e.target.style.borderColor = '#e5e7eb'}
                         >
-                          {product.colors.map(color => (
+                          {parsedColors.map(color => (
                             <option key={color} value={color}>{color}</option>
                           ))}
                         </select>
@@ -336,8 +400,8 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
                       id: product.id,
                       title: displayTitle,
                       image: product.imageUrl,
-                      price: product.price ?? 250,
-                      originalPrice: product.originalPrice,
+                      price: displayPrice,
+                      originalPrice: displayOriginalPrice,
                       size: hasParsedSizes ? selectedSize : product.size,
                       color: hasColors ? selectedColor : undefined
                     });

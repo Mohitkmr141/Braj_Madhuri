@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import "./SearchBar.css";
 import { useProducts } from "../context/ProductsContext.jsx";
+import { getEffectivePrice } from "../utils/productHelpers.js";
 
 // Build a flat searchable list from the DB products
 function buildSearchIndex(dbProducts) {
@@ -15,7 +16,7 @@ function buildSearchIndex(dbProducts) {
     // Include both description fields so the index matches what the gallery filter uses
     description: product.description || product.categoryDesc || "",
     categoryDesc: product.categoryDesc || "",
-    price: product.price,
+    price: getEffectivePrice(product),
     imageUrl: product.imageUrl,
   }));
 }

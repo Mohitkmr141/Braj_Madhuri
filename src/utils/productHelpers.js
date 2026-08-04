@@ -83,7 +83,7 @@ export function resolveFilter(filterFolder, searchQuery, allProducts) {
  * Gets the effective display price for a product.
  * If variants exist, returns the minimum variant price (what customers see first).
  */
-function getEffectivePrice(product) {
+export function getEffectivePrice(product) {
   if (Array.isArray(product.variants) && product.variants.length > 0) {
     const variantPrices = product.variants
       .map(v => parseFloat(v.price))
