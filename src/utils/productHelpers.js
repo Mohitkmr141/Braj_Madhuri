@@ -80,13 +80,30 @@ export function resolveFilter(filterFolder, searchQuery, allProducts) {
 }
 
 /**
- * Sorts products based on sort order ("low-to-high" or "high-to-low")
+ * Gets the effective display price for a product.
+ * If variants exist, returns the minimum variant price (what customers see first).
+ */
+function getEffectivePrice(product) {
+  if (Array.isArray(product.variants) && product.variants.length > 0) {
+    const variantPrices = product.variants
+      .map(v => parseFloat(v.price))
+      .filter(p => !isNaN(p) && p > 0);
+    if (variantPrices.length > 0) {
+      return Math.min(...variantPrices);
+    }
+  }
+  return parseFloat(product.price) || 0;
+}
+
+/**
+ * Sorts products based on sort order ("low-to-high" or "high-to-low").
+ * Uses effective variant price when variants exist.
  */
 export function sortProducts(products, sortOrder) {
   if (sortOrder === "low-to-high") {
-    return [...products].sort((a, b) => (a.price || 0) - (b.price || 0));
+    return [...products].sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
   } else if (sortOrder === "high-to-low") {
-    return [...products].sort((a, b) => (b.price || 0) - (a.price || 0));
+    return [...products].sort((a, b) => getEffectivePrice(b) - getEffectivePrice(a));
   }
   return products;
 }

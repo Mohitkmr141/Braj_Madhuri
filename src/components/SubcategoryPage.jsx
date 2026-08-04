@@ -56,8 +56,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
   }, [product?.size, product?.sizes, product?.variants]);
 
   const hasParsedSizes = parsedSizes.length > 0;
-  const initialSize = hasParsedSizes ? parsedSizes[0] : (product?.size || "");
-  const [selectedSize, setSelectedSize] = useState(initialSize);
+  const [selectedSize, setSelectedSize] = useState(() => hasParsedSizes ? parsedSizes[0] : (product?.size || ""));
   const [flashing, flash] = useCartFlash();
   const [isZoomed, setIsZoomed] = useState(false);
 
@@ -72,11 +71,18 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
   }, [product?.colors, product?.variants]);
 
   const hasColors = parsedColors.length > 0;
-  const initialColor = hasColors ? parsedColors[0] : "";
-  const [selectedColor, setSelectedColor] = useState(initialColor);
+  const [selectedColor, setSelectedColor] = useState(() => hasColors ? parsedColors[0] : "");
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const revealRef = useScrollReveal();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Reset selections when the product itself changes (e.g. navigating between categories)
+  useEffect(() => {
+    setSelectedSize(parsedSizes.length > 0 ? parsedSizes[0] : (product?.size || ""));
+    setSelectedColor(parsedColors.length > 0 ? parsedColors[0] : "");
+    setCurrentImageIndex(0);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id]);
 
   const isFav = isInWishlist(product.id, selectedSize);
 
@@ -113,28 +119,36 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
   }, [product.images, product.imageUrl]);
 
   const mainImage = useMemo(() => {
-    if (activeVariant && activeVariant.image) {
+    if (activeVariant && activeVariant.image && activeVariant.image.trim() !== '') {
       return activeVariant.image;
     }
     return allImages[0] || '';
   }, [activeVariant, allImages]);
 
+  // When active variant has a specific linked image, sync the slideshow to it
   useEffect(() => {
-    if (activeVariant && activeVariant.image) {
+    if (activeVariant && activeVariant.image && activeVariant.image.trim() !== '') {
       const idx = allImages.indexOf(activeVariant.image);
       if (idx !== -1) {
         setCurrentImageIndex(idx);
       }
+    } else {
+      // No variant image: reset to first image
+      setCurrentImageIndex(0);
     }
   }, [activeVariant, allImages]);
 
+  // When the quick-view modal closes, reset the slideshow
   useEffect(() => {
     if (!isZoomed) {
-      if (!(activeVariant && activeVariant.image)) {
+      if (activeVariant && activeVariant.image && activeVariant.image.trim() !== '') {
+        const idx = allImages.indexOf(activeVariant.image);
+        setCurrentImageIndex(idx !== -1 ? idx : 0);
+      } else {
         setCurrentImageIndex(0);
       }
     }
-  }, [isZoomed, product.id, activeVariant]);
+  }, [isZoomed, allImages, activeVariant]);
 
   // Safe numeric extraction
   const displayPrice = useMemo(() => {

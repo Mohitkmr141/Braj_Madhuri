@@ -455,27 +455,29 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                             </select>
                           </td>
                           <td style={{ padding: '8px 12px' }}>
-                            <input type="text" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} placeholder="M" value={variant.size} onChange={(e) => updateVariant(idx, 'size', e.target.value)} />
+                            <input type="text" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} placeholder="M" value={variant.size ?? ''} onChange={(e) => updateVariant(idx, 'size', e.target.value)} />
                           </td>
                           <td style={{ padding: '8px 12px' }}>
-                            <input type="text" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} placeholder="Red" value={variant.color} onChange={(e) => updateVariant(idx, 'color', e.target.value)} />
+                            <input type="text" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} placeholder="Red" value={variant.color ?? ''} onChange={(e) => updateVariant(idx, 'color', e.target.value)} />
                           </td>
                           <td style={{ padding: '8px 12px' }}>
-                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} required min="0" step="0.01" value={variant.price} onChange={(e) => updateVariant(idx, 'price', e.target.value)} />
+                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} required min="0" step="0.01" value={variant.price ?? ''} onChange={(e) => updateVariant(idx, 'price', e.target.value)} />
                           </td>
                           <td style={{ padding: '8px 12px' }}>
-                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} min="0" step="0.01" value={variant.originalPrice} onChange={(e) => updateVariant(idx, 'originalPrice', e.target.value)} />
+                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} min="0" step="0.01" value={variant.originalPrice ?? ''} onChange={(e) => updateVariant(idx, 'originalPrice', e.target.value)} />
                           </td>
                           <td style={{ padding: '8px 12px' }}>
-                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} required min="0" value={variant.stock} onChange={(e) => updateVariant(idx, 'stock', e.target.value)} />
+                            <input type="number" style={{ width: '100%', padding: '6px', borderRadius: '4px', border: '1px solid #d1d5db' }} required min="0" value={variant.stock ?? ''} onChange={(e) => updateVariant(idx, 'stock', e.target.value)} />
                           </td>
-                          <td style={{ padding: '8px 12px', display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                            <button type="button" onClick={() => duplicateVariant(idx)} style={{ color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }} title="Duplicate variant">
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                            </button>
-                            <button type="button" onClick={() => removeVariant(idx)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }} title="Remove variant">
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                            </button>
+                          <td style={{ padding: '8px 12px' }}>
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                              <button type="button" onClick={() => duplicateVariant(idx)} style={{ color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }} title="Duplicate variant">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                              </button>
+                              <button type="button" onClick={() => removeVariant(idx)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }} title="Remove variant">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
