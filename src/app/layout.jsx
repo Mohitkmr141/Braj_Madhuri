@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import SiteShell from "./SiteShell.jsx";
 import { ToastProvider } from "../context/ToastContext.jsx";
 import "../App.css";
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 export const viewport = {
   width: "device-width",
@@ -109,6 +110,7 @@ export default async function RootLayout({ children }) {
             <SiteShell initialCategories={categories}>{children}</SiteShell>
           </ToastProvider>
         </Suspense>
+        <GoogleAnalytics gaId="G-E2XC6LB5PH" />
       </body>
     </html>
   );
