@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import imageCompression from 'browser-image-compression';
 
 export const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel, confirmText = 'Delete', cancelText = 'Cancel', isDangerous = true }) => {
   if (!isOpen) return null;
@@ -86,7 +87,19 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
     setUploading(true);
     try {
       const newImageUrls = [];
-      for (const file of files) {
+      for (const originalFile of files) {
+        // Compress image before upload
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          fileType: 'image/webp'
+        };
+        const compressedBlob = await imageCompression(originalFile, options);
+        // Maintain the name but change extension to .webp
+        const newName = originalFile.name.replace(/\.[^/.]+$/, "") + ".webp";
+        const file = new File([compressedBlob], newName, { type: 'image/webp' });
+
         const formData = new FormData();
         formData.append('file', file);
         const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import imageCompression from 'browser-image-compression';
 import { ConfirmDialog } from './AdminModals';
 
 export default function CategoryImagesTab() {
@@ -36,10 +37,21 @@ export default function CategoryImagesTab() {
     fetchCategories();
   }, [fetchCategories]);
 
-  const handleCategoryImageUpload = async (categoryId, file) => {
-    if (!file) return;
+  const handleCategoryImageUpload = async (categoryId, originalFile) => {
+    if (!originalFile) return;
     setCatImageUploading(categoryId);
     try {
+      // Compress image before upload
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+        fileType: 'image/webp'
+      };
+      const compressedBlob = await imageCompression(originalFile, options);
+      const newName = originalFile.name.replace(/\.[^/.]+$/, "") + ".webp";
+      const file = new File([compressedBlob], newName, { type: 'image/webp' });
+
       const fd = new FormData();
       fd.append('file', file);
       fd.append('categoryId', categoryId);
