@@ -9,6 +9,7 @@ export default function CategoryImagesTab() {
   const [loading, setLoading] = useState(false);
   const [catImageUploading, setCatImageUploading] = useState(null);
   const [catImageRemoving, setCatImageRemoving] = useState(null);
+  const [uploadFormat, setUploadFormat] = useState('image/webp');
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     title: '',
@@ -46,11 +47,12 @@ export default function CategoryImagesTab() {
         maxSizeMB: 1,
         maxWidthOrHeight: 1920,
         useWebWorker: true,
-        fileType: 'image/webp'
+        fileType: uploadFormat
       };
       const compressedBlob = await imageCompression(originalFile, options);
-      const newName = originalFile.name.replace(/\.[^/.]+$/, "") + ".webp";
-      const file = new File([compressedBlob], newName, { type: 'image/webp' });
+      const ext = uploadFormat === 'image/webp' ? '.webp' : '.png';
+      const newName = originalFile.name.replace(/\.[^/.]+$/, "") + ext;
+      const file = new File([compressedBlob], newName, { type: uploadFormat });
 
       const fd = new FormData();
       fd.append('file', file);
@@ -102,10 +104,22 @@ export default function CategoryImagesTab() {
 
   return (
     <div className="tab-pane">
-      <div className="admin-toolbar">
+      <div className="admin-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2 className="font-semibold text-maroon" style={{margin:0, fontSize: '20px'}}>Category Images</h2>
           <p className="text-muted text-sm" style={{margin:'4px 0 0 0'}}>Upload dedicated thumbnails for your categories.</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '12px', color: '#6b7280' }}>Format:</span>
+          <select 
+            className="form-select" 
+            value={uploadFormat} 
+            onChange={e => setUploadFormat(e.target.value)}
+            style={{ padding: '4px 28px 4px 8px', fontSize: '13px', width: 'auto', minHeight: 'auto' }}
+          >
+            <option value="image/webp">WebP (Recommended)</option>
+            <option value="image/png">PNG</option>
+          </select>
         </div>
       </div>
 

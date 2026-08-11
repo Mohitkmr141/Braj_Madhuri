@@ -40,6 +40,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploadFormat, setUploadFormat] = useState('image/webp');
 
   useEffect(() => {
     if (editingProduct) {
@@ -93,12 +94,12 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
           maxSizeMB: 1,
           maxWidthOrHeight: 1920,
           useWebWorker: true,
-          fileType: 'image/webp'
+          fileType: uploadFormat
         };
         const compressedBlob = await imageCompression(originalFile, options);
-        // Maintain the name but change extension to .webp
-        const newName = originalFile.name.replace(/\.[^/.]+$/, "") + ".webp";
-        const file = new File([compressedBlob], newName, { type: 'image/webp' });
+        const ext = uploadFormat === 'image/webp' ? '.webp' : '.png';
+        const newName = originalFile.name.replace(/\.[^/.]+$/, "") + ext;
+        const file = new File([compressedBlob], newName, { type: uploadFormat });
 
         const formData = new FormData();
         formData.append('file', file);
@@ -354,6 +355,18 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
           <div className="form-row">
             <div className="form-col">
               <label className="form-label">Product Images</label>
+              <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '12px', color: '#6b7280' }}>Format:</span>
+                <select 
+                  className="form-select" 
+                  value={uploadFormat} 
+                  onChange={e => setUploadFormat(e.target.value)}
+                  style={{ padding: '4px 28px 4px 8px', fontSize: '13px', width: 'auto', minHeight: 'auto' }}
+                >
+                  <option value="image/webp">WebP (Recommended)</option>
+                  <option value="image/png">PNG</option>
+                </select>
+              </div>
               <input 
                 type="file" 
                 className="form-input" 
