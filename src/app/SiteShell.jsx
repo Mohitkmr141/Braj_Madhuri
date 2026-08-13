@@ -6,6 +6,7 @@ import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
 import FloatingCart from "../components/FloatingCart.jsx";
 import FloatingWhatsApp from "../components/FloatingWhatsApp.jsx";
+import SaleModalBanner from "../components/SaleModalBanner.jsx";
 import { CartProvider } from "../context/CartContext.jsx";
 import { SessionProvider } from "next-auth/react";
 import { WishlistProvider } from "../context/WishlistContext.jsx";
@@ -190,6 +191,7 @@ export default function SiteShell({ children, initialCategories }) {
             <Footer />
             <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
             <FloatingWhatsApp />
+            <SaleModalBanner />
           </WishlistProvider>
         </CartProvider>
       </ProductsProvider>

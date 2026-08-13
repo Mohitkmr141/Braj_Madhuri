@@ -25,6 +25,7 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
   const [searchOpen, setSearchOpen]       = useState(false);
   const [accountOpen, setAccountOpen]     = useState(false);
   const [suggestionQuery, setSuggestionQuery] = useState("");
+  const [globalSettings, setGlobalSettings] = useState(null);
   const accountRef = useRef(null);
   const closeMenu   = () => setMenuOpen(false);
   const closeSearch = () => { setSearchOpen(false); setSuggestionQuery(""); };
@@ -42,6 +43,21 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.settings) setGlobalSettings(data.settings);
+        }
+      } catch (e) {
+        console.error("Failed to fetch settings", e);
+      }
+    };
+    fetchSettings();
   }, []);
 
   useEffect(() => {
@@ -85,6 +101,11 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
 
   return (
     <>
+      {globalSettings?.isSaleActive && globalSettings?.saleTitle && (
+        <div className="announcement-bar" style={{ backgroundColor: 'var(--maroon)', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '14px', fontWeight: 'bold' }}>
+          {globalSettings.saleTitle}
+        </div>
+      )}
       {/* Search Overlay */}
       {searchOpen && (
         <div className="search-overlay" role="dialog" aria-label="Search" onClick={(e) => { if (e.target === e.currentTarget) closeSearch(); }}>

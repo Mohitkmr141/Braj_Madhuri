@@ -8,6 +8,7 @@ import OrdersTab from './OrdersTab';
 import ProductsTab from './ProductsTab';
 import CategoriesTab from './CategoriesTab';
 import CategoryImagesTab from './CategoryImagesTab';
+import SettingsTab from './SettingsTab';
 
 export default function AdminLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -76,13 +77,13 @@ export default function AdminLayout() {
           <div className="admin-header-left">
             <h1 className="admin-title">Admin Dashboard</h1>
             <div className="admin-tabs">
-              {['orders', 'inventory', 'categories', 'categoryImages'].map(tab => (
+              {['orders', 'inventory', 'categories', 'categoryImages', 'settings'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`admin-tab-btn ${activeTab === tab ? 'active' : ''}`}
                 >
-                  {tab === 'orders' ? 'Orders' : tab === 'inventory' ? 'Products' : tab === 'categories' ? 'Categories' : '🖼️ Category Images'}
+                  {tab === 'orders' ? 'Orders' : tab === 'inventory' ? 'Products' : tab === 'categories' ? 'Categories' : tab === 'categoryImages' ? '🖼️ Category Images' : '⚙️ Marketing & Settings'}
                 </button>
               ))}
             </div>
@@ -94,6 +95,7 @@ export default function AdminLayout() {
         {activeTab === 'inventory' && <ProductsTab />}
         {activeTab === 'categories' && <CategoriesTab />}
         {activeTab === 'categoryImages' && <CategoryImagesTab />}
+        {activeTab === 'settings' && <SettingsTab />}
       </div>
     </div>
   );

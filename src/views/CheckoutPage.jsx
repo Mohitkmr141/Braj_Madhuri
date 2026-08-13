@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "../context/CartContext.jsx";
@@ -34,6 +34,14 @@ export default function CheckoutPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [globalSettings, setGlobalSettings] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/settings').then(r => r.json()).then(d => {
+      if (d.success) setGlobalSettings(d.settings);
+    });
+  }, []);
+
   const totalOriginalPrice = useMemo(() => {
     return cartItems.reduce((acc, item) => {
       const itemOriginal = item.originalPrice || item.price || 250;
@@ -41,8 +49,11 @@ export default function CheckoutPage() {
     }, 0);
   }, [cartItems]);
 
-  const totalDiscount = totalOriginalPrice - cartTotal;
-  const finalTotalAmount = cartTotal + shippingCost;
+  const baseDiscount = totalOriginalPrice - cartTotal;
+  const specialSaleDiscount = globalSettings?.isSaleActive ? Math.round(cartTotal * (globalSettings.saleDiscountPercentage / 100)) : 0;
+  const totalDiscount = baseDiscount + specialSaleDiscount;
+  const finalDiscountedCartTotal = cartTotal - specialSaleDiscount;
+  const finalTotalAmount = finalDiscountedCartTotal + shippingCost;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -51,7 +62,7 @@ export default function CheckoutPage() {
 
   // Calculate shipping cost dynamically based on selected zone
   React.useEffect(() => {
-    if (cartTotal >= 999) {
+    if (finalDiscountedCartTotal >= 999) {
       setShippingCost(0);
       return;
     }
@@ -63,7 +74,7 @@ export default function CheckoutPage() {
     } else {
       setShippingCost(0);
     }
-  }, [formData.state, cartTotal]);
+  }, [formData.state, finalDiscountedCartTotal]);
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -245,7 +256,7 @@ export default function CheckoutPage() {
             <p>Please enter your shipping and payment details.</p>
           </div>
           
-          <FreeShippingBanner cartTotal={cartTotal} />
+          <FreeShippingBanner cartTotal={finalDiscountedCartTotal} />
           
           {error && <div className="error-message">{error}</div>}
 
@@ -281,8 +292,8 @@ export default function CheckoutPage() {
                 <label htmlFor="state">Shipping Zone *</label>
                 <select id="state" name="state" value={formData.state} onChange={handleInputChange} required>
                   <option value="">Select Zone</option>
-                  <option value="Delhi NCR">Zone A - Delhi NCR {cartTotal >= 999 ? '(Free)' : '(₹79)'}</option>
-                  <option value="Rest of India">Zone B - Rest of India {cartTotal >= 999 ? '(Free)' : '(₹119)'}</option>
+                  <option value="Delhi NCR">Zone A - Delhi NCR {finalDiscountedCartTotal >= 999 ? '(Free)' : '(₹79)'}</option>
+                  <option value="Rest of India">Zone B - Rest of India {finalDiscountedCartTotal >= 999 ? '(Free)' : '(₹119)'}</option>
                 </select>
               </div>
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>
@@ -324,13 +335,19 @@ export default function CheckoutPage() {
                 <span>{formatCurrency(totalOriginalPrice)}</span>
               </div>
               <div className="summary-row summary-row--green" style={{ color: '#2e7d32', display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
-                <span>Discount</span>
-                <span>− {formatCurrency(totalDiscount)}</span>
+                <span>Product Discount</span>
+                <span>− {formatCurrency(baseDiscount)}</span>
               </div>
+              {specialSaleDiscount > 0 && (
+                <div className="summary-row summary-row--green" style={{ color: '#2e7d32', display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
+                  <span>{globalSettings?.saleDiscountPercentage}% Special Sale</span>
+                  <span>− {formatCurrency(specialSaleDiscount)}</span>
+                </div>
+              )}
               <div className="summary-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
                 <span>Delivery Charges</span>
                 <span>
-                  {cartTotal >= 999 ? (
+                  {finalDiscountedCartTotal >= 999 ? (
                     <span style={{ color: '#2e7d32', fontWeight: '600' }}>Free</span>
                   ) : shippingCost > 0 ? (
                     formatCurrency(shippingCost)

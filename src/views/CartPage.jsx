@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "../context/CartContext.jsx";
@@ -17,6 +17,14 @@ const formatCurrency = (value) =>
 export default function CartPage() {
   const { cartItems, cartCount, cartTotal, updateQuantity, removeFromCart } = useCart();
 
+  const [globalSettings, setGlobalSettings] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/settings').then(r => r.json()).then(d => {
+      if (d.success) setGlobalSettings(d.settings);
+    });
+  }, []);
+
   const totalOriginalPrice = useMemo(() => {
     return cartItems.reduce((acc, item) => {
       // If no originalPrice is available, fallback to current price to avoid zero-savings bugs
@@ -25,7 +33,10 @@ export default function CartPage() {
     }, 0);
   }, [cartItems]);
 
-  const totalDiscount = totalOriginalPrice - cartTotal;
+  const baseDiscount = totalOriginalPrice - cartTotal;
+  const specialSaleDiscount = globalSettings?.isSaleActive ? Math.round(cartTotal * (globalSettings.saleDiscountPercentage / 100)) : 0;
+  const totalDiscount = baseDiscount + specialSaleDiscount;
+  const finalTotal = cartTotal - specialSaleDiscount;
 
   if (cartCount === 0) {
     return (
@@ -56,7 +67,7 @@ export default function CartPage() {
           <div className="cart-header">
             <h1>My Cart ({cartCount})</h1>
           </div>
-          <FreeShippingBanner cartTotal={cartTotal} />
+          <FreeShippingBanner cartTotal={finalTotal} />
           
           <div className="cart-items-list">
             {cartItems.map((item) => {
@@ -138,9 +149,15 @@ export default function CartPage() {
               <span>{formatCurrency(totalOriginalPrice)}</span>
             </div>
             <div className="summary-row summary-row--green">
-              <span>Discount</span>
-              <span>− {formatCurrency(totalDiscount)}</span>
+              <span>Product Discount</span>
+              <span>− {formatCurrency(baseDiscount)}</span>
             </div>
+            {specialSaleDiscount > 0 && (
+              <div className="summary-row summary-row--green">
+                <span>{globalSettings?.saleDiscountPercentage}% Special Sale</span>
+                <span>− {formatCurrency(specialSaleDiscount)}</span>
+              </div>
+            )}
             <div className="summary-row" style={{ fontSize: '14px' }}>
               <span>Delivery Charges</span>
               {cartTotal >= 999 ? (
@@ -154,7 +171,7 @@ export default function CartPage() {
             
             <div className="summary-total">
               <span>Total Amount</span>
-              <span>{formatCurrency(cartTotal)}</span>
+              <span>{formatCurrency(finalTotal)}</span>
             </div>
             
             <Link href="/checkout" className="place-order-btn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>

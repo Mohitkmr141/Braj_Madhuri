@@ -3,14 +3,13 @@ import { NextResponse } from 'next/server';
 import { sendOrderEmail } from '../../../lib/mailer.js';
 import { createShiprocketOrder } from '../../../lib/shiprocket.js';
 import crypto from 'crypto';
-
-
+import Razorpay from 'razorpay';
 
 export async function POST(request) {
   const prisma = getPrisma();
   try {
     const body = await request.json();
-    const {
+    let {
       formData,
       cartItems,
       cartTotal,
@@ -36,6 +35,31 @@ export async function POST(request) {
       );
     }
 
+    // ── Server-Side Cart Calculation & Security Verification ─────────────────
+    let calculatedCartTotal = 0;
+    for (const item of cartItems) {
+      const product = await prisma.product.findUnique({ where: { id: item.id } });
+      if (!product) {
+        return NextResponse.json({ success: false, error: `Product ${item.title} not found` }, { status: 400 });
+      }
+      calculatedCartTotal += (product.price || 0) * item.quantity;
+    }
+
+    const settings = await prisma.siteSettings.findUnique({ where: { id: 'global' } });
+    let specialSaleDiscount = 0;
+    if (settings && settings.isSaleActive) {
+      specialSaleDiscount = Math.round(calculatedCartTotal * (settings.saleDiscountPercentage / 100));
+    }
+    const finalDiscountedTotal = Math.max(0, calculatedCartTotal - specialSaleDiscount);
+
+    let serverShippingCost = 0;
+    if (finalDiscountedTotal < 999) {
+      if (formData.state === "Delhi NCR") serverShippingCost = 79;
+      else if (formData.state === "Rest of India") serverShippingCost = 119;
+    }
+    
+    const expectedFinalAmount = finalDiscountedTotal + serverShippingCost;
+
     // ── Verify Razorpay signature ─────────────────────────────────────────────
     if (paymentMethod === 'online') {
       if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
@@ -58,7 +82,28 @@ export async function POST(request) {
           { status: 400 }
         );
       }
+
+      // Verify that the paid order matches the requested cart items exactly
+      const razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID,
+        key_secret: process.env.RAZORPAY_KEY_SECRET,
+      });
+      
+      const rzpOrder = await razorpay.orders.fetch(razorpay_order_id);
+      const expectedAmountInPaise = Math.round(expectedFinalAmount * 100);
+
+      if (rzpOrder.amount !== expectedAmountInPaise) {
+        console.error(`[Checkout] Cart Tampering Detected! Razorpay Order Amount: ${rzpOrder.amount} vs Expected: ${expectedAmountInPaise}`);
+        return NextResponse.json(
+          { success: false, error: 'Order validation failed due to cart mismatch. Please contact support.' },
+          { status: 400 }
+        );
+      }
     }
+
+    // Override client-provided totals with secure server-calculated totals
+    cartTotal = expectedFinalAmount;
+    shippingCost = serverShippingCost;
 
     // ── DB transaction: stock check → decrement → create order ───────────────
     const result = await prisma.$transaction(async (tx) => {

@@ -26,9 +26,20 @@ export async function POST(request) {
       calculatedCartTotal += (product.price || 0) * item.quantity;
     }
 
+    // Fetch site settings
+    const settings = await prisma.siteSettings.findUnique({ where: { id: 'global' } });
+    
+    // Apply special sale discount
+    let specialSaleDiscount = 0;
+    if (settings && settings.isSaleActive) {
+      specialSaleDiscount = Math.round(calculatedCartTotal * (settings.saleDiscountPercentage / 100));
+    }
+    
+    const finalDiscountedTotal = Math.max(0, calculatedCartTotal - specialSaleDiscount);
+
     // 2. Calculate shipping cost
     let shippingCost = 0;
-    if (calculatedCartTotal < 999) {
+    if (finalDiscountedTotal < 999) {
       if (state === "Delhi NCR") {
         shippingCost = 79;
       } else if (state === "Rest of India") {
@@ -36,7 +47,7 @@ export async function POST(request) {
       }
     }
 
-    const amount = calculatedCartTotal + shippingCost;
+    const amount = finalDiscountedTotal + shippingCost;
 
     // Initialize Razorpay
     const razorpay = new Razorpay({
