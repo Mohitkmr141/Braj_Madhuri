@@ -3,6 +3,20 @@ import SiteShell from "./SiteShell.jsx";
 import { ToastProvider } from "../context/ToastContext.jsx";
 import "../App.css";
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { Playfair_Display, Inter } from "next/font/google";
+import { unstable_cache } from "next/cache";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const viewport = {
   width: "device-width",
@@ -51,25 +65,29 @@ export const metadata = {
 
 import { getPrisma } from "../lib/prisma.js";
 
-async function fetchInitialCategories() {
-  try {
-    const prisma = getPrisma();
-    const categories = await prisma.category.findMany({
-      include: {
-        products: {
-          include: {
-            subcategory: true
-          }
+const fetchInitialCategories = unstable_cache(
+  async () => {
+    try {
+      const prisma = getPrisma();
+      const categories = await prisma.category.findMany({
+        include: {
+          products: {
+            include: {
+              subcategory: true
+            }
+          },
+          subcategories: true,
         },
-        subcategories: true,
-      },
-    });
-    return categories;
-  } catch (error) {
-    console.error("Failed to fetch initial products:", error);
-    return [];
-  }
-}
+      });
+      return categories;
+    } catch (error) {
+      console.error("Failed to fetch initial products:", error);
+      return [];
+    }
+  },
+  ["initial-categories-cache"],
+  { revalidate: 300, tags: ["categories"] }
+);
 
 export default async function RootLayout({ children }) {
   const categories = await fetchInitialCategories();
@@ -97,8 +115,9 @@ export default async function RootLayout({ children }) {
   };
 
   return (
-    <html lang="en-IN">
+    <html lang="en-IN" className={`${playfair.variable} ${inter.variable}`}>
       <head>
+        <link rel="preconnect" href="https://vdujlymtqvmztikeokje.supabase.co" crossOrigin="anonymous" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

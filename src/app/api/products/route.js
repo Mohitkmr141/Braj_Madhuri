@@ -1,14 +1,13 @@
 import { getPrisma } from '../../../lib/prisma.js';
 import { NextResponse } from 'next/server';
+import { unstable_cache } from 'next/cache';
 
 export const revalidate = 60; // Cache the response for 60 seconds to improve load speeds
 
-
-
-export async function GET() {
-  const prisma = getPrisma();
-  try {
-    const categories = await prisma.category.findMany({
+const getCachedCategories = unstable_cache(
+  async () => {
+    const prisma = getPrisma();
+    return prisma.category.findMany({
       include: {
         products: {
           include: {
@@ -17,10 +16,24 @@ export async function GET() {
         },
         subcategories: true,
       },
-      // thumbnailUrl is already a direct field on Category, included automatically
     });
+  },
+  ['api-products-categories-cache'],
+  { revalidate: 60, tags: ['categories'] }
+);
 
-    return NextResponse.json({ success: true, categories });
+export async function GET() {
+  try {
+    const categories = await getCachedCategories();
+
+    return NextResponse.json(
+      { success: true, categories },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        },
+      }
+    );
   } catch (error) {
     console.error("Failed to fetch products:", error);
     return NextResponse.json(
