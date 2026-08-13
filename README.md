@@ -42,6 +42,19 @@ A modern, full-featured devotional e-commerce storefront built with **Next.js 16
 | `/combos` | Combos — Curated seva pack listing |
 | `/about` | About — Story and brand values |
 | `/contact` | Contact — WhatsApp, Email, Support hours |
+| `/admin` | Admin Dashboard — Manage products, marketing, settings, orders, and Shiprocket |
+
+### ⚙️ Admin & Marketing (New)
+- **Marketing & Settings Tab**: Fully dynamic dashboard to control global store behavior.
+- **Global Sale Switch**: Instantly toggle a sitewide sale on or off without redeploying.
+- **Floating Sale Modal**: Beautiful, semi-transparent popup banner that automatically welcomes customers during a sale (remembers dismissals via `sessionStorage`).
+- **Dynamic Announcement Bar**: Top marquee strip that appears when a sale is active.
+- **Image Uploading**: Integrated securely with Supabase Storage for instant banner updates.
+
+### 🛡️ Secure Checkout & Payments (New)
+- **Tamper-Proof Razorpay Integration**: 100% secure server-side cart verification. The backend dynamically re-calculates the cart using strict database pricing and sale logic, verifying the exact amount paid down to the final Paisa before accepting the order.
+- **Dynamic Shipping Thresholds**: Instantly computes shipping based on actual cart weight and state zones (Delhi NCR vs Rest of India), supporting free shipping thresholds after sale discounts are applied.
+- **Shiprocket Integration**: Automatically generates shipping labels for valid orders.
 
 ---
 
