@@ -307,6 +307,7 @@
   box-shadow: var(--shadow-glow);
   transform: translateY(-4px);
 }
+
 .place-order-btn:active {
   transform: scale(0.98);
   box-shadow: 0 4px 16px rgb(74 21 33 / 30%);

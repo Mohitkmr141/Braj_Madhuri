@@ -290,30 +290,31 @@
 @media (width <= 768px) {
   .subcategory-list {
     /* Reset absolute centering; instead anchor to left edge of the cell-wrap */
-    left: auto;
     right: auto;
-    transform: none;
     animation: subcatFadeInMobile 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+
     /* Position relative to the category-cell-wrap using a negative left margin
        to center it, but clamped so it never escapes the viewport */
     width: 190px;
+
     /* Shift left by half the dropdown width minus half the cell width so it
        'centres' under the cell, but we use JS-free CSS viewport clamping     */
     left: 50%;
     transform: translateX(-50%);
+
     /* The key fix: ensure the rendered box never exits the screen */
     max-width: calc(100vw - 24px);
   }
 
-  /* For cells in the FIRST column of a 3-col grid: anchor to left */
-  .category-cell-wrap:nth-child(3n + 1) .subcategory-list {
+  /* For cells in the FIRST column of a 4-col grid: anchor to left */
+  .category-cell-wrap:nth-child(4n + 1) .subcategory-list {
     left: 0;
     transform: none;
     animation: subcatFadeInLeft 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  /* For cells in the LAST column of a 3-col grid: anchor to right */
-  .category-cell-wrap:nth-child(3n) .subcategory-list {
+  /* For cells in the LAST column of a 4-col grid: anchor to right */
+  .category-cell-wrap:nth-child(4n) .subcategory-list {
     left: auto;
     right: 0;
     transform: none;
@@ -322,25 +323,33 @@
 }
 
 @media (width <= 480px) {
+  /* Reset 4-col anchor logic from the tablet breakpoint */
+  .category-cell-wrap:nth-child(4n + 1) .subcategory-list,
+  .category-cell-wrap:nth-child(4n) .subcategory-list {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+
+  /* Apply 3-col anchor logic */
+  .category-cell-wrap:nth-child(3n + 1) .subcategory-list {
+    left: 0;
+    transform: none;
+  }
+
+  .category-cell-wrap:nth-child(3n) .subcategory-list {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+
   .subcategory-list {
     width: 175px;
     min-width: 150px;
     font-size: 11px;
   }
 
-  /* 3-col layout: first column items anchor left */
-  .category-cell-wrap:nth-child(3n + 1) .subcategory-list {
-    left: 0;
-    right: auto;
-    transform: none;
-  }
 
-  /* 3-col layout: last column items anchor right */
-  .category-cell-wrap:nth-child(3n) .subcategory-list {
-    left: auto;
-    right: 0;
-    transform: none;
-  }
 }
 
 @keyframes subcatFadeInMobile {
@@ -499,6 +508,7 @@
 }
 
 .image-card-img-wrapper:hover .slide-btn { opacity: 1; }
+
 @media (hover: none), (width <= 768px) {
   .slide-btn { opacity: 1; }
 }
