@@ -236,6 +236,7 @@ body {
 .status-badge.shipped,
 .status-badge.delivered { background: #dcfce7; color: #15803d; }
 .status-badge.cancelled { background: #fee2e2; color: #b91c1c; }
+.status-badge.payment_pending { background: #f3e8ff; color: #7e22ce; }
 
 /* AWB Badge */
 .awb-badge {

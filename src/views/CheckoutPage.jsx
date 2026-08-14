@@ -147,7 +147,7 @@ export default function CheckoutPage() {
       const orderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cartItems, state: formData.state }),
+        body: JSON.stringify({ cartItems, state: formData.state, formData }),
       });
       if (!orderRes.ok) {
         const errData = await orderRes.json().catch(() => ({}));
@@ -181,6 +181,7 @@ export default function CheckoutPage() {
                 cartTotal: finalTotalAmount,
                 shippingCost,
                 paymentMethod,
+                orderNumber: orderData.orderNumber,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_signature: response.razorpay_signature,

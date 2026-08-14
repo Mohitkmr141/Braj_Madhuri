@@ -33,6 +33,8 @@ export async function GET(request) {
         { orderNumber: { contains: search, mode: 'insensitive' } },
         { email: { contains: search, mode: 'insensitive' } },
         { phone: { contains: search } },
+        { razorpayOrderId: { contains: search, mode: 'insensitive' } },
+        { razorpayPaymentId: { contains: search, mode: 'insensitive' } },
       ];
     }
 

@@ -1,15 +1,11 @@
-import { getPrisma } from '../../../lib/prisma.js';
 import { NextResponse } from 'next/server';
-import { sendOrderEmail } from '../../../lib/mailer.js';
-import { createShiprocketOrder } from '../../../lib/shiprocket.js';
 import crypto from 'crypto';
-import Razorpay from 'razorpay';
+import { finalizePaidOrder } from '../../../lib/orderService.js';
 
 export async function POST(request) {
-  const prisma = getPrisma();
   try {
     const body = await request.json();
-    let {
+    const {
       formData,
       cartItems,
       cartTotal,
@@ -18,6 +14,7 @@ export async function POST(request) {
       razorpay_payment_id,
       razorpay_order_id,
       razorpay_signature,
+      orderNumber,
     } = body;
 
     // ── Validate required fields ──────────────────────────────────────────────
@@ -27,38 +24,6 @@ export async function POST(request) {
         { status: 400 }
       );
     }
-
-    if (!cartItems?.length) {
-      return NextResponse.json(
-        { success: false, error: 'Cart is empty' },
-        { status: 400 }
-      );
-    }
-
-    // ── Server-Side Cart Calculation & Security Verification ─────────────────
-    let calculatedCartTotal = 0;
-    for (const item of cartItems) {
-      const product = await prisma.product.findUnique({ where: { id: item.id } });
-      if (!product) {
-        return NextResponse.json({ success: false, error: `Product ${item.title} not found` }, { status: 400 });
-      }
-      calculatedCartTotal += (product.price || 0) * item.quantity;
-    }
-
-    const settings = await prisma.siteSettings.findUnique({ where: { id: 'global' } });
-    let specialSaleDiscount = 0;
-    if (settings && settings.isSaleActive) {
-      specialSaleDiscount = Math.round(calculatedCartTotal * (settings.saleDiscountPercentage / 100));
-    }
-    const finalDiscountedTotal = Math.max(0, calculatedCartTotal - specialSaleDiscount);
-
-    let serverShippingCost = 0;
-    if (finalDiscountedTotal < 999) {
-      if (formData.state === "Delhi NCR") serverShippingCost = 79;
-      else if (formData.state === "Rest of India") serverShippingCost = 119;
-    }
-    
-    const expectedFinalAmount = finalDiscountedTotal + serverShippingCost;
 
     // ── Verify Razorpay signature ─────────────────────────────────────────────
     if (paymentMethod === 'online') {
@@ -82,175 +47,36 @@ export async function POST(request) {
           { status: 400 }
         );
       }
-
-      // Verify that the paid order matches the requested cart items exactly
-      const razorpay = new Razorpay({
-        key_id: process.env.RAZORPAY_KEY_ID,
-        key_secret: process.env.RAZORPAY_KEY_SECRET,
-      });
-      
-      const rzpOrder = await razorpay.orders.fetch(razorpay_order_id);
-      const expectedAmountInPaise = Math.round(expectedFinalAmount * 100);
-
-      if (rzpOrder.amount !== expectedAmountInPaise) {
-        console.error(`[Checkout] Cart Tampering Detected! Razorpay Order Amount: ${rzpOrder.amount} vs Expected: ${expectedAmountInPaise}`);
-        return NextResponse.json(
-          { success: false, error: 'Order validation failed due to cart mismatch. Please contact support.' },
-          { status: 400 }
-        );
-      }
     }
 
-    // Override client-provided totals with secure server-calculated totals
-    cartTotal = expectedFinalAmount;
-    shippingCost = serverShippingCost;
-
-    // ── DB transaction: stock check → decrement → create order ───────────────
-    const result = await prisma.$transaction(async (tx) => {
-      // 1. Check stock for all items (checks base stock; variant stock is best-effort)
-      for (const item of cartItems) {
-        const product = await tx.product.findUnique({ where: { id: item.id } });
-        if (!product) {
-          throw new Error(`Product "${item.title}" not found.`);
-        }
-
-        // If a specific variant is selected, check variant stock
-        if (item.size || item.color) {
-          const variants = Array.isArray(product.variants) ? product.variants : [];
-          const matchedVariant = variants.find(v => {
-            const vS = (v.size || '').trim().toLowerCase();
-            const vC = (v.color || '').trim().toLowerCase();
-            const iS = (item.size || '').trim().toLowerCase();
-            const iC = (item.color || '').trim().toLowerCase();
-            return (!vS || vS === iS) && (!vC || vC === iC);
-          });
-          if (matchedVariant) {
-            const variantStock = parseInt(matchedVariant.stock, 10) || 0;
-            if (variantStock < item.quantity) {
-              throw new Error(
-                `Insufficient stock for "${item.title}" (${[item.size, item.color].filter(Boolean).join(', ')}). Only ${variantStock} left.`
-              );
-            }
-          } else if (product.stock < item.quantity) {
-            throw new Error(
-              `Insufficient stock for "${item.title}". Only ${product.stock} left.`
-            );
-          }
-        } else if (product.stock < item.quantity) {
-          throw new Error(
-            `Insufficient stock for "${item.title}". Only ${product.stock} left.`
-          );
-        }
-      }
-
-      // 2. Decrement stock (base product + variant if applicable)
-      for (const item of cartItems) {
-        const product = await tx.product.findUnique({ where: { id: item.id } });
-        let updatedVariants = Array.isArray(product.variants) ? [...product.variants] : [];
-
-        if ((item.size || item.color) && updatedVariants.length > 0) {
-          // Decrement the matching variant's stock
-          let variantMatched = false;
-          updatedVariants = updatedVariants.map(v => {
-            const vS = (v.size || '').trim().toLowerCase();
-            const vC = (v.color || '').trim().toLowerCase();
-            const iS = (item.size || '').trim().toLowerCase();
-            const iC = (item.color || '').trim().toLowerCase();
-            if ((!vS || vS === iS) && (!vC || vC === iC)) {
-              variantMatched = true;
-              const newStock = Math.max(0, (parseInt(v.stock, 10) || 0) - item.quantity);
-              return { ...v, stock: newStock };
-            }
-            return v;
-          });
-
-          await tx.product.update({
-            where: { id: item.id },
-            data: {
-              // Also decrement base stock for overall inventory tracking
-              stock: { decrement: item.quantity },
-              // Save updated variant stocks back to the JSON field
-              ...(variantMatched ? { variants: updatedVariants } : {}),
-            },
-          });
-        } else {
-          await tx.product.update({
-            where: { id: item.id },
-            data: { stock: { decrement: item.quantity } },
-          });
-        }
-      }
-
-      // 3. Generate unique Order Number (timestamp + random suffix for collision safety)
-      const timestamp = Date.now().toString(36).toUpperCase();
-      const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-      const orderNumber = `BM-${timestamp}${randomSuffix}`;
-
-      // 4. Save order to database
-      const newOrder = await tx.order.create({
-        data: {
-          orderNumber,
-          customerName: `${formData.firstName} ${formData.lastName || ''}`.trim(),
-          email: formData.email.trim().toLowerCase(),
-          phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          pincode: formData.pincode,
-          totalAmount: cartTotal,
-          paymentMethod: paymentMethod,
-          shippingCost: shippingCost || 0,
-          cartItems: cartItems,
-        },
-      });
-
-      return { orderNumber, newOrder };
+    // ── Finalize paid order idempotently ──────────────────────────────────────
+    const result = await finalizePaidOrder({
+      razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+      orderNumber: orderNumber,
+      fallbackData: {
+        formData,
+        cartItems: cartItems || [],
+        cartTotal: cartTotal || 0,
+        shippingCost: shippingCost || 0,
+      },
     });
 
-    console.log(`[Checkout] Order ${result.orderNumber} saved. Razorpay Payment ID: ${razorpay_payment_id}`);
+    console.log(`[Checkout] Order ${result.order.orderNumber} confirmed. Payment ID: ${razorpay_payment_id}`);
 
-    // ── Execute background tasks (emails & shiprocket) before returning ──────────
-    await Promise.allSettled([
-      sendOrderEmail(result.newOrder).then((emailResult) => {
-        if (!emailResult.success && !emailResult.skipped) {
-          console.error(`[Checkout] Email delivery had issues for order ${result.orderNumber}:`, emailResult);
-        }
-      }).catch((err) => {
-        console.error(`[Checkout] Unexpected email error for order ${result.orderNumber}:`, err.message);
-      }),
-      createShiprocketOrder(result.newOrder).then(async (srResult) => {
-        if (srResult?.order_id) {
-          await prisma.order.update({
-            where: { id: result.newOrder.id },
-            data: {
-              shiprocketOrderId: srResult.order_id,
-              shiprocketShipmentId: srResult.shipment_id,
-            },
-          }).catch((err) => console.error('[Checkout] Failed to update Shiprocket IDs:', err.message));
-        }
-      }).catch((err) => {
-        console.error('[Checkout] Failed to create Shiprocket order:', err.message);
-      })
-    ]);
-
-    // ── Return success immediately — emails/shiprocket run in background ──────
-    return NextResponse.json({ success: true, orderNumber: result.orderNumber });
+    return NextResponse.json({
+      success: true,
+      orderNumber: result.order.orderNumber,
+    });
 
   } catch (error) {
-    // Stock errors are user-facing; everything else is a server error
-    const isUserError =
-      error.message?.includes('Insufficient stock') ||
-      error.message?.includes('not found');
-
-    console.error('[Checkout] Error:', error.message);
+    console.error('[Checkout] Error finalizing order:', error.message);
     return NextResponse.json(
       {
         success: false,
-        error: isUserError ? error.message : 'Failed to process your order. Please try again.',
+        error: error.message || 'Failed to process your order. Please contact support with your Payment ID.',
       },
-      { status: isUserError ? 409 : 500 }
+      { status: 500 }
     );
   }
 }
-
-

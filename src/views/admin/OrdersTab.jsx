@@ -132,20 +132,27 @@ const OrdersTab = () => {
           <input
             type="text"
             className="admin-search-input"
-            placeholder="Search by order ID, name, or phone..."
+            placeholder="Search by order ID, Razorpay ID, name, or phone..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
         </div>
         
         <div className="filter-bar">
-          {['', 'Pending', 'Shipped', 'Delivered', 'Cancelled'].map(s => (
+          {[
+            { key: '', label: 'All' },
+            { key: 'Pending', label: 'Paid / Pending' },
+            { key: 'Shipped', label: 'Shipped' },
+            { key: 'Delivered', label: 'Delivered' },
+            { key: 'Cancelled', label: 'Cancelled' },
+            { key: 'Payment_Pending', label: 'Pending Payment' },
+          ].map(tab => (
             <button
-              key={s}
-              className={`filter-chip ${statusFilter === s ? 'active' : ''}`}
-              onClick={() => setStatusFilter(s)}
+              key={tab.key}
+              className={`filter-chip ${statusFilter === tab.key ? 'active' : ''}`}
+              onClick={() => setStatusFilter(tab.key)}
             >
-              {s || 'All'}
+              {tab.label}
             </button>
           ))}
           {selectedOrders.length > 0 && (
@@ -235,7 +242,14 @@ const OrdersTab = () => {
                         }}
                       />
                     </td>
-                    <td data-label="Order ID"><span className="awb-badge">{order.orderNumber}</span></td>
+                    <td data-label="Order ID">
+                      <span className="awb-badge">{order.orderNumber}</span>
+                      {order.razorpayPaymentId && (
+                        <div className="text-xs text-muted mt-1" title="Razorpay Payment ID">
+                          💳 {order.razorpayPaymentId}
+                        </div>
+                      )}
+                    </td>
                     <td data-label="Date">{formatDate(order.createdAt)}</td>
                     <td data-label="Customer">
                       <div className="font-medium">{order.customerName || 'N/A'}</div>
@@ -264,7 +278,7 @@ const OrdersTab = () => {
                     <td data-label="Total" className="font-medium">{formatCurrency(order.totalAmount)}</td>
                     <td data-label="Status">
                       <span className={`status-badge ${order.status?.toLowerCase() || 'pending'}`}>
-                        {order.status}
+                        {order.status === 'Payment_Pending' ? 'Pending Payment' : order.status === 'Pending' ? 'Paid / Pending' : order.status}
                       </span>
                     </td>
                     <td data-label="Actions">

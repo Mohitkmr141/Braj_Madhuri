@@ -89,16 +89,20 @@ export async function createShiprocketOrder(order) {
     order_id: order.orderNumber,
     order_date: new Date().toISOString().split("T")[0],
     pickup_location: "Home",
-    billing_customer_name: order.customerName,
+    billing_customer_name: order.customerName && order.customerName.length >= 3 ? order.customerName : (order.customerName || "Guest") + " Customer",
     billing_last_name: "",
-    billing_address: order.address,
-    billing_city: order.city,
-    billing_pincode: order.pincode,
+    billing_address: order.address || "No Address Provided",
+    billing_city: order.city || "Unknown",
+    billing_pincode: order.pincode || "110001",
     // Map zone names to valid Indian state names required by Shiprocket
     billing_state: order.state === "Delhi NCR" ? "Delhi" : (order.state === "Rest of India" ? "Uttar Pradesh" : (order.state || "Uttar Pradesh")),
     billing_country: "India",
-    billing_email: order.email,
-    billing_phone: order.phone,
+    billing_email: order.email || "no-reply@thebrajmadhuri.com",
+    billing_phone: (() => {
+      let p = order.phone ? order.phone.replace(/\D/g, "") : "";
+      if (p.length < 10) return "9999999999";
+      return p.slice(-15);
+    })(),
     shipping_is_billing: true,
     order_items: orderItems,
     payment_method: "Prepaid",
