@@ -75,7 +75,7 @@
   border: 1px solid #d4c8be;
   border-radius: 6px;
   font-family: inherit;
-  font-size: 15px;
+  font-size: 16px;
   transition: all 0.2s;
   background: #fdfcf9;
 }
@@ -125,7 +125,7 @@
 .payment-option-label {
   font-weight: 500;
   color: var(--text);
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .payment-option-desc {
@@ -172,6 +172,11 @@
   background: linear-gradient(135deg, var(--maroon), var(--maroon-light, #6A1E2F));
 }
 
+.complete-order-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 16px rgb(74 21 33 / 30%);
+}
+
 .complete-order-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -181,6 +186,9 @@
 @media (width <= 992px) {
   .checkout-container {
     grid-template-columns: 1fr;
+  }
+  .checkout-summary {
+    position: static;
   }
 }
 
@@ -200,5 +208,22 @@
 
   .checkout-header h1 {
     font-size: 26px;
+  }
+}
+
+@media (width <= 480px) {
+  .checkout-wrapper {
+    padding: 20px 12px;
+  }
+  .checkout-section {
+    padding: 16px 14px;
+    border-radius: 8px;
+  }
+  .checkout-header h1 {
+    font-size: 22px;
+  }
+  .complete-order-btn {
+    padding: 16px;
+    font-size: 15px;
   }
 }

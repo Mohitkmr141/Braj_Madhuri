@@ -1,7 +1,5 @@
 /* src/components/CategoryGalleries.css */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Nunito:wght@300;400;500;600;700&display=swap');
-
 /* ── Variables ─────────────────────────────────────────────── */
 :root {
   --saffron:      #D4AF37;
@@ -407,14 +405,29 @@
 }
 
 .slide-dot {
-  width: 6px;
-  height: 6px;
+  position: relative;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: rgb(255 255 255 / 62%);
   border: none;
   cursor: pointer;
   padding: 0;
   transition: background 0.25s ease, transform 0.3s var(--ease-premium), width 0.3s var(--ease-premium);
+}
+
+.slide-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.slide-dot:active {
+  transform: scale(0.9);
 }
 
 .slide-dot:hover {

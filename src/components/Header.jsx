@@ -96,7 +96,11 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
       }
     };
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("touchstart", handler, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("touchstart", handler);
+    };
   }, [accountOpen]);
 
   return (
@@ -276,8 +280,12 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
             aria-label={`View collection. Cart has ${cartCount} item${cartCount === 1 ? "" : "s"} worth INR ${cartTotal.toLocaleString("en-IN")}.`}
           >
             <div className="bm-cart">
-              <span className="bm-cart__icon" aria-hidden="true">
-                <Image src="/cart-icon.png" alt="Cart" width={24} height={24} className="bm-cart__icon-img" />
+              <span className="bm-cart__icon" aria-hidden="true" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
               </span>
               <span className="bm-cart__label">
                 {cartCount > 0 ? `INR ${cartTotal.toLocaleString("en-IN")}` : "Cart"}
@@ -370,16 +378,20 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
             {/* Cart Mobile */}
             <Link
               href="/cart"
-              style={{ position: 'relative', display: 'inline-block', marginLeft: "4px", marginRight: "4px" }}
+              style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: '40px', minHeight: '40px', padding: "4px", color: 'white', textDecoration: 'none', marginLeft: "4px", marginRight: "4px" }}
               aria-label={`Cart has ${cartCount} items`}
             >
-              <div className="bm-cart" style={{ padding: "4px 8px", minHeight: "auto" }}>
-                <span className="bm-cart__icon" aria-hidden="true">
-                  <Image src="/cart-icon.png" alt="Cart" className="bm-cart__icon-img" width={16} height={16} />
+              <div className="bm-cart" style={{ padding: "6px 8px", minHeight: "auto", display: 'inline-flex', alignItems: 'center' }}>
+                <span className="bm-cart__icon" aria-hidden="true" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '18px', height: '18px' }}>
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                  </svg>
                 </span>
               </div>
               {cartCount > 0 && (
-                <span className="bm-cart__badge" style={{ top: "-5px", right: "-5px", width: "16px", height: "16px", fontSize: "9px" }}>
+                <span className="bm-cart__badge" style={{ top: "-3px", right: "-3px", width: "16px", height: "16px", fontSize: "9px" }}>
                   {cartCount > 99 ? "99+" : cartCount}
                 </span>
               )}

@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
-
   :root {
     --saffron: #D4AF37;
     --saffron-light: #E8C96B;
@@ -350,6 +348,11 @@
     background: linear-gradient(135deg, var(--maroon), var(--maroon-light));
   }
 
+  .btn-primary:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 16px rgb(74 21 33 / 30%);
+  }
+
   .btn-primary:hover::after {
     left: 150%;
   }
@@ -376,6 +379,11 @@
     border-color: var(--ivory);
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgb(255 255 255 / 10%);
+  }
+
+  .btn-outline:active {
+    transform: scale(0.98);
+    background: rgb(255 255 255 / 25%);
   }
 
 /* Dead code removed: .hero-image-area, .hero-image-placeholder, .hero-bottle-svg, .hero-stats were for old Hero — elements no longer exist in component */
@@ -684,7 +692,7 @@
     padding: 12px 16px;
     border: 1px solid rgb(201 151 42 / 30%);
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 16px;
     font-family: inherit;
     background: #fdfbf7;
     color: var(--text-main);
@@ -1556,6 +1564,7 @@
     .newsletter { padding: 40px 16px; }
     .hero-content { padding: 30px 16px; }
     .hero-ctas { flex-direction: column; }
+    .trust-bar { gap: 16px; padding: 14px 16px; flex-wrap: wrap; justify-content: center; }
 
     .btn-primary,
     .btn-outline { width: 100%; text-align: center; }

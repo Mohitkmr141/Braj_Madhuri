@@ -191,7 +191,7 @@
 .category-name {
   margin: 10px 0 0;
   font-family: Inter, sans-serif;
-  font-size: clamp(9px, 1.1vw, 12px);
+  font-size: clamp(11px, 2.5vw, 13px);
   font-weight: 600;
   color: #2e1a0a;
   letter-spacing: 0.01em;
@@ -499,6 +499,9 @@
 }
 
 .image-card-img-wrapper:hover .slide-btn { opacity: 1; }
+@media (hover: none), (width <= 768px) {
+  .slide-btn { opacity: 1; }
+}
 .slide-btn:focus-visible               { opacity: 1; }
 .slide-btn--prev { left: 6px; }
 .slide-btn--next { right: 6px; }
@@ -526,6 +529,7 @@
 }
 
 .slide-dot {
+  position: relative;
   width: 7px;
   height: 7px;
   border-radius: 50%;
@@ -534,6 +538,20 @@
   cursor: pointer;
   padding: 0;
   transition: background 0.2s, transform 0.2s;
+}
+
+.slide-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.slide-dot:active {
+  transform: scale(0.9);
 }
 
 .slide-dot--active {

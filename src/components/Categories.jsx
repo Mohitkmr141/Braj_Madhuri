@@ -39,7 +39,24 @@ export default function CategoryGalleries({
   }, [filterFolder, searchQuery, dbProducts, sortOrder]);
 
   if (!isLoaded) {
-    return <section className="galleries-wrapper" id="collections"><div className="section-header"><h2 className="section-title">Loading Products...</h2></div></section>;
+    return (
+      <section className="galleries-wrapper" id="collections">
+        <div className="section-header">
+          <span className="section-eyebrow">The Braj Madhuri</span>
+          <h2 className="section-title">Loading Collections...</h2>
+        </div>
+        <div className="image-grid" style={{ padding: '24px 0' }}>
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+            <div key={n} className="skeleton-card" style={{ minHeight: '320px' }}>
+              <div className="skeleton skeleton-image" style={{ height: '180px' }} />
+              <div className="skeleton skeleton-text title" style={{ width: '80%', marginTop: '12px' }} />
+              <div className="skeleton skeleton-text short" />
+              <div className="skeleton skeleton-button" style={{ height: '40px', marginTop: 'auto' }} />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -204,6 +221,17 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
     if (autoOpen) setIsQuickViewOpen(true);
   }, [autoOpen]);
 
+  // Lock background scroll when Quick View modal is open on mobile
+  useEffect(() => {
+    if (isQuickViewOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isQuickViewOpen]);
+
   if (!product || !product.imageUrl) {
     return null;
   }
@@ -307,7 +335,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
       </div>
 
       {isQuickViewOpen && typeof document !== "undefined" && createPortal(
-        <div className="quick-view-overlay" onClick={() => setIsQuickViewOpen(false)}>
+        <div className="quick-view-overlay" onClick={() => setIsQuickViewOpen(false)} role="dialog" aria-modal="true">
           <div className="quick-view-modal" onClick={(e) => e.stopPropagation()}>
             <button className="quick-view-close" type="button" onClick={() => setIsQuickViewOpen(false)} aria-label="Close">
               &times;

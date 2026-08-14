@@ -50,3 +50,17 @@
   color: #2e7d32;
   font-weight: 600;
 }
+
+@media (width <= 480px) {
+  .shipping-banner {
+    padding: 12px 14px;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .shipping-banner-content p {
+    font-size: 13px;
+  }
+  .shipping-banner-price-tag {
+    font-size: 18px;
+  }
+}

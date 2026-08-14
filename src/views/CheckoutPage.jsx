@@ -40,6 +40,14 @@ export default function CheckoutPage() {
     fetch('/api/settings').then(r => r.json()).then(d => {
       if (d.success) setGlobalSettings(d.settings);
     });
+
+    // Preload Razorpay script on checkout mount to avoid network latency at click
+    if (!document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      document.body.appendChild(script);
+    }
   }, []);
 
   const totalOriginalPrice = useMemo(() => {
@@ -266,31 +274,89 @@ export default function CheckoutPage() {
             <div className="form-grid">
               <div className="form-group">
                 <label htmlFor="firstName">First Name *</label>
-                <input type="text" id="firstName" name="firstName" value={formData.firstName} onChange={handleInputChange} required />
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                  autoComplete="given-name"
+                  required
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="lastName">Last Name</label>
-                <input type="text" id="lastName" name="lastName" value={formData.lastName} onChange={handleInputChange} />
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                  autoComplete="family-name"
+                />
               </div>
               <div className="form-group full-width">
                 <label htmlFor="email">Email Address *</label>
-                <input type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} required />
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
               <div className="form-group full-width">
-                <label htmlFor="phone">Phone Number *</label>
-                <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleInputChange} required />
+                <label htmlFor="phone">Phone Number (10 Digits) *</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  maxLength={10}
+                  placeholder="e.g. 9876543210"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
               <div className="form-group full-width">
                 <label htmlFor="address">Address (House No, Building, Street) *</label>
-                <input type="text" id="address" name="address" value={formData.address} onChange={handleInputChange} required />
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  autoComplete="street-address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="city">City *</label>
-                <input type="text" id="city" name="city" value={formData.city} onChange={handleInputChange} required />
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  autoComplete="address-level2"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
               <div className="form-group">
                 <label htmlFor="state">Shipping Zone *</label>
-                <select id="state" name="state" value={formData.state} onChange={handleInputChange} required>
+                <select
+                  id="state"
+                  name="state"
+                  autoComplete="address-level1"
+                  value={formData.state}
+                  onChange={handleInputChange}
+                  required
+                >
                   <option value="">Select Zone</option>
                   <option value="Delhi NCR">Zone A - Delhi NCR {finalDiscountedCartTotal >= 999 ? '(Free)' : '(₹79)'}</option>
                   <option value="Rest of India">Zone B - Rest of India {finalDiscountedCartTotal >= 999 ? '(Free)' : '(₹119)'}</option>
@@ -298,7 +364,19 @@ export default function CheckoutPage() {
               </div>
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>
                 <label htmlFor="pincode">Pincode *</label>
-                <input type="text" id="pincode" name="pincode" value={formData.pincode} onChange={handleInputChange} required />
+                <input
+                  type="text"
+                  id="pincode"
+                  name="pincode"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  autoComplete="postal-code"
+                  placeholder="6-digit pincode"
+                  value={formData.pincode}
+                  onChange={handleInputChange}
+                  required
+                />
               </div>
             </div>
           </div>

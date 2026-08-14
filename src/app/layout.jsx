@@ -21,11 +21,13 @@ const inter = Inter({
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
+  themeColor: "#4A1521",
 };
 
 export const metadata = {
   metadataBase: new URL("https://thebrajmadhuri.com"),
+  manifest: "/manifest.json",
   title: {
     default: "The Braj Madhuri - Devotional Essentials",
     template: "%s | The Braj Madhuri",
@@ -57,6 +59,7 @@ export const metadata = {
   },
   icons: {
     icon: "/Logo.jpeg",
+    apple: "/Logo.jpeg",
   },
   alternates: {
     canonical: "https://thebrajmadhuri.com",
@@ -124,7 +127,12 @@ export default async function RootLayout({ children }) {
         />
       </head>
       <body>
-        <Suspense fallback={null}>
+        <Suspense fallback={
+          <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#FDFBF7" }}>
+            <div style={{ width: "36px", height: "36px", border: "3px solid #E8C96B", borderTopColor: "#4A1521", borderRadius: "50%", animation: "bmSpin 0.8s linear infinite" }} />
+            <style>{`@keyframes bmSpin { to { transform: rotate(360deg); } }`}</style>
+          </div>
+        }>
           <ToastProvider>
             <SiteShell initialCategories={categories}>{children}</SiteShell>
           </ToastProvider>

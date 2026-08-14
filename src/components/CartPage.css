@@ -160,15 +160,20 @@
 .qty-btn {
   background: #fdfbf7;
   border: none;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
   cursor: pointer;
   color: #3d2410;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.qty-btn:active {
+  background: #eadaaf;
+  transform: scale(0.95);
 }
 
 .qty-btn:hover {
@@ -176,14 +181,14 @@
 }
 
 .qty-input {
-  width: 40px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border: none;
   border-left: 1px solid #d4c8b8;
   border-right: 1px solid #d4c8b8;
   text-align: center;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #2e1a0a;
   background: #fff;
@@ -203,7 +208,14 @@
   font-weight: 600;
   cursor: pointer;
   text-transform: uppercase;
-  padding: 8px 0;
+  padding: 10px 14px;
+  margin: -4px -8px;
+  border-radius: 4px;
+}
+
+.cart-remove-btn:active {
+  color: #c9972a;
+  background: rgb(201 151 42 / 10%);
 }
 
 .cart-remove-btn:hover {
@@ -294,6 +306,10 @@
   background: #c9972a;
   box-shadow: var(--shadow-glow);
   transform: translateY(-4px);
+}
+.place-order-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 16px rgb(74 21 33 / 30%);
 }
 
 .cart-savings-msg {
