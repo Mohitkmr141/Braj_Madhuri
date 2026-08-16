@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import "./SaleModalBanner.css";
 
@@ -88,10 +89,13 @@ export default function SaleModalBanner() {
         </button>
 
         <div className="sale-modal-image-wrap">
-          <img 
+          <Image 
             src={settings.saleBannerUrl} 
             alt={settings.saleTitle || "Special Sale"} 
             className="sale-modal-img"
+            width={800}
+            height={800}
+            style={{ width: "100%", height: "auto", maxHeight: "70vh", objectFit: "contain" }}
           />
         </div>
 

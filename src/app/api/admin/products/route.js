@@ -1,3 +1,4 @@
+import { verifyAdminToken } from '../../../../lib/auth.js';
 import { getPrisma } from '../../../../lib/prisma.js';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
@@ -18,7 +19,7 @@ function triggerRevalidation() {
 export async function GET() {
   const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
-  if (!session || session.value !== 'authenticated') {
+  if (!session || !(await verifyAdminToken(session.value))) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 
@@ -85,7 +86,7 @@ function sanitizeVariants(variants, basePrice, baseOriginalPrice) {
 export async function POST(request) {
   const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
-  if (!session || session.value !== 'authenticated') {
+  if (!session || !(await verifyAdminToken(session.value))) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 
@@ -136,7 +137,7 @@ export async function POST(request) {
 export async function PUT(request) {
   const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
-  if (!session || session.value !== 'authenticated') {
+  if (!session || !(await verifyAdminToken(session.value))) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 
@@ -188,7 +189,7 @@ export async function PUT(request) {
 export async function DELETE(request) {
   const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
-  if (!session || session.value !== 'authenticated') {
+  if (!session || !(await verifyAdminToken(session.value))) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 

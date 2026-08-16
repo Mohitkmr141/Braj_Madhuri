@@ -1,3 +1,4 @@
+import { signAdminToken } from '../../../../lib/auth.js';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
@@ -14,7 +15,7 @@ export async function POST(request) {
     if (password === correctPassword) {
       // Set secure cookie
       const cookieStore = await cookies();
-      cookieStore.set('admin_session', 'authenticated', {
+      cookieStore.set('admin_session', await signAdminToken(), {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',

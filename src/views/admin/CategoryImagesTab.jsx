@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import imageCompression from 'browser-image-compression';
 import { ConfirmDialog } from './AdminModals';
 
+import Image from 'next/image';
+
 export default function CategoryImagesTab() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -131,7 +133,7 @@ export default function CategoryImagesTab() {
             <div key={cat.id} className="cat-image-card">
               <div className="cat-image-preview">
                 {cat.thumbnailUrl ? (
-                  <img src={cat.thumbnailUrl} alt={cat.title} className="thumbnail" />
+                  <Image src={cat.thumbnailUrl} alt={cat.title} className="thumbnail" width={150} height={150} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
                 ) : (
                   <div className="placeholder-thumbnail">No Thumbnail</div>
                 )}

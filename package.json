@@ -15,6 +15,7 @@
     "@supabase/supabase-js": "^2.110.3",
     "bcryptjs": "^3.0.3",
     "browser-image-compression": "^2.0.2",
+    "jose": "^6.2.9",
     "next": "^16.2.10",
     "next-auth": "^4.24.14",
     "nodemailer": "^9.0.3",
@@ -22,6 +23,7 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-hot-toast": "^2.6.0",
+    "typescript": "^7.0.2",
     "uuid": "^14.0.1"
   },
   "devDependencies": {
@@ -30,8 +32,7 @@
     "eslint-config-next": "^16.2.10",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.4.0",
-    "prisma": "^5.22.0",
-    "typescript": "^5.7.2"
+    "prisma": "^5.22.0"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

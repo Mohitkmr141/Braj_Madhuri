@@ -1,3 +1,4 @@
+import { verifyAdminToken } from '../../../../lib/auth.js';
 import { NextResponse } from 'next/server';
 import { getPrisma } from '../../../../lib/prisma.js';
 import { cookies } from 'next/headers';
@@ -7,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request) {
   const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
-  if (!session || session.value !== 'authenticated') {
+  if (!session || !(await verifyAdminToken(session.value))) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 
@@ -37,7 +38,7 @@ export async function GET(request) {
 export async function PUT(request) {
   const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
-  if (!session || session.value !== 'authenticated') {
+  if (!session || !(await verifyAdminToken(session.value))) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 

@@ -1,3 +1,4 @@
+import { verifyAdminToken } from '../../../../lib/auth.js';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import nodemailer from 'nodemailer';
@@ -5,7 +6,7 @@ import nodemailer from 'nodemailer';
 export async function GET(request) {
   const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
-  if (!session || session.value !== 'authenticated') {
+  if (!session || !(await verifyAdminToken(session.value))) {
     return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
   }
 
