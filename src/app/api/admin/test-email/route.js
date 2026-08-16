@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import nodemailer from 'nodemailer';
 
 export async function GET(request) {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('admin_session');
+  if (!session || session.value !== 'authenticated') {
+    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  }
+
   try {
     const rawUser = process.env.EMAIL_USER;
     const rawPass = process.env.EMAIL_PASS;
@@ -51,10 +58,10 @@ export async function GET(request) {
     });
 
   } catch (error) {
+    console.error('Test email error:', error);
     return NextResponse.json({
       success: false,
-      error: error.message,
-      stack: error.stack
+      error: error.message || 'Failed to send test email'
     }, { status: 500 });
   }
 }

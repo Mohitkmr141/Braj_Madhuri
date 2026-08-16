@@ -16,10 +16,12 @@ export async function POST(request) {
 
     // Filter to find the cheapest rate or default to 0 if none found
     let minRate = null;
-    if (rates.available_courier_companies && rates.available_courier_companies.length > 0) {
-      minRate = Math.min(
-        ...rates.available_courier_companies.map((c) => c.rate)
-      );
+    const couriers = rates?.available_courier_companies;
+    if (Array.isArray(couriers) && couriers.length > 0) {
+      const validRates = couriers.map((c) => Number(c.rate)).filter((r) => !isNaN(r) && r >= 0);
+      if (validRates.length > 0) {
+        minRate = Math.min(...validRates);
+      }
     }
 
     return NextResponse.json({

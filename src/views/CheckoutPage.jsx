@@ -14,6 +14,15 @@ const formatCurrency = (value) =>
     style: "currency",
   }).format(value);
 
+const INDIAN_STATES = [
+  "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar",
+  "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Goa",
+  "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand", "Karnataka",
+  "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya",
+  "Mizoram", "Nagaland", "Odisha", "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
+  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+];
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { cartItems, cartCount, cartTotal, emptyCart } = useCart();
@@ -30,7 +39,6 @@ export default function CheckoutPage() {
   });
   
   const [paymentMethod] = useState("online");
-  const [shippingCost, setShippingCost] = useState(0);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -61,6 +69,16 @@ export default function CheckoutPage() {
   const specialSaleDiscount = globalSettings?.isSaleActive ? Math.round(cartTotal * (globalSettings.saleDiscountPercentage / 100)) : 0;
   const totalDiscount = baseDiscount + specialSaleDiscount;
   const finalDiscountedCartTotal = cartTotal - specialSaleDiscount;
+
+  // Derive shipping cost synchronously — no extra render cycle
+  const shippingCost = useMemo(() => {
+    if (finalDiscountedCartTotal >= 999) return 0;
+    const { state } = formData;
+    if (state === "Delhi" || state === "Delhi NCR") return 79;
+    if (state) return 119;
+    return 0;
+  }, [formData.state, finalDiscountedCartTotal]);
+
   const finalTotalAmount = finalDiscountedCartTotal + shippingCost;
 
   const handleInputChange = (e) => {
@@ -68,27 +86,18 @@ export default function CheckoutPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Calculate shipping cost dynamically based on selected zone
-  React.useEffect(() => {
-    if (finalDiscountedCartTotal >= 999) {
-      setShippingCost(0);
-      return;
-    }
-    const { state } = formData;
-    if (state === "Delhi NCR") {
-      setShippingCost(79); // Zone A
-    } else if (state === "Rest of India") {
-      setShippingCost(119); // Zone B
-    } else {
-      setShippingCost(0);
-    }
-  }, [formData.state, finalDiscountedCartTotal]);
-
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
-      // Prevent multiple script injections
-      if (document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
+      // If already loaded and available, resolve immediately
+      if (typeof window !== 'undefined' && window.Razorpay) {
         resolve(true);
+        return;
+      }
+      // If script tag exists but Razorpay not yet on window, wait for its load
+      const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+      if (existing) {
+        existing.addEventListener('load', () => resolve(true));
+        existing.addEventListener('error', () => resolve(false));
         return;
       }
       const script = document.createElement("script");
@@ -349,7 +358,7 @@ export default function CheckoutPage() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="state">Shipping Zone *</label>
+                <label htmlFor="state">State *</label>
                 <select
                   id="state"
                   name="state"
@@ -358,9 +367,12 @@ export default function CheckoutPage() {
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="">Select Zone</option>
-                  <option value="Delhi NCR">Zone A - Delhi NCR {finalDiscountedCartTotal >= 999 ? '(Free)' : '(₹79)'}</option>
-                  <option value="Rest of India">Zone B - Rest of India {finalDiscountedCartTotal >= 999 ? '(Free)' : '(₹119)'}</option>
+                  <option value="">Select State / UT</option>
+                  {INDIAN_STATES.map((st) => (
+                    <option key={st} value={st}>
+                      {st} {finalDiscountedCartTotal >= 999 ? '(Free Delivery)' : (st === 'Delhi' || st === 'Delhi NCR') ? '(₹79 Shipping)' : '(₹119 Shipping)'}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>

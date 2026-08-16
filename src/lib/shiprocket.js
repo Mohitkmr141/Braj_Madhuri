@@ -1,9 +1,16 @@
 export const SHIPROCKET_BASE_URL = "https://apiv2.shiprocket.in/v1/external";
 
+let _cachedToken = null;
+let _tokenExpiresAt = 0;
+
 /**
- * Authenticates with Shiprocket and retrieves a secure session token.
+ * Authenticates with Shiprocket and retrieves a secure session token with caching.
  */
 export async function getShiprocketToken() {
+  const now = Date.now();
+  if (_cachedToken && now < _tokenExpiresAt) {
+    return _cachedToken;
+  }
 
   const email = process.env.SHIPROCKET_EMAIL;
   const password = process.env.SHIPROCKET_PASSWORD;
@@ -21,12 +28,21 @@ export async function getShiprocketToken() {
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`Failed to authenticate with Shiprocket: ${errorData.message || response.statusText}`);
+    let errorMessage = response.statusText;
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.message || response.statusText;
+    } catch {
+      // ignore
+    }
+    throw new Error(`Failed to authenticate with Shiprocket: ${errorMessage}`);
   }
 
   const data = await response.json();
-  return data.token;
+  _cachedToken = data.token;
+  // Cache for 9 days (Shiprocket tokens expire in 10 days)
+  _tokenExpiresAt = now + (9 * 24 * 60 * 60 * 1000);
+  return _cachedToken;
 }
 
 /**
@@ -48,6 +64,11 @@ async function shiprocketRequest(endpoint, method = "GET", body = null) {
   const response = await fetch(`${SHIPROCKET_BASE_URL}${endpoint}`, options);
   
   if (!response.ok) {
+    // Clear cached token on 401 so the next call re-authenticates
+    if (response.status === 401) {
+      _cachedToken = null;
+      _tokenExpiresAt = 0;
+    }
     let errorMessage = response.statusText;
     try {
       const errorData = await response.json();
@@ -75,15 +96,29 @@ export async function calculateShipping(deliveryPincode, weight = 0.5, cod = 0) 
  * Maps your website's order data and sends it to Shiprocket API.
  */
 export async function createShiprocketOrder(order) {
-  const orderItems = order.cartItems.map((item) => ({
-    name: item.title,
-    sku: item.id || "SKU-UNKNOWN",
-    units: item.quantity || 1,
-    selling_price: item.price,
+  let items = [];
+  try {
+    items = typeof order.cartItems === 'string' ? JSON.parse(order.cartItems) : (order.cartItems || []);
+  } catch (e) {
+    items = [];
+  }
+  if (!Array.isArray(items)) items = [];
+
+  const orderItems = items.map((item) => ({
+    name: (item.title || "Product").slice(0, 100),
+    sku: (item.id || "SKU-UNKNOWN").slice(0, 50),
+    units: parseInt(item.quantity, 10) || 1,
+    selling_price: parseFloat(item.price) || 0,
     discount: 0,
     tax: 0,
     hsn: "",
   }));
+
+  let resolvedState = (order.state || "Delhi").trim();
+  if (resolvedState === "Delhi NCR") resolvedState = "Delhi";
+  else if (resolvedState === "Rest of India") resolvedState = "Delhi";
+
+  const subTotal = orderItems.reduce((acc, it) => acc + (it.selling_price * it.units), 0);
 
   const shiprocketOrderData = {
     order_id: order.orderNumber,
@@ -94,8 +129,7 @@ export async function createShiprocketOrder(order) {
     billing_address: order.address || "No Address Provided",
     billing_city: order.city || "Unknown",
     billing_pincode: order.pincode || "110001",
-    // Map zone names to valid Indian state names required by Shiprocket
-    billing_state: order.state === "Delhi NCR" ? "Delhi" : (order.state === "Rest of India" ? "Uttar Pradesh" : (order.state || "Uttar Pradesh")),
+    billing_state: resolvedState,
     billing_country: "India",
     billing_email: order.email || "no-reply@thebrajmadhuri.com",
     billing_phone: (() => {
@@ -110,7 +144,7 @@ export async function createShiprocketOrder(order) {
     giftwrap_charges: 0,
     transaction_charges: 0,
     total_discount: 0,
-    sub_total: order.totalAmount,
+    sub_total: subTotal || order.totalAmount,
     length: 10,
     breadth: 10,
     height: 10,

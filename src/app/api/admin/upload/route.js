@@ -19,7 +19,22 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'No file provided' }, { status: 400 });
     }
 
-    const fileExt = file.name.split('.').pop();
+    const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ success: false, error: 'File size exceeds 5MB limit.' }, { status: 400 });
+    }
+
+    const fileExt = (file.name.split('.').pop() || '').toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(fileExt) || !ALLOWED_MIME_TYPES.includes(file.type)) {
+      return NextResponse.json({
+        success: false,
+        error: 'Invalid file type. Only JPG, PNG, and WebP images are allowed.'
+      }, { status: 400 });
+    }
+
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
     const filePath = `product-images/${fileName}`;
 

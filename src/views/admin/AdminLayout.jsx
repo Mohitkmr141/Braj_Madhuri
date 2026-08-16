@@ -12,9 +12,21 @@ import SettingsTab from './SettingsTab';
 
 export default function AdminLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('orders');
+
+  React.useEffect(() => {
+    fetch('/api/admin/products')
+      .then((res) => {
+        if (res.ok) {
+          setIsAuthenticated(true);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setIsCheckingAuth(false));
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -41,6 +53,14 @@ export default function AdminLayout() {
     setIsAuthenticated(false);
     setPassword('');
   };
+
+  if (isCheckingAuth) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--admin-bg)' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '15px' }}>Loading Admin Workspace...</p>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (

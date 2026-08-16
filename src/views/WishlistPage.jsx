@@ -20,7 +20,7 @@ export default function WishlistPage() {
 
   const handleMoveToCart = (item) => {
     addToCart(item);
-    removeFromWishlist(item.id, item.size);
+    removeFromWishlist(item.id, item.size, item.color);
   };
 
   if (wishlistItems.length === 0) {
@@ -51,18 +51,18 @@ export default function WishlistPage() {
 
       <div className="wishlist-grid">
         {wishlistItems.map((item, idx) => (
-          <div key={`${item.id}-${item.size}-${idx}`} className="wishlist-card">
+          <div key={`${item.id}-${item.size || ''}-${item.color || ''}-${idx}`} className="wishlist-card">
             <button
               className="wishlist-remove-btn"
-              onClick={() => removeFromWishlist(item.id, item.size)}
+              onClick={() => removeFromWishlist(item.id, item.size, item.color)}
               aria-label="Remove from wishlist"
             >
               &times;
             </button>
             <div className="wishlist-img-box">
               <Image
-                src={item.image}
-                alt={item.title}
+                src={item.image || "/header-banner.jpg"}
+                alt={item.title || "Product"}
                 fill
                 sizes="(max-width: 600px) 100vw, 300px"
                 style={{ objectFit: "cover" }}

@@ -16,8 +16,20 @@ export async function POST(request) {
     const prisma = getPrisma();
     let calculatedCartTotal = 0;
 
+    const COMBO_MAP = {
+      'combo-daily-pooja-pack': { title: 'Daily Pooja Pack', price: 399 },
+      'combo-japa-essentials': { title: 'Japa Essentials', price: 599 },
+      'combo-thakur-ji-seva': { title: 'Thakur Ji Seva', price: 799 },
+    };
+
     // 1. Validate items and pre-check stock from database
     for (const item of cartItems) {
+      if (item.id && (item.id.startsWith('combo-') || COMBO_MAP[item.id])) {
+        const comboInfo = COMBO_MAP[item.id] || { price: item.price || 399 };
+        calculatedCartTotal += (comboInfo.price || item.price || 0) * item.quantity;
+        continue;
+      }
+
       const product = await prisma.product.findUnique({ where: { id: item.id } });
       if (!product) {
         return NextResponse.json(
@@ -26,7 +38,9 @@ export async function POST(request) {
         );
       }
 
-      // Check variant stock if applicable
+      let itemPrice = product.price || 0;
+
+      // Check variant stock and pricing if applicable
       if (item.size || item.color) {
         const variants = Array.isArray(product.variants) ? product.variants : [];
         const matchedVariant = variants.find(v => {
@@ -48,6 +62,10 @@ export async function POST(request) {
               { status: 400 }
             );
           }
+          if (matchedVariant.price !== undefined && matchedVariant.price !== null && matchedVariant.price !== '') {
+            const vp = parseFloat(matchedVariant.price);
+            if (!isNaN(vp)) itemPrice = vp;
+          }
         } else if (product.stock < item.quantity) {
           return NextResponse.json(
             { success: false, error: `Insufficient stock for "${item.title}". Only ${product.stock} left.` },
@@ -61,7 +79,7 @@ export async function POST(request) {
         );
       }
 
-      calculatedCartTotal += (product.price || 0) * item.quantity;
+      calculatedCartTotal += itemPrice * item.quantity;
     }
 
     // 2. Fetch site settings for discounts
@@ -75,12 +93,13 @@ export async function POST(request) {
     const finalDiscountedTotal = Math.max(0, calculatedCartTotal - specialSaleDiscount);
 
     // 3. Calculate shipping cost
-    const customerState = formData?.state || state;
+    const customerState = (formData?.state || state || '').trim();
     let shippingCost = 0;
     if (finalDiscountedTotal < 999) {
-      if (customerState === "Delhi NCR") {
+      if (customerState.toLowerCase() === "delhi" || customerState.toLowerCase() === "delhi ncr") {
         shippingCost = 79;
-      } else if (customerState === "Rest of India") {
+      } else {
+        // Default to standard shipping rate (covers missing state from direct API calls)
         shippingCost = 119;
       }
     }

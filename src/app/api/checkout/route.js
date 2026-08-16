@@ -25,28 +25,45 @@ export async function POST(request) {
       );
     }
 
+    // ── Enforce supported payment method ─────────────────────────────────────
+    if (paymentMethod !== 'online') {
+      return NextResponse.json(
+        { success: false, error: 'Invalid payment method. Only online payments are accepted.' },
+        { status: 400 }
+      );
+    }
+
     // ── Verify Razorpay signature ─────────────────────────────────────────────
-    if (paymentMethod === 'online') {
-      if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
-        return NextResponse.json(
-          { success: false, error: 'Missing Razorpay payment details' },
-          { status: 400 }
-        );
-      }
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      return NextResponse.json(
+        { success: false, error: 'Missing Razorpay payment details' },
+        { status: 400 }
+      );
+    }
 
-      const bodyToSign = `${razorpay_order_id}|${razorpay_payment_id}`;
-      const expectedSignature = crypto
-        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-        .update(bodyToSign)
-        .digest('hex');
+    if (!process.env.RAZORPAY_KEY_SECRET) {
+      console.error('[Checkout] RAZORPAY_KEY_SECRET is not configured on the server.');
+      return NextResponse.json(
+        { success: false, error: 'Server configuration error' },
+        { status: 500 }
+      );
+    }
 
-      if (expectedSignature !== razorpay_signature) {
-        console.error('[Checkout] Signature mismatch — possible tampered request');
-        return NextResponse.json(
-          { success: false, error: 'Payment verification failed. Please contact support.' },
-          { status: 400 }
-        );
-      }
+    const bodyToSign = `${razorpay_order_id}|${razorpay_payment_id}`;
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(bodyToSign)
+      .digest('hex');
+
+    const expectedBuf = Buffer.from(expectedSignature, 'utf8');
+    const receivedBuf = Buffer.from(razorpay_signature, 'utf8');
+
+    if (expectedBuf.length !== receivedBuf.length || !crypto.timingSafeEqual(expectedBuf, receivedBuf)) {
+      console.error('[Checkout] Signature mismatch — possible tampered request');
+      return NextResponse.json(
+        { success: false, error: 'Payment verification failed. Please contact support.' },
+        { status: 400 }
+      );
     }
 
     // ── Finalize paid order idempotently ──────────────────────────────────────

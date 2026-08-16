@@ -178,20 +178,30 @@ export default function SiteShell({ children, initialCategories }) {
     };
   }, [pathname]);
 
+  const isAdminRoute = pathname?.startsWith('/admin');
+
   return (
     <SessionProvider>
       <ProductsProvider initialCategories={initialCategories}>
         <CartProvider value={contextValue}>
           <WishlistProvider value={wishlistContextValue}>
-            <p className="visually-hidden" aria-live="polite">
-              {cartAnnouncement}
-            </p>
-            <Header cartCount={cartCount} cartTotal={cartTotal} wishlistCount={wishlistCount} />
+            {!isAdminRoute && (
+              <>
+                <p className="visually-hidden" aria-live="polite">
+                  {cartAnnouncement}
+                </p>
+                <Header cartCount={cartCount} cartTotal={cartTotal} wishlistCount={wishlistCount} />
+              </>
+            )}
             {children}
-            <Footer />
-            <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
-            <FloatingWhatsApp />
-            <SaleModalBanner />
+            {!isAdminRoute && (
+              <>
+                <Footer />
+                <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
+                <FloatingWhatsApp />
+                <SaleModalBanner />
+              </>
+            )}
           </WishlistProvider>
         </CartProvider>
       </ProductsProvider>

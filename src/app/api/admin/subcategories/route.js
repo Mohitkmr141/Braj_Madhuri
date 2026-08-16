@@ -1,6 +1,19 @@
 import { NextResponse } from 'next/server';
 import { getPrisma } from '../../../../lib/prisma.js';
 import { cookies } from 'next/headers';
+import { revalidateTag, revalidatePath } from 'next/cache';
+
+export const dynamic = 'force-dynamic';
+
+function triggerRevalidation() {
+  try {
+    revalidateTag('categories');
+    revalidatePath('/shop');
+    revalidatePath('/api/products');
+  } catch (e) {
+    // ignore in non-cached environments
+  }
+}
 
 export async function POST(request) {
   const cookieStore = await cookies();
@@ -26,6 +39,7 @@ export async function POST(request) {
       }
     });
 
+    triggerRevalidation();
     return NextResponse.json({ success: true, subcategory }, { status: 201 });
   } catch (error) {
     console.error('Error creating subcategory:', error);
@@ -53,9 +67,13 @@ export async function DELETE(request) {
       where: { id }
     });
 
+    triggerRevalidation();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting subcategory:', error);
+    if (error.code === 'P2025') {
+      return NextResponse.json({ success: false, error: 'Subcategory not found' }, { status: 404 });
+    }
     return NextResponse.json(
       { success: false, error: 'Failed to delete subcategory' },
       { status: 500 }
@@ -88,9 +106,13 @@ export async function PUT(request) {
       }
     });
 
+    triggerRevalidation();
     return NextResponse.json({ success: true, subcategory }, { status: 200 });
   } catch (error) {
     console.error('Error updating subcategory:', error);
+    if (error.code === 'P2025') {
+      return NextResponse.json({ success: false, error: 'Subcategory not found' }, { status: 404 });
+    }
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

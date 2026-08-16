@@ -23,6 +23,7 @@ async function decrementStockForItems(tx, cartItems) {
       if ((item.size || item.color) && updatedVariants.length > 0) {
         let variantMatched = false;
         updatedVariants = updatedVariants.map((v) => {
+          if (variantMatched) return v;
           const vS = (v.size || '').trim().toLowerCase();
           const vC = (v.color || '').trim().toLowerCase();
           const iS = (item.size || '').trim().toLowerCase();
@@ -96,6 +97,7 @@ export async function finalizePaidOrder({
   }
 
   let finalizedOrder = null;
+  let isNewOrUpdated = false;
 
   if (existingOrder) {
     // 3A. Transition existing 'Payment_Pending' order to 'Pending'
@@ -106,9 +108,11 @@ export async function finalizePaidOrder({
         return current;
       }
 
+      isNewOrUpdated = true;
+
       let items = [];
       try {
-        items = typeof current.cartItems === 'string' ? JSON.parse(current.cartItems) : current.cartItems;
+        items = typeof current.cartItems === 'string' ? JSON.parse(current.cartItems) : (current.cartItems || []);
       } catch (e) {
         items = [];
       }
@@ -159,36 +163,39 @@ export async function finalizePaidOrder({
 
       return created;
     });
+    isNewOrUpdated = true;
   } else {
     throw new Error(`Cannot finalize order: No order found for Razorpay Order ID ${razorpayOrderId} and no fallback data provided.`);
   }
 
   console.log(`[OrderService] Order ${finalizedOrder.orderNumber} successfully finalized with status: ${finalizedOrder.status}`);
 
-  // 4. Background tasks: Trigger Email & Shiprocket if not already done
-  Promise.allSettled([
-    sendOrderEmail(finalizedOrder).then((emailResult) => {
-      if (!emailResult.success && !emailResult.skipped) {
-        console.error(`[OrderService] Email delivery issue for order ${finalizedOrder.orderNumber}:`, emailResult);
-      }
-    }).catch((err) => {
-      console.error(`[OrderService] Email error for order ${finalizedOrder.orderNumber}:`, err.message);
-    }),
+  // 4. Background tasks: Trigger Email & Shiprocket if updated in this call
+  if (isNewOrUpdated && finalizedOrder.status === 'Pending') {
+    await Promise.allSettled([
+      sendOrderEmail(finalizedOrder).then((emailResult) => {
+        if (!emailResult.success && !emailResult.skipped) {
+          console.error(`[OrderService] Email delivery issue for order ${finalizedOrder.orderNumber}:`, emailResult);
+        }
+      }).catch((err) => {
+        console.error(`[OrderService] Email error for order ${finalizedOrder.orderNumber}:`, err.message);
+      }),
 
-    createShiprocketOrder(finalizedOrder).then(async (srResult) => {
-      if (srResult?.order_id) {
-        await prisma.order.update({
-          where: { id: finalizedOrder.id },
-          data: {
-            shiprocketOrderId: srResult.order_id,
-            shiprocketShipmentId: srResult.shipment_id,
-          },
-        }).catch((err) => console.error('[OrderService] Failed to update Shiprocket IDs:', err.message));
-      }
-    }).catch((err) => {
-      console.error('[OrderService] Shiprocket order creation error:', err.message);
-    }),
-  ]);
+      createShiprocketOrder(finalizedOrder).then(async (srResult) => {
+        if (srResult?.order_id) {
+          await prisma.order.update({
+            where: { id: finalizedOrder.id },
+            data: {
+              shiprocketOrderId: srResult.order_id,
+              shiprocketShipmentId: srResult.shipment_id,
+            },
+          }).catch((err) => console.error('[OrderService] Failed to update Shiprocket IDs:', err.message));
+        }
+      }).catch((err) => {
+        console.error('[OrderService] Shiprocket order creation error:', err.message);
+      }),
+    ]);
+  }
 
-  return { success: true, order: finalizedOrder, isNewOrUpdated: true };
+  return { success: true, order: finalizedOrder, isNewOrUpdated };
 }

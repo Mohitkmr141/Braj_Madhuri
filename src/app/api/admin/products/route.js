@@ -1,10 +1,19 @@
 import { getPrisma } from '../../../../lib/prisma.js';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { revalidateTag, revalidatePath } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 
-
+function triggerRevalidation() {
+  try {
+    revalidateTag('categories');
+    revalidatePath('/shop');
+    revalidatePath('/api/products');
+  } catch (e) {
+    // ignore in non-cached environments
+  }
+}
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -58,25 +67,17 @@ function sanitizeVariants(variants, basePrice, baseOriginalPrice) {
   const parsedBaseOrig = parseFloat(baseOriginalPrice);
 
   return variants.map((v, i) => {
-    let p = (v.price !== undefined && v.price !== '' && v.price !== null) ? parseFloat(v.price) : null;
-    let op = (v.originalPrice !== undefined && v.originalPrice !== '' && v.originalPrice !== null) ? parseFloat(v.originalPrice) : null;
-
-    // Normalize prices matching base price to null for dynamic inheritance
-    if (!isNaN(parsedBase) && p === parsedBase) {
-      p = null;
-    }
-    if (!isNaN(parsedBaseOrig) && op === parsedBaseOrig) {
-      op = null;
-    }
+    const varPrice = v.price !== undefined && v.price !== null && v.price !== '' ? parseFloat(v.price) : parsedBase;
+    const varOrigPrice = v.originalPrice !== undefined && v.originalPrice !== null && v.originalPrice !== '' ? parseFloat(v.originalPrice) : (parsedBaseOrig || varPrice);
+    const varStock = v.stock !== undefined && v.stock !== null && v.stock !== '' ? parseInt(v.stock, 10) : 0;
 
     return {
-      id: v.id || `${Date.now()}-${i}`,
-      size: v.size ? String(v.size).trim() : '',
-      color: v.color ? String(v.color).trim() : '',
-      price: p,
-      originalPrice: op,
-      stock: parseInt(v.stock, 10) || 0,
-      image: v.image ? String(v.image).trim() : '',
+      id: v.id || `var-${Date.now()}-${i}`,
+      size: v.size ? String(v.size).trim() : null,
+      color: v.color ? String(v.color).trim() : null,
+      price: isNaN(varPrice) ? 0 : varPrice,
+      originalPrice: isNaN(varOrigPrice) ? 0 : varOrigPrice,
+      stock: isNaN(varStock) ? 0 : varStock,
     };
   });
 }
@@ -97,17 +98,21 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Title and Category are required' }, { status: 400 });
     }
 
+    const price = isNaN(parseFloat(data.price)) ? 0 : parseFloat(data.price);
+    const originalPrice = isNaN(parseFloat(data.originalPrice)) ? price : parseFloat(data.originalPrice);
+    const stock = isNaN(parseInt(data.stock, 10)) ? 0 : parseInt(data.stock, 10);
+
     const newProduct = await prisma.product.create({
       data: {
         title: data.title,
         categoryId: data.categoryId,
         subcategoryId: data.subcategoryId || null,
-        price: parseFloat(data.price) || 0,
-        originalPrice: parseFloat(data.originalPrice) || parseFloat(data.price) || 0,
-        stock: parseInt(data.stock, 10) || 0,
+        price: price,
+        originalPrice: originalPrice,
+        stock: stock,
         colors: sanitizeColors(data.colors),
         images: Array.isArray(data.images) ? data.images : [],
-        variants: sanitizeVariants(data.variants, data.price, data.originalPrice),
+        variants: sanitizeVariants(data.variants, price, originalPrice),
         imageUrl: data.imageUrl || null,
         description: data.description || null,
         size: data.size || null,
@@ -117,6 +122,7 @@ export async function POST(request) {
       }
     });
 
+    triggerRevalidation();
     return NextResponse.json({ success: true, product: newProduct });
   } catch (error) {
     console.error('Error creating product:', error);
@@ -142,18 +148,22 @@ export async function PUT(request) {
       return NextResponse.json({ success: false, error: 'Product ID is required' }, { status: 400 });
     }
 
+    const price = isNaN(parseFloat(data.price)) ? 0 : parseFloat(data.price);
+    const originalPrice = isNaN(parseFloat(data.originalPrice)) ? price : parseFloat(data.originalPrice);
+    const stock = isNaN(parseInt(data.stock, 10)) ? 0 : parseInt(data.stock, 10);
+
     const updatedProduct = await prisma.product.update({
       where: { id: data.id },
       data: {
         title: data.title,
         categoryId: data.categoryId,
         subcategoryId: data.subcategoryId || null,
-        price: parseFloat(data.price),
-        originalPrice: parseFloat(data.originalPrice) || parseFloat(data.price),
-        stock: parseInt(data.stock, 10),
+        price: price,
+        originalPrice: originalPrice,
+        stock: stock,
         colors: sanitizeColors(data.colors),
         images: Array.isArray(data.images) ? data.images : [],
-        variants: sanitizeVariants(data.variants, data.price, data.originalPrice),
+        variants: sanitizeVariants(data.variants, price, originalPrice),
         imageUrl: data.imageUrl || null,
         description: data.description || null,
         size: data.size || null,
@@ -161,9 +171,13 @@ export async function PUT(request) {
       }
     });
 
+    triggerRevalidation();
     return NextResponse.json({ success: true, product: updatedProduct });
   } catch (error) {
     console.error('Error updating product:', error);
+    if (error.code === 'P2025') {
+      return NextResponse.json({ success: false, error: 'Product not found' }, { status: 404 });
+    }
     return NextResponse.json(
       { success: false, error: 'Failed to update product' },
       { status: 500 }
@@ -194,6 +208,7 @@ export async function DELETE(request) {
       }
     });
 
+    triggerRevalidation();
     return NextResponse.json({ success: true, message: `Successfully deleted ${result.count} products.` });
   } catch (error) {
     console.error('Error deleting products:', error);

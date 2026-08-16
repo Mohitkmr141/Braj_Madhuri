@@ -50,6 +50,16 @@ async function withRetry(fn, maxAttempts = 3, delayMs = 1000) {
   throw lastError;
 }
 
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // ─── Build HTML helpers for Orders ───────────────────────────────────────────
 function buildItemsHtml(order) {
   let items = [];
@@ -70,34 +80,40 @@ function buildItemsHtml(order) {
     .map(
       (item) =>
         `<li style="margin-bottom:6px;">
-          <strong>${item.quantity || 1}x ${item.title || "Product"}</strong>
-          ${item.size ? `<span style="color:#888;"> (Size: ${item.size})</span>` : ""}
-          ${item.color ? `<span style="color:#888;"> [${item.color}]</span>` : ""}
-          — ₹${item.price || 0}
+          <strong>${Number(item.quantity) || 1}x ${escapeHtml(item.title || "Product")}</strong>
+          ${item.size ? `<span style="color:#888;"> (Size: ${escapeHtml(item.size)})</span>` : ""}
+          ${item.color ? `<span style="color:#888;"> [${escapeHtml(item.color)}]</span>` : ""}
+          — ₹${Number(item.price) || 0}
         </li>`
     )
     .join("");
 }
 
 function buildAdminHtml(order, itemsHtml) {
+  const safeOrderNumber = escapeHtml(order.orderNumber);
+  const safeCustomerName = escapeHtml(order.customerName);
+  const safeEmail = escapeHtml(order.email || "—");
+  const safePhone = escapeHtml(order.phone);
+  const safeAddress = `${escapeHtml(order.address)}, ${escapeHtml(order.city)}, ${escapeHtml(order.state)} — ${escapeHtml(order.pincode)}`;
+
   return `
     <div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:10px;">
       <h2 style="color:#4A1521;margin-top:0;">🎉 New Order Received!</h2>
       <p style="color:#555;">A new order has been placed on <strong>The Braj Madhuri</strong>.</p>
 
       <table style="width:100%;border-collapse:collapse;margin:16px 0;">
-        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;width:40%;border-radius:4px;">Order ID</td><td style="padding:8px;">${order.orderNumber}</td></tr>
-        <tr><td style="padding:8px;font-weight:bold;">Total Amount</td><td style="padding:8px;">₹${order.totalAmount}</td></tr>
-        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;">Shipping Cost</td><td style="padding:8px;">₹${order.shippingCost || 0}</td></tr>
+        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;width:40%;border-radius:4px;">Order ID</td><td style="padding:8px;">${safeOrderNumber}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold;">Total Amount</td><td style="padding:8px;">₹${Number(order.totalAmount) || 0}</td></tr>
+        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;">Shipping Cost</td><td style="padding:8px;">₹${Number(order.shippingCost) || 0}</td></tr>
         <tr><td style="padding:8px;font-weight:bold;">Payment</td><td style="padding:8px;">Online (Razorpay)</td></tr>
       </table>
 
       <h3 style="color:#C9972A;">Customer Details</h3>
       <table style="width:100%;border-collapse:collapse;margin:8px 0;">
-        <tr><td style="padding:6px;font-weight:bold;width:40%;">Name</td><td style="padding:6px;">${order.customerName}</td></tr>
-        <tr><td style="padding:6px;background:#fdf8f0;font-weight:bold;">Email</td><td style="padding:6px;background:#fdf8f0;">${order.email || "—"}</td></tr>
-        <tr><td style="padding:6px;font-weight:bold;">Phone</td><td style="padding:6px;">${order.phone}</td></tr>
-        <tr><td style="padding:6px;background:#fdf8f0;font-weight:bold;">Address</td><td style="padding:6px;background:#fdf8f0;">${order.address}, ${order.city}, ${order.state} — ${order.pincode}</td></tr>
+        <tr><td style="padding:6px;font-weight:bold;width:40%;">Name</td><td style="padding:6px;">${safeCustomerName}</td></tr>
+        <tr><td style="padding:6px;background:#fdf8f0;font-weight:bold;">Email</td><td style="padding:6px;background:#fdf8f0;">${safeEmail}</td></tr>
+        <tr><td style="padding:6px;font-weight:bold;">Phone</td><td style="padding:6px;">${safePhone}</td></tr>
+        <tr><td style="padding:6px;background:#fdf8f0;font-weight:bold;">Address</td><td style="padding:6px;background:#fdf8f0;">${safeAddress}</td></tr>
       </table>
 
       <h3 style="color:#C9972A;">Items Ordered</h3>
@@ -109,16 +125,20 @@ function buildAdminHtml(order, itemsHtml) {
 }
 
 function buildCustomerHtml(order, itemsHtml) {
+  const safeOrderNumber = escapeHtml(order.orderNumber);
+  const safeCustomerName = escapeHtml(order.customerName);
+  const safeAddress = `${escapeHtml(order.address)}, ${escapeHtml(order.city)}, ${escapeHtml(order.state)} — ${escapeHtml(order.pincode)}`;
+
   return `
     <div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:10px;">
       <h2 style="color:#4A1521;margin-top:0;">🪷 Thank you for your order!</h2>
-      <p style="color:#555;">Dear <strong>${order.customerName}</strong>,</p>
+      <p style="color:#555;">Dear <strong>${safeCustomerName}</strong>,</p>
       <p style="color:#555;">Your order has been placed successfully and is being processed. Here's a summary:</p>
 
       <table style="width:100%;border-collapse:collapse;margin:16px 0;">
-        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;width:40%;border-radius:4px;">Order ID</td><td style="padding:8px;font-weight:bold;color:#4A1521;">${order.orderNumber}</td></tr>
-        <tr><td style="padding:8px;font-weight:bold;">Total Amount</td><td style="padding:8px;">₹${order.totalAmount}</td></tr>
-        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;">Delivery To</td><td style="padding:8px;background:#fdf8f0;">${order.address}, ${order.city}, ${order.state} — ${order.pincode}</td></tr>
+        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;width:40%;border-radius:4px;">Order ID</td><td style="padding:8px;font-weight:bold;color:#4A1521;">${safeOrderNumber}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold;">Total Amount</td><td style="padding:8px;">₹${Number(order.totalAmount) || 0}</td></tr>
+        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;">Delivery To</td><td style="padding:8px;background:#fdf8f0;">${safeAddress}</td></tr>
       </table>
 
       <h3 style="color:#C9972A;">Items Ordered</h3>
@@ -133,35 +153,45 @@ function buildCustomerHtml(order, itemsHtml) {
 
 // ─── Build HTML helpers for Contact / Inquiries ──────────────────────────────
 function buildContactAdminHtml({ name, email, phone, subject, message }) {
+  const safeName = escapeHtml(name);
+  const safeEmail = escapeHtml(email);
+  const safePhone = escapeHtml(phone);
+  const safeSubject = escapeHtml(subject);
+  const safeMessage = escapeHtml(message);
+
   return `
     <div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:10px;">
       <h2 style="color:#4A1521;margin-top:0;">📩 New Website Inquiry</h2>
       <p style="color:#555;">A new message was submitted on <strong>The Braj Madhuri</strong> contact form.</p>
 
       <table style="width:100%;border-collapse:collapse;margin:16px 0;">
-        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;width:30%;border-radius:4px;">Sender Name</td><td style="padding:8px;">${name}</td></tr>
-        <tr><td style="padding:8px;font-weight:bold;">Email Address</td><td style="padding:8px;"><a href="mailto:${email}" style="color:#4A1521;text-decoration:none;">${email}</a></td></tr>
-        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;">Phone Number</td><td style="padding:8px;">${phone || "Not provided"}</td></tr>
-        <tr><td style="padding:8px;font-weight:bold;">Subject</td><td style="padding:8px;">${subject || "General Inquiry"}</td></tr>
+        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;width:30%;border-radius:4px;">Sender Name</td><td style="padding:8px;">${safeName}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold;">Email Address</td><td style="padding:8px;"><a href="mailto:${safeEmail}" style="color:#4A1521;text-decoration:none;">${safeEmail}</a></td></tr>
+        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;">Phone Number</td><td style="padding:8px;">${safePhone || "Not provided"}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold;">Subject</td><td style="padding:8px;">${safeSubject || "General Inquiry"}</td></tr>
       </table>
 
       <h3 style="color:#C9972A;">Message Content</h3>
-      <div style="padding:16px;background:#f9f9f9;border-left:4px solid #C9972A;white-space:pre-wrap;color:#333;font-size:14px;line-height:1.6;">${message}</div>
+      <div style="padding:16px;background:#f9f9f9;border-left:4px solid #C9972A;white-space:pre-wrap;color:#333;font-size:14px;line-height:1.6;">${safeMessage}</div>
 
       <hr style="border:none;border-top:1px solid #e0e0e0;margin:20px 0;" />
-      <p style="font-size:12px;color:#888;">You can reply directly to this email or send a response to ${email}.</p>
+      <p style="font-size:12px;color:#888;">You can reply directly to this email or send a response to ${safeEmail}.</p>
     </div>`;
 }
 
 function buildContactCustomerHtml({ name, subject, message }) {
+  const safeName = escapeHtml(name);
+  const safeSubject = escapeHtml(subject);
+  const safeMessage = escapeHtml(message);
+
   return `
     <div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:10px;">
       <h2 style="color:#4A1521;margin-top:0;">🪷 We've received your message</h2>
-      <p style="color:#555;">Dear <strong>${name}</strong>,</p>
-      <p style="color:#555;">Thank you for reaching out to <strong>The Braj Madhuri</strong>. We have received your message regarding <em>"${subject || "General Inquiry"}"</em> and our team will respond as quickly as possible.</p>
+      <p style="color:#555;">Dear <strong>${safeName}</strong>,</p>
+      <p style="color:#555;">Thank you for reaching out to <strong>The Braj Madhuri</strong>. We have received your message regarding <em>"${safeSubject || "General Inquiry"}"</em> and our team will respond as quickly as possible.</p>
 
       <h4 style="color:#C9972A;margin-bottom:6px;">Copy of your message:</h4>
-      <div style="padding:12px;background:#fdf8f0;border-radius:6px;white-space:pre-wrap;color:#444;font-size:13px;line-height:1.5;">${message}</div>
+      <div style="padding:12px;background:#fdf8f0;border-radius:6px;white-space:pre-wrap;color:#444;font-size:13px;line-height:1.5;">${safeMessage}</div>
 
       <hr style="border:none;border-top:1px solid #e0e0e0;margin:20px 0;" />
       <p style="font-size:14px;color:#4A1521;font-weight:bold;margin-top:10px;">Jai Shri Krishna · Radhe Radhe 🙏</p>
@@ -185,7 +215,7 @@ export const sendOrderEmail = async (order) => {
   // 1. Send admin notification (with retry)
   const adminResult = await withRetry(
     () =>
-      transporter.sendMail({
+      getTransporter().sendMail({
         from: `"The Braj Madhuri" <${adminEmail}>`,
         to: adminEmail,
         subject: `🛍️ New Order [${order.orderNumber}]`,
@@ -206,7 +236,7 @@ export const sendOrderEmail = async (order) => {
   if (customerEmail) {
     customerResult = await withRetry(
       () =>
-        transporter.sendMail({
+        getTransporter().sendMail({
           from: `"The Braj Madhuri" <${adminEmail}>`,
           to: customerEmail,
           subject: `Order Confirmed — The Braj Madhuri [${order.orderNumber}]`,
@@ -244,10 +274,10 @@ export const sendContactEmail = async ({ name, email, phone, subject, message })
   // 1. Send inquiry notification to admin
   const adminResult = await withRetry(
     () =>
-      transporter.sendMail({
+      getTransporter().sendMail({
         from: `"The Braj Madhuri Inquiries" <${adminEmail}>`,
         to: adminEmail,
-        replyTo: customerEmail ? `"${name}" <${customerEmail}>` : adminEmail,
+        replyTo: customerEmail ? `"${name.replace(/[\r\n"]/g, '')}" <${customerEmail}>` : adminEmail,
         subject: `📩 Contact Inquiry: ${subject || "Website Message"} [from ${name}]`,
         html: buildContactAdminHtml({ name, email, phone, subject, message }),
       }),
@@ -266,7 +296,7 @@ export const sendContactEmail = async ({ name, email, phone, subject, message })
   if (customerEmail) {
     customerResult = await withRetry(
       () =>
-        transporter.sendMail({
+        getTransporter().sendMail({
           from: `"The Braj Madhuri" <${adminEmail}>`,
           to: customerEmail,
           subject: `We've received your message — The Braj Madhuri`,

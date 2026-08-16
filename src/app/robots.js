@@ -3,7 +3,7 @@ export default function robots() {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/admin/"],
+      disallow: ["/api/", "/admin/", "/cart", "/checkout", "/success"],
     },
     sitemap: "https://thebrajmadhuri.com/sitemap.xml",
   };

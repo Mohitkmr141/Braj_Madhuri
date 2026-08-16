@@ -71,7 +71,7 @@ export const authOptions = {
   pages: {
     signIn: "/login",
   },
-  secret: process.env.NEXTAUTH_SECRET || "fallback_secret_for_development_only",
+  secret: process.env.NEXTAUTH_SECRET || (process.env.NODE_ENV === 'development' ? "dev_secret_only" : undefined),
 };
 
 const handler = NextAuth(authOptions);

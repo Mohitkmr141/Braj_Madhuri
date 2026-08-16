@@ -196,10 +196,16 @@ export default function Reviews() {
     let animFrame;
     let pos = 0;
     const speed = 0.4;
+    let half = (track.scrollWidth / 2) || 1000;
+
+    const updateDimensions = () => {
+      if (track) half = (track.scrollWidth / 2) || 1000;
+    };
+
+    window.addEventListener("resize", updateDimensions);
 
     const tick = () => {
       pos -= speed;
-      const half = track.scrollWidth / 2;
       if (Math.abs(pos) >= half) pos = 0;
       track.style.transform = `translateX(${pos}px)`;
       animFrame = requestAnimationFrame(tick);
@@ -209,12 +215,13 @@ export default function Reviews() {
 
     // Pause on hover
     const pause = () => cancelAnimationFrame(animFrame);
-    const resume = () => { animFrame = requestAnimationFrame(tick); };
+    const resume = () => { cancelAnimationFrame(animFrame); animFrame = requestAnimationFrame(tick); };
     track.addEventListener("mouseenter", pause);
     track.addEventListener("mouseleave", resume);
 
     return () => {
       cancelAnimationFrame(animFrame);
+      window.removeEventListener("resize", updateDimensions);
       track.removeEventListener("mouseenter", pause);
       track.removeEventListener("mouseleave", resume);
     };

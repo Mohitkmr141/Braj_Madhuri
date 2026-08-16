@@ -20,11 +20,16 @@ export default function SaleModalBanner() {
   }, [isOpen]);
 
   useEffect(() => {
+    let isMounted = true;
+    let timer = null;
+
     const fetchSettings = async () => {
       try {
         const res = await fetch("/api/settings");
+        if (!isMounted) return;
         if (res.ok) {
           const data = await res.json();
+          if (!isMounted) return;
           if (data.settings && data.settings.isSaleActive && data.settings.saleBannerUrl) {
             setSettings(data.settings);
             
@@ -33,23 +38,27 @@ export default function SaleModalBanner() {
             try {
               isDismissed = sessionStorage.getItem("bm_sale_modal_dismissed") === "true";
             } catch (e) {
-              console.error(e);
+              // sessionStorage may be unavailable
             }
-            if (!isDismissed) {
+            if (!isDismissed && isMounted) {
               // Delay slightly for smooth display
-              const timer = setTimeout(() => {
-                setIsOpen(true);
+              timer = setTimeout(() => {
+                if (isMounted) setIsOpen(true);
               }, 600);
-              return () => clearTimeout(timer);
             }
           }
         }
       } catch (err) {
-        console.error("Failed to load sale modal settings:", err);
+        if (isMounted) console.error("Failed to load sale modal settings:", err);
       }
     };
 
     fetchSettings();
+
+    return () => {
+      isMounted = false;
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   const handleClose = () => {

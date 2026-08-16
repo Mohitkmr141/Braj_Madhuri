@@ -210,8 +210,14 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
     if (activeVariant && activeVariant.image) {
       return activeVariant.image;
     }
-    return product.imageUrl;
-  }, [activeVariant, product.imageUrl]);
+    if (product?.imageUrl) {
+      return product.imageUrl;
+    }
+    if (Array.isArray(product?.images) && product.images.length > 0) {
+      return product.images[0];
+    }
+    return "/header-banner.jpg";
+  }, [activeVariant, product?.imageUrl, product?.images]);
 
   const isFav = isInWishlist(product?.id, selectedSize, hasColors ? selectedColor : undefined);
 
@@ -232,7 +238,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
     }
   }, [isQuickViewOpen]);
 
-  if (!product || !product.imageUrl) {
+  if (!product) {
     return null;
   }
 

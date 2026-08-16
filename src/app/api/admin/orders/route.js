@@ -15,8 +15,8 @@ export async function GET(request) {
   const prisma = getPrisma();
   try {
     const { searchParams } = new URL(request.url);
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '25', 10)));
+    const page = Math.max(1, parseInt(searchParams.get('page'), 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit'), 10) || 25));
     const search = searchParams.get('search')?.trim() || '';
     const status = searchParams.get('status')?.trim() || '';
 
@@ -85,18 +85,22 @@ export async function DELETE(request) {
 
     const prisma = getPrisma();
     
-    // 1. Fetch orders to get cart items for restocking
+    // 1. Fetch orders to get cart items and status
     const ordersToDelete = await prisma.order.findMany({
       where: { id: { in: orderIds } },
-      select: { cartItems: true }
+      select: { id: true, status: true, cartItems: true }
     });
 
-    // 2. Aggregate quantities to restock
-    const restockMap = {};
+    // 2. Aggregate items to restock only for active/paid orders (Pending/Shipped)
+    const restockItems = [];
     for (const order of ordersToDelete) {
+      if (order.status !== 'Pending' && order.status !== 'Shipped') {
+        continue; // Do not restock Payment_Pending or Cancelled orders
+      }
+
       let items = [];
       try {
-        items = typeof order.cartItems === 'string' ? JSON.parse(order.cartItems) : order.cartItems;
+        items = typeof order.cartItems === 'string' ? JSON.parse(order.cartItems) : (order.cartItems || []);
       } catch (e) {
         items = [];
       }
@@ -104,7 +108,7 @@ export async function DELETE(request) {
       if (Array.isArray(items)) {
         for (const item of items) {
           if (item.id && item.quantity) {
-            restockMap[item.id] = (restockMap[item.id] || 0) + parseInt(item.quantity, 10);
+            restockItems.push(item);
           }
         }
       }
@@ -112,11 +116,32 @@ export async function DELETE(request) {
 
     // 3. Perform bulk deletion and restock in a transaction
     await prisma.$transaction(async (tx) => {
-      // Restock products (using updateMany so it doesn't fail if product was deleted)
-      for (const [productId, quantity] of Object.entries(restockMap)) {
-        await tx.product.updateMany({
-          where: { id: productId },
-          data: { stock: { increment: quantity } }
+      for (const item of restockItems) {
+        const qty = parseInt(item.quantity, 10) || 1;
+        const prod = await tx.product.findUnique({ where: { id: item.id } });
+        if (!prod) continue;
+
+        let newVariants = prod.variants;
+        if ((item.size || item.color) && Array.isArray(prod.variants)) {
+          const vS = (item.size || '').trim().toLowerCase();
+          const vC = (item.color || '').trim().toLowerCase();
+          newVariants = prod.variants.map((v) => {
+            const matchS = (!v.size && !vS) || (v.size || '').trim().toLowerCase() === vS;
+            const matchC = (!v.color && !vC) || (v.color || '').trim().toLowerCase() === vC;
+            if (matchS && matchC) {
+              const curStock = parseInt(v.stock, 10) || 0;
+              return { ...v, stock: curStock + qty };
+            }
+            return v;
+          });
+        }
+
+        await tx.product.update({
+          where: { id: item.id },
+          data: {
+            stock: { increment: qty },
+            ...(newVariants !== prod.variants ? { variants: newVariants } : {}),
+          },
         });
       }
 
@@ -126,7 +151,11 @@ export async function DELETE(request) {
       });
     });
 
-    return NextResponse.json({ success: true, message: `Successfully deleted ${ordersToDelete.length} orders and restocked items.`, count: ordersToDelete.length });
+    return NextResponse.json({
+      success: true,
+      message: `Successfully deleted ${ordersToDelete.length} order(s).`,
+      count: ordersToDelete.length
+    });
   } catch (error) {
     console.error('Error deleting orders:', error);
     return NextResponse.json(
