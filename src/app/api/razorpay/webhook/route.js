@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { finalizePaidOrder } from '../../../../lib/orderService.js';
+import { getPrisma } from '../../../../lib/prisma.js';
 
 export async function POST(request) {
   try {
@@ -79,6 +80,25 @@ export async function POST(request) {
       });
 
       return NextResponse.json({ status: 'ok', processed: true });
+    }
+
+    if (event === 'payment.failed') {
+      const paymentEntity = payload.payload?.payment?.entity;
+      const razorpayOrderId = paymentEntity?.order_id;
+      if (razorpayOrderId) {
+        const prisma = getPrisma();
+        await prisma.order.updateMany({
+          where: {
+            razorpayOrderId: razorpayOrderId,
+            status: 'Payment_Pending',
+          },
+          data: {
+            status: 'Payment_Failed',
+          },
+        }).catch((err) => console.error('[Razorpay Webhook] Error marking order as Payment_Failed:', err.message));
+        console.log(`[Razorpay Webhook] Marked order with Razorpay ID ${razorpayOrderId} as Payment_Failed`);
+      }
+      return NextResponse.json({ status: 'ok', handled: 'payment.failed' });
     }
 
     // Return 200 for other unhandled events so Razorpay doesn't retry them indefinitely

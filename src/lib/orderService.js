@@ -1,9 +1,11 @@
 import { getPrisma } from './prisma.js';
 import { sendOrderEmail } from './mailer.js';
 import { createShiprocketOrder } from './shiprocket.js';
+import Razorpay from 'razorpay';
 
 /**
  * Safely decrements stock for cart items within a Prisma transaction or client.
+ * Uses PostgreSQL row-locking FOR UPDATE on variant products to prevent lost updates under concurrency.
  */
 async function decrementStockForItems(tx, cartItems) {
   if (!Array.isArray(cartItems) || cartItems.length === 0) return;
@@ -11,13 +13,23 @@ async function decrementStockForItems(tx, cartItems) {
   for (const item of cartItems) {
     if (!item.id) continue;
     try {
+      const qty = Math.max(1, parseInt(item.quantity, 10) || 1);
+
+      // If variant-specific, lock the product row first to prevent concurrent JSON overwrites
+      if (item.size || item.color) {
+        try {
+          await tx.$queryRaw`SELECT id FROM "Product" WHERE id = ${item.id} FOR UPDATE`;
+        } catch {
+          // In case underlying DB doesn't support SELECT FOR UPDATE (e.g. test mock), proceed safely
+        }
+      }
+
       const product = await tx.product.findUnique({ where: { id: item.id } });
       if (!product) {
         console.warn(`[OrderService] Product ${item.id} not found during stock decrement; skipping.`);
         continue;
       }
 
-      const qty = parseInt(item.quantity, 10) || 1;
       let updatedVariants = Array.isArray(product.variants) ? [...product.variants] : [];
 
       if ((item.size || item.color) && updatedVariants.length > 0) {
@@ -133,37 +145,74 @@ export async function finalizePaidOrder({
       return updated;
     });
   } else if (fallbackData) {
-    // 3B. If no pre-existing order was found, create it from fallbackData so no paid order is lost
+    // 3B. If no pre-existing order was found, verify amount directly with Razorpay API before creation
+    let verifiedTotalAmount = fallbackData.totalAmount || fallbackData.cartTotal || 0;
+
+    if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET && (razorpayPaymentId || razorpayOrderId)) {
+      try {
+        const razorpay = new Razorpay({
+          key_id: process.env.RAZORPAY_KEY_ID,
+          key_secret: process.env.RAZORPAY_KEY_SECRET,
+        });
+
+        if (razorpayPaymentId) {
+          const payment = await razorpay.payments.fetch(razorpayPaymentId);
+          if (payment && payment.amount) {
+            verifiedTotalAmount = payment.amount / 100;
+          }
+        } else if (razorpayOrderId) {
+          const rzpOrder = await razorpay.orders.fetch(razorpayOrderId);
+          if (rzpOrder && rzpOrder.amount) {
+            verifiedTotalAmount = rzpOrder.amount / 100;
+          }
+        }
+      } catch (rzpFetchErr) {
+        console.warn('[OrderService] Unable to fetch Razorpay details during fallback creation:', rzpFetchErr.message);
+      }
+    }
+
     const genOrderNumber = orderNumber || `BM-${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
     const cartItems = fallbackData.cartItems || [];
 
-    finalizedOrder = await prisma.$transaction(async (tx) => {
-      // Decrement stock
-      await decrementStockForItems(tx, cartItems);
+    try {
+      finalizedOrder = await prisma.$transaction(async (tx) => {
+        // Decrement stock
+        await decrementStockForItems(tx, cartItems);
 
-      const created = await tx.order.create({
-        data: {
-          orderNumber: genOrderNumber,
-          customerName: fallbackData.customerName || `${fallbackData.formData?.firstName || 'Guest'} ${fallbackData.formData?.lastName || ''}`.trim(),
-          email: (fallbackData.email || fallbackData.formData?.email || '').trim().toLowerCase(),
-          phone: fallbackData.phone || fallbackData.formData?.phone || '',
-          address: fallbackData.address || fallbackData.formData?.address || '',
-          city: fallbackData.city || fallbackData.formData?.city || '',
-          state: fallbackData.state || fallbackData.formData?.state || '',
-          pincode: fallbackData.pincode || fallbackData.formData?.pincode || '',
-          totalAmount: fallbackData.totalAmount || fallbackData.cartTotal || 0,
-          paymentMethod: 'online',
-          status: 'Pending',
-          cartItems: cartItems,
-          shippingCost: fallbackData.shippingCost || 0,
-          razorpayOrderId: razorpayOrderId || null,
-          razorpayPaymentId: razorpayPaymentId || null,
-        },
+        const created = await tx.order.create({
+          data: {
+            orderNumber: genOrderNumber,
+            customerName: fallbackData.customerName || `${fallbackData.formData?.firstName || 'Guest'} ${fallbackData.formData?.lastName || ''}`.trim(),
+            email: (fallbackData.email || fallbackData.formData?.email || '').trim().toLowerCase(),
+            phone: fallbackData.phone || fallbackData.formData?.phone || '',
+            address: fallbackData.address || fallbackData.formData?.address || '',
+            city: fallbackData.city || fallbackData.formData?.city || '',
+            state: fallbackData.state || fallbackData.formData?.state || '',
+            pincode: fallbackData.pincode || fallbackData.formData?.pincode || '',
+            totalAmount: verifiedTotalAmount,
+            paymentMethod: 'online',
+            status: 'Pending',
+            cartItems: cartItems,
+            shippingCost: fallbackData.shippingCost || 0,
+            razorpayOrderId: razorpayOrderId || null,
+            razorpayPaymentId: razorpayPaymentId || null,
+          },
+        });
+
+        return created;
       });
-
-      return created;
-    });
-    isNewOrUpdated = true;
+      isNewOrUpdated = true;
+    } catch (createErr) {
+      // Gracefully resolve Prisma unique constraint violation (P2002) in concurrent races
+      if (createErr.code === 'P2002' && razorpayOrderId) {
+        console.log(`[OrderService] Race condition handled for Razorpay Order ${razorpayOrderId}`);
+        const winningOrder = await prisma.order.findUnique({ where: { razorpayOrderId } });
+        if (winningOrder) {
+          return { success: true, order: winningOrder, isNewOrUpdated: false };
+        }
+      }
+      throw createErr;
+    }
   } else {
     throw new Error(`Cannot finalize order: No order found for Razorpay Order ID ${razorpayOrderId} and no fallback data provided.`);
   }

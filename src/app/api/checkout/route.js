@@ -11,11 +11,11 @@ export async function POST(request) {
       cartTotal,
       shippingCost,
       paymentMethod,
-      razorpay_payment_id,
-      razorpay_order_id,
-      razorpay_signature,
-      orderNumber,
     } = body;
+    const razorpay_payment_id = (body.razorpay_payment_id || '').trim();
+    const razorpay_order_id = (body.razorpay_order_id || '').trim();
+    const razorpay_signature = (body.razorpay_signature || '').trim();
+    const orderNumber = (body.orderNumber || '').trim();
 
     // ── Validate required fields ──────────────────────────────────────────────
     if (!formData?.email || !formData?.firstName || !formData?.phone || !formData?.address) {
@@ -33,10 +33,17 @@ export async function POST(request) {
       );
     }
 
-    // ── Verify Razorpay signature ─────────────────────────────────────────────
+    // ── Verify Razorpay payment details format ────────────────────────────────
     if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
       return NextResponse.json(
         { success: false, error: 'Missing Razorpay payment details' },
+        { status: 400 }
+      );
+    }
+
+    if (!razorpay_order_id.startsWith('order_') || !razorpay_payment_id.startsWith('pay_')) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid Razorpay transaction identifiers' },
         { status: 400 }
       );
     }

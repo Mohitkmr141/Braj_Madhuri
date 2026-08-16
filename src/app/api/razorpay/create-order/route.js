@@ -2,13 +2,26 @@ import { NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { getPrisma } from '../../../../lib/prisma.js';
 
+const COMBO_MAP = {
+  'combo-daily-pooja-pack': { title: 'Daily Pooja Pack', price: 399 },
+  'combo-japa-essentials': { title: 'Japa Essentials', price: 599 },
+  'combo-thakur-ji-seva': { title: 'Thakur Ji Seva', price: 799 },
+};
+
 export async function POST(request) {
   try {
     const { cartItems, state, formData } = await request.json();
 
-    if (!cartItems || !cartItems.length) {
+    if (!Array.isArray(cartItems) || cartItems.length === 0) {
       return NextResponse.json(
-        { success: false, error: 'Cart items are required' },
+        { success: false, error: 'Cart cannot be empty.' },
+        { status: 400 }
+      );
+    }
+
+    if (!formData?.email || !formData?.phone || !formData?.firstName || !formData?.address || !formData?.city || !formData?.state || !formData?.pincode) {
+      return NextResponse.json(
+        { success: false, error: 'Please provide all required shipping and contact details.' },
         { status: 400 }
       );
     }
@@ -16,17 +29,33 @@ export async function POST(request) {
     const prisma = getPrisma();
     let calculatedCartTotal = 0;
 
-    const COMBO_MAP = {
-      'combo-daily-pooja-pack': { title: 'Daily Pooja Pack', price: 399 },
-      'combo-japa-essentials': { title: 'Japa Essentials', price: 599 },
-      'combo-thakur-ji-seva': { title: 'Thakur Ji Seva', price: 799 },
-    };
-
-    // 1. Validate items and pre-check stock from database
+    // 1. Strictly validate items, quantities, and prices from DB / COMBO_MAP
     for (const item of cartItems) {
-      if (item.id && (item.id.startsWith('combo-') || COMBO_MAP[item.id])) {
-        const comboInfo = COMBO_MAP[item.id] || { price: item.price || 399 };
-        calculatedCartTotal += (comboInfo.price || item.price || 0) * item.quantity;
+      if (!item || !item.id) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid item found in cart.' },
+          { status: 400 }
+        );
+      }
+
+      const qty = Number(item.quantity);
+      if (!Number.isInteger(qty) || qty < 1 || qty > 50) {
+        return NextResponse.json(
+          { success: false, error: `Invalid quantity for item "${item.title || item.id}". Quantity must be between 1 and 50.` },
+          { status: 400 }
+        );
+      }
+
+      // Check combo items strictly from COMBO_MAP - NEVER trust item.price from client
+      if (item.id.startsWith('combo-') || COMBO_MAP[item.id]) {
+        const comboInfo = COMBO_MAP[item.id];
+        if (!comboInfo) {
+          return NextResponse.json(
+            { success: false, error: `Invalid combo product: "${item.id}".` },
+            { status: 400 }
+          );
+        }
+        calculatedCartTotal += comboInfo.price * qty;
         continue;
       }
 
@@ -53,7 +82,7 @@ export async function POST(request) {
 
         if (matchedVariant) {
           const variantStock = parseInt(matchedVariant.stock, 10) || 0;
-          if (variantStock < item.quantity) {
+          if (variantStock < qty) {
             return NextResponse.json(
               {
                 success: false,
@@ -64,42 +93,41 @@ export async function POST(request) {
           }
           if (matchedVariant.price !== undefined && matchedVariant.price !== null && matchedVariant.price !== '') {
             const vp = parseFloat(matchedVariant.price);
-            if (!isNaN(vp)) itemPrice = vp;
+            if (!isNaN(vp) && vp >= 0) itemPrice = vp;
           }
-        } else if (product.stock < item.quantity) {
+        } else if (product.stock < qty) {
           return NextResponse.json(
             { success: false, error: `Insufficient stock for "${item.title}". Only ${product.stock} left.` },
             { status: 400 }
           );
         }
-      } else if (product.stock < item.quantity) {
+      } else if (product.stock < qty) {
         return NextResponse.json(
           { success: false, error: `Insufficient stock for "${item.title}". Only ${product.stock} left.` },
           { status: 400 }
         );
       }
 
-      calculatedCartTotal += itemPrice * item.quantity;
+      calculatedCartTotal += itemPrice * qty;
     }
 
     // 2. Fetch site settings for discounts
     const settings = await prisma.siteSettings.findUnique({ where: { id: 'global' } });
     
     let specialSaleDiscount = 0;
-    if (settings && settings.isSaleActive) {
+    if (settings && settings.isSaleActive && settings.saleDiscountPercentage > 0) {
       specialSaleDiscount = Math.round(calculatedCartTotal * (settings.saleDiscountPercentage / 100));
     }
     
     const finalDiscountedTotal = Math.max(0, calculatedCartTotal - specialSaleDiscount);
 
-    // 3. Calculate shipping cost
+    // 3. Calculate shipping cost strictly from customer state
     const customerState = (formData?.state || state || '').trim();
     let shippingCost = 0;
     if (finalDiscountedTotal < 999) {
       if (customerState.toLowerCase() === "delhi" || customerState.toLowerCase() === "delhi ncr") {
         shippingCost = 79;
       } else {
-        // Default to standard shipping rate (covers missing state from direct API calls)
         shippingCost = 119;
       }
     }
@@ -111,6 +139,14 @@ export async function POST(request) {
       return NextResponse.json(
         { success: false, error: 'Amount must be at least 1 INR (100 paise)' },
         { status: 400 }
+      );
+    }
+
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      console.error('[Create-Order] Missing Razorpay API keys.');
+      return NextResponse.json(
+        { success: false, error: 'Payment gateway configuration error.' },
+        { status: 500 }
       );
     }
 
@@ -150,31 +186,26 @@ export async function POST(request) {
     const rzpOrder = await razorpay.orders.create(options);
 
     // 6. Pre-record the order in database with status 'Payment_Pending'
-    if (formData?.email && formData?.phone) {
-      try {
-        await prisma.order.create({
-          data: {
-            orderNumber: orderNumber,
-            customerName: customerName,
-            email: formData.email.trim().toLowerCase(),
-            phone: formData.phone.trim(),
-            address: formData.address || '',
-            city: formData.city || '',
-            state: customerState || '',
-            pincode: formData.pincode || '',
-            totalAmount: totalAmount,
-            paymentMethod: 'online',
-            status: 'Payment_Pending',
-            cartItems: cartItems,
-            shippingCost: shippingCost,
-            razorpayOrderId: rzpOrder.id,
-          },
-        });
-        console.log(`[Create-Order] Pre-recorded order ${orderNumber} (Razorpay: ${rzpOrder.id}) as Payment_Pending`);
-      } catch (dbErr) {
-        console.error(`[Create-Order] Failed to pre-record order in DB:`, dbErr.message);
-      }
-    }
+    await prisma.order.create({
+      data: {
+        orderNumber: orderNumber,
+        customerName: customerName,
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim(),
+        address: formData.address || '',
+        city: formData.city || '',
+        state: customerState || '',
+        pincode: formData.pincode || '',
+        totalAmount: totalAmount,
+        paymentMethod: 'online',
+        status: 'Payment_Pending',
+        cartItems: cartItems,
+        shippingCost: shippingCost,
+        razorpayOrderId: rzpOrder.id,
+      },
+    });
+
+    console.log(`[Create-Order] Pre-recorded order ${orderNumber} (Razorpay: ${rzpOrder.id}) as Payment_Pending`);
 
     return NextResponse.json({
       success: true,
@@ -184,7 +215,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('Razorpay Create Order Error:', error);
     return NextResponse.json(
-      { success: false, error: error.message || 'Failed to create Razorpay order' },
+      { success: false, error: error.message || 'Failed to create payment order' },
       { status: 500 }
     );
   }
