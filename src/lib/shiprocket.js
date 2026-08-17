@@ -119,6 +119,7 @@ export async function createShiprocketOrder(order) {
   else if (resolvedState === "Rest of India") resolvedState = "Delhi";
 
   const subTotal = orderItems.reduce((acc, it) => acc + (it.selling_price * it.units), 0);
+  const totalDiscount = Math.max(0, Math.round(subTotal + (order.shippingCost || 0) - (order.totalAmount || 0)));
 
   const shiprocketOrderData = {
     order_id: order.orderNumber,
@@ -143,7 +144,7 @@ export async function createShiprocketOrder(order) {
     shipping_charges: order.shippingCost || 0,
     giftwrap_charges: 0,
     transaction_charges: 0,
-    total_discount: 0,
+    total_discount: totalDiscount,
     sub_total: subTotal || order.totalAmount,
     length: 10,
     breadth: 10,

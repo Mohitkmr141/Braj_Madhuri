@@ -78,8 +78,9 @@
 .reviews-marquee-wrapper {
   width: 100%;
   overflow: hidden;
-  padding: 8px 0 40px;
+  padding: 8px 0 20px;
   mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
 }
 
 .reviews-marquee-track {
@@ -87,6 +88,21 @@
   gap: 24px;
   width: max-content;
   will-change: transform;
+  animation: bmReviewsMarquee 48s linear infinite;
+}
+
+.reviews-marquee-track:hover,
+.reviews-marquee-track:active {
+  animation-play-state: paused;
+}
+
+@keyframes bmReviewsMarquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
 }
 
 .reviews-marquee-card {
@@ -97,20 +113,8 @@
   flex-shrink: 0;
   box-shadow: 0 4px 20px rgb(74 21 33 / 7%);
   border: 1px solid rgb(201 151 42 / 15%);
-}
-
-/* ─── Grid Section ────────────────────────────────────────────────────── */
-
-.reviews-grid-section {
-  padding: 0 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.reviews-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ─── Review Card ─────────────────────────────────────────────────────── */

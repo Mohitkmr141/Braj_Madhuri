@@ -32,7 +32,19 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
   const isActive = (to) => (to === "/" ? pathname === "/" : pathname === to);
 
   useEffect(() => {
-    const onScroll = () => setNavSticky(window.scrollY > 10);
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setNavSticky((prev) => {
+            const isSticky = window.scrollY > 10;
+            return prev !== isSticky ? isSticky : prev;
+          });
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -105,9 +117,9 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
 
   return (
     <>
-      {globalSettings?.isSaleActive && globalSettings?.saleTitle && (
+      {globalSettings?.isSaleActive && (globalSettings?.saleTitle || globalSettings?.saleDiscountPercentage > 0) && (
         <div className="announcement-bar" style={{ backgroundColor: 'var(--maroon)', color: '#fff', textAlign: 'center', padding: '8px 16px', fontSize: '14px', fontWeight: 'bold' }}>
-          {globalSettings.saleTitle}
+          {globalSettings.saleTitle || `🎉 SPECIAL SALE: FLAT ${globalSettings.saleDiscountPercentage}% OFF Sitewide on All Orders!`}
         </div>
       )}
       {/* Search Overlay */}
@@ -202,14 +214,26 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
 
       {pathname === "/" && (
         <div className="bm-banner">
-          <Image
-            src={heroBanner}
-            alt="The Braj Madhuri"
-            className="bm-banner__img"
-            priority
-            placeholder="blur"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
+          {globalSettings?.isSaleActive && globalSettings?.saleBannerUrl ? (
+            <Image
+              src={globalSettings.saleBannerUrl}
+              alt={globalSettings.saleTitle || "The Braj Madhuri Special Sale"}
+              className="bm-banner__img"
+              priority
+              width={1920}
+              height={600}
+              style={{ width: '100%', height: 'auto', maxHeight: '500px', objectFit: 'cover' }}
+            />
+          ) : (
+            <Image
+              src={heroBanner}
+              alt="The Braj Madhuri"
+              className="bm-banner__img"
+              priority
+              placeholder="blur"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          )}
 
           <div className="bm-banner__ham">
             <button

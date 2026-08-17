@@ -24,6 +24,15 @@ export default function SaleModalBanner() {
     let isMounted = true;
     let timer = null;
 
+    // Check if already dismissed in session before firing network request
+    let isDismissed = false;
+    try {
+      isDismissed = sessionStorage.getItem("bm_sale_modal_dismissed") === "true";
+    } catch (e) {
+      // sessionStorage may be unavailable
+    }
+    if (isDismissed) return;
+
     const fetchSettings = async () => {
       try {
         const res = await fetch("/api/settings");
@@ -34,19 +43,10 @@ export default function SaleModalBanner() {
           if (data.settings && data.settings.isSaleActive && data.settings.saleBannerUrl) {
             setSettings(data.settings);
             
-            // Check if dismissed in session
-            let isDismissed = false;
-            try {
-              isDismissed = sessionStorage.getItem("bm_sale_modal_dismissed") === "true";
-            } catch (e) {
-              // sessionStorage may be unavailable
-            }
-            if (!isDismissed && isMounted) {
-              // Delay slightly for smooth display
-              timer = setTimeout(() => {
-                if (isMounted) setIsOpen(true);
-              }, 600);
-            }
+            // Delay slightly for smooth display
+            timer = setTimeout(() => {
+              if (isMounted) setIsOpen(true);
+            }, 600);
           }
         }
       } catch (err) {

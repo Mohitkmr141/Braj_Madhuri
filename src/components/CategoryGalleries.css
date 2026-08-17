@@ -56,8 +56,6 @@
   gap: 20px;
 }
 
-/* horizontal lines flanking the title, each carrying a single bead
-   of "light" at its center — like a stone set along a chain */
 .category-title::before,
 .category-title::after {
   content: "";
@@ -150,10 +148,12 @@
   min-width: 0;
   box-shadow: var(--shadow-soft);
   isolation: isolate;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 340px;
   transition:
-    border-color 0.4s var(--ease-premium),
-    box-shadow 0.4s var(--ease-premium),
-    transform 0.4s var(--ease-premium);
+    border-color 0.35s var(--ease-premium),
+    box-shadow 0.35s var(--ease-premium),
+    transform 0.35s var(--ease-premium);
 }
 
 .image-card::before {
@@ -166,15 +166,15 @@
     linear-gradient(315deg, rgb(201 150 12 / 12%), transparent 38%);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.4s var(--ease-premium);
+  transition: opacity 0.35s var(--ease-premium);
   z-index: -1;
 }
 
 .image-card:hover,
 .image-card:focus-within {
   border-color: rgb(212 175 55 / 60%);
-  box-shadow: 0 30px 60px -15px rgb(74 21 33 / 25%), 0 0 0 1px rgb(212 175 55 / 35%);
-  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 20px 40px -12px rgb(74 21 33 / 20%), 0 0 0 1px rgb(212 175 55 / 35%);
+  transform: translateY(-8px);
 }
 
 .image-card:hover::before,
@@ -195,9 +195,6 @@
   padding: clamp(14px, 5vw, 24px);
 }
 
-/* inner frame + the signature "light-catch" sweep, layered in one
-   pseudo-element: a hairline border that a beam of light crosses
-   on hover, the way a glass display case catches light on gold */
 .image-card-img-wrapper::before {
   content: "";
   position: absolute;
@@ -235,7 +232,6 @@
   transition: transform 0.5s var(--ease-premium), opacity 0.5s var(--ease-premium);
 }
 
-/* optional: toggle from JS while the product image is loading */
 .image-card-img-wrapper.is-loading {
   background-image: linear-gradient(
     100deg,
@@ -262,13 +258,11 @@
   display: block;
   position: relative;
   z-index: 1;
-  filter: drop-shadow(0 14px 18px rgb(57 35 17 / 16%));
-  transition: filter 0.45s var(--ease-premium), transform 0.45s var(--ease-premium), opacity 0.3s ease;
+  transition: transform 0.35s var(--ease-premium), opacity 0.3s ease;
 }
 
 .image-card:hover .image-card-img-wrapper img {
-  filter: drop-shadow(0 24px 32px rgb(74 21 33 / 25%));
-  transform: scale(1.1) translateY(-6px);
+  transform: scale(1.06) translateY(-4px);
 }
 
 .image-card:hover .image-card-img-wrapper::after {
@@ -283,9 +277,6 @@
 }
 
 /* ── Discount badge ─────────────────────────────────────────── */
-
-/* shaped like a hang-tag, with a small punched hole at the left
-   edge — the way a price tag is actually tied onto a piece */
 .discount-badge {
   position: absolute;
   top: 14px;
@@ -300,11 +291,10 @@
   box-shadow: 0 8px 18px rgb(232 101 10 / 28%), 2px 2px 0 rgb(26 18 8 / 6%);
   transform: rotate(-3deg);
   z-index: 2;
-          mask-image: radial-gradient(circle 2.5px at 8px 50%, transparent 98%, #000 100%);
+  mask-image: radial-gradient(circle 2.5px at 8px 50%, transparent 98%, #000 100%);
+  -webkit-mask-image: radial-gradient(circle 2.5px at 8px 50%, transparent 98%, #000 100%);
 }
 
-/* optional companion tag, e.g. "NEW" — mirrors the discount tag
-   on the opposite corner when both apply */
 .new-badge {
   position: absolute;
   top: 14px;
@@ -319,7 +309,8 @@
   box-shadow: 0 8px 18px rgb(123 27 42 / 26%);
   transform: rotate(3deg);
   z-index: 2;
-          mask-image: radial-gradient(circle 2.5px at calc(100% - 8px) 50%, transparent 98%, #000 100%);
+  mask-image: radial-gradient(circle 2.5px at calc(100% - 8px) 50%, transparent 98%, #000 100%);
+  -webkit-mask-image: radial-gradient(circle 2.5px at calc(100% - 8px) 50%, transparent 98%, #000 100%);
 }
 
 /* ── Slideshow buttons ──────────────────────────────────────── */
@@ -518,7 +509,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* optional: pairs with .item-original-price to show the % saved */
 .save-chip {
   font-size: 11px;
   font-weight: 700;
@@ -614,7 +604,7 @@
     animation-duration: 0.01ms !important;
   }
 
-  .image-card:hover {
+  .image-card:hover {
     transform: none;
   }
 }
@@ -698,7 +688,6 @@
   height: 100%;
   max-height: 60vh;
   object-fit: contain;
-  filter: drop-shadow(0 14px 18px rgb(57 35 17 / 16%));
 }
 
 .quick-view-info-panel {

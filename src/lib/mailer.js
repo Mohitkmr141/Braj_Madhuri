@@ -89,12 +89,27 @@ function buildItemsHtml(order) {
     .join("");
 }
 
+function getOrderPricingBreakdown(order) {
+  let items = [];
+  try {
+    items = typeof order.cartItems === "string" ? JSON.parse(order.cartItems) : order.cartItems || [];
+  } catch (err) {
+    items = [];
+  }
+  const itemsTotal = Array.isArray(items) ? items.reduce((acc, it) => acc + ((Number(it.price) || 0) * (Number(it.quantity) || 1)), 0) : 0;
+  const shippingCost = Number(order.shippingCost) || 0;
+  const totalAmount = Number(order.totalAmount) || 0;
+  const discountAmount = Math.max(0, Math.round(itemsTotal + shippingCost - totalAmount));
+  return { itemsTotal, shippingCost, totalAmount, discountAmount };
+}
+
 function buildAdminHtml(order, itemsHtml) {
   const safeOrderNumber = escapeHtml(order.orderNumber);
   const safeCustomerName = escapeHtml(order.customerName);
   const safeEmail = escapeHtml(order.email || "—");
   const safePhone = escapeHtml(order.phone);
   const safeAddress = `${escapeHtml(order.address)}, ${escapeHtml(order.city)}, ${escapeHtml(order.state)} — ${escapeHtml(order.pincode)}`;
+  const { itemsTotal, shippingCost, totalAmount, discountAmount } = getOrderPricingBreakdown(order);
 
   return `
     <div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:10px;">
@@ -103,8 +118,10 @@ function buildAdminHtml(order, itemsHtml) {
 
       <table style="width:100%;border-collapse:collapse;margin:16px 0;">
         <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;width:40%;border-radius:4px;">Order ID</td><td style="padding:8px;">${safeOrderNumber}</td></tr>
-        <tr><td style="padding:8px;font-weight:bold;">Total Amount</td><td style="padding:8px;">₹${Number(order.totalAmount) || 0}</td></tr>
-        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;">Shipping Cost</td><td style="padding:8px;">₹${Number(order.shippingCost) || 0}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold;">Subtotal</td><td style="padding:8px;">₹${itemsTotal}</td></tr>
+        ${discountAmount > 0 ? `<tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#2e7d32;">Special Sale Discount</td><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#2e7d32;">− ₹${discountAmount}</td></tr>` : ''}
+        <tr><td style="padding:8px;font-weight:bold;">Shipping Cost</td><td style="padding:8px;">${shippingCost > 0 ? `₹${shippingCost}` : 'Free'}</td></tr>
+        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#4A1521;font-size:15px;">Total Amount Paid</td><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#4A1521;font-size:15px;">₹${totalAmount}</td></tr>
         <tr><td style="padding:8px;font-weight:bold;">Payment</td><td style="padding:8px;">Online (Razorpay)</td></tr>
       </table>
 
@@ -128,6 +145,7 @@ function buildCustomerHtml(order, itemsHtml) {
   const safeOrderNumber = escapeHtml(order.orderNumber);
   const safeCustomerName = escapeHtml(order.customerName);
   const safeAddress = `${escapeHtml(order.address)}, ${escapeHtml(order.city)}, ${escapeHtml(order.state)} — ${escapeHtml(order.pincode)}`;
+  const { itemsTotal, shippingCost, totalAmount, discountAmount } = getOrderPricingBreakdown(order);
 
   return `
     <div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;padding:24px;border:1px solid #e0e0e0;border-radius:10px;">
@@ -137,7 +155,10 @@ function buildCustomerHtml(order, itemsHtml) {
 
       <table style="width:100%;border-collapse:collapse;margin:16px 0;">
         <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;width:40%;border-radius:4px;">Order ID</td><td style="padding:8px;font-weight:bold;color:#4A1521;">${safeOrderNumber}</td></tr>
-        <tr><td style="padding:8px;font-weight:bold;">Total Amount</td><td style="padding:8px;">₹${Number(order.totalAmount) || 0}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold;">Subtotal</td><td style="padding:8px;">₹${itemsTotal}</td></tr>
+        ${discountAmount > 0 ? `<tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#2e7d32;">Special Sale Discount</td><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#2e7d32;">− ₹${discountAmount}</td></tr>` : ''}
+        <tr><td style="padding:8px;font-weight:bold;">Shipping Cost</td><td style="padding:8px;">${shippingCost > 0 ? `₹${shippingCost}` : 'Free'}</td></tr>
+        <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#4A1521;font-size:15px;">Total Amount</td><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#4A1521;font-size:15px;">₹${totalAmount}</td></tr>
         <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;">Delivery To</td><td style="padding:8px;background:#fdf8f0;">${safeAddress}</td></tr>
       </table>
 

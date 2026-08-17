@@ -19,6 +19,9 @@ export default function CategoryGalleries({
 }) {
   const { categories, isLoaded } = useProducts();
   const [sortOrder, setSortOrder] = useState("low-to-high");
+  const INITIAL_BATCH_SIZE = 16;
+  const [displayLimit, setDisplayLimit] = useState(INITIAL_BATCH_SIZE);
+
   const dbProducts = useMemo(() => {
     if (!categories) return [];
     return categories.flatMap(c => 
@@ -37,6 +40,15 @@ export default function CategoryGalleries({
     result.products = sortProducts(result.products, sortOrder);
     return result;
   }, [filterFolder, searchQuery, dbProducts, sortOrder]);
+
+  // Reset display limit when filter, search, or sort changes
+  useEffect(() => {
+    setDisplayLimit(INITIAL_BATCH_SIZE);
+  }, [filterFolder, searchQuery, sortOrder]);
+
+  const displayedProducts = useMemo(() => {
+    return visibleProducts.slice(0, displayLimit);
+  }, [visibleProducts, displayLimit]);
 
   if (!isLoaded) {
     return (
@@ -93,8 +105,8 @@ export default function CategoryGalleries({
       </div>
 
       <div className="image-grid">
-        {visibleProducts.length > 0 ? (
-          visibleProducts.map((product, index) => (
+        {displayedProducts.length > 0 ? (
+          displayedProducts.map((product, index) => (
             <ProductCard
               key={product.id}
               addToCart={addToCart}
@@ -119,6 +131,19 @@ export default function CategoryGalleries({
           </div>
         )}
       </div>
+
+      {visibleProducts.length > displayLimit && (
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
+          <button
+            type="button"
+            className="explore-btn"
+            onClick={() => setDisplayLimit((prev) => prev + 16)}
+            style={{ padding: "12px 32px", fontSize: "14px" }}
+          >
+            Load More Products ({visibleProducts.length - displayLimit} remaining)
+          </button>
+        </div>
+      )}
     </section>
   );
 }
@@ -243,7 +268,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
   }
 
   const discount =
-    displayOriginalPrice && displayPrice
+    displayOriginalPrice && displayPrice && displayOriginalPrice > displayPrice
       ? Math.round((1 - displayPrice / displayOriginalPrice) * 100)
       : null;
 

@@ -275,7 +275,29 @@ const OrdersTab = () => {
                         )) : "No items"}
                       </div>
                     </td>
-                    <td data-label="Total" className="font-medium">{formatCurrency(order.totalAmount)}</td>
+                    <td data-label="Total" className="font-medium">
+                      <div>{formatCurrency(order.totalAmount)}</div>
+                      {(() => {
+                        const itemsSubtotal = items.reduce((acc, it) => acc + ((parseFloat(it.price) || 0) * (parseInt(it.quantity, 10) || 1)), 0);
+                        const shipping = parseFloat(order.shippingCost) || 0;
+                        const total = parseFloat(order.totalAmount) || 0;
+                        const discount = Math.max(0, Math.round(itemsSubtotal + shipping - total));
+                        return (
+                          <>
+                            {discount > 0 && (
+                              <div className="text-xs" style={{ color: '#2e7d32', marginTop: '2px', fontWeight: '500' }}>
+                                Disc: −{formatCurrency(discount)}
+                              </div>
+                            )}
+                            {shipping > 0 && (
+                              <div className="text-xs text-muted" style={{ marginTop: '1px' }}>
+                                (₹{shipping} ship)
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </td>
                     <td data-label="Status">
                       <span className={`status-badge ${order.status?.toLowerCase() || 'pending'}`}>
                         {order.status === 'Payment_Pending' ? 'Pending Payment' : order.status === 'Pending' ? 'Paid / Pending' : order.status}

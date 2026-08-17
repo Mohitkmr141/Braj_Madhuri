@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import "./Reviews.css";
 
 const REVIEWS = [
@@ -140,94 +140,8 @@ const StarRating = ({ count }) => (
   </div>
 );
 
-function ReviewCard({ review, index }) {
-  return (
-    <div
-      className="review-card reveal"
-      style={{ animationDelay: `${index * 0.1}s` }}
-    >
-      {/* Quote icon */}
-      <div className="review-quote-icon" aria-hidden="true">"</div>
-
-      {/* Stars */}
-      <StarRating count={review.rating} />
-
-      {/* Review text */}
-      <p className="review-text">{review.text}</p>
-
-      {/* Product badge */}
-      <div className="review-product-badge">
-        <span className="review-product-dot" style={{ background: review.color }} />
-        {review.product}
-      </div>
-
-      {/* Reviewer info */}
-      <div className="review-author">
-        <div
-          className="review-avatar"
-          style={{ background: `linear-gradient(135deg, ${review.color}cc, ${review.color})` }}
-          aria-hidden="true"
-        >
-          {review.initial}
-        </div>
-        <div className="review-author-info">
-          <span className="review-author-name">{review.name}</span>
-          <span className="review-author-location">📍 {review.location}</span>
-        </div>
-        <div className="review-verified" title="Verified Customer">
-          <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
-            <circle cx="12" cy="12" r="10" fill="#4CAF50" />
-            <path d="M8 12l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Reviews() {
-  const trackRef = useRef(null);
-
-  // Auto-scroll marquee for desktop
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-
-    let animFrame;
-    let pos = 0;
-    const speed = 0.4;
-    let half = (track.scrollWidth / 2) || 1000;
-
-    const updateDimensions = () => {
-      if (track) half = (track.scrollWidth / 2) || 1000;
-    };
-
-    window.addEventListener("resize", updateDimensions);
-
-    const tick = () => {
-      pos -= speed;
-      if (Math.abs(pos) >= half) pos = 0;
-      track.style.transform = `translateX(${pos}px)`;
-      animFrame = requestAnimationFrame(tick);
-    };
-
-    animFrame = requestAnimationFrame(tick);
-
-    // Pause on hover
-    const pause = () => cancelAnimationFrame(animFrame);
-    const resume = () => { cancelAnimationFrame(animFrame); animFrame = requestAnimationFrame(tick); };
-    track.addEventListener("mouseenter", pause);
-    track.addEventListener("mouseleave", resume);
-
-    return () => {
-      cancelAnimationFrame(animFrame);
-      window.removeEventListener("resize", updateDimensions);
-      track.removeEventListener("mouseenter", pause);
-      track.removeEventListener("mouseleave", resume);
-    };
-  }, []);
-
-  // Duplicate reviews for seamless infinite loop
+  // Duplicate reviews array once for seamless, zero-gap infinite CSS scrolling
   const allReviews = [...REVIEWS, ...REVIEWS];
 
   return (
@@ -249,13 +163,17 @@ export default function Reviews() {
         </div>
       </div>
 
-      {/* Scrolling marquee */}
+      {/* GPU-Accelerated Pure CSS Scrolling marquee */}
       <div className="reviews-marquee-wrapper" aria-hidden="true">
-        <div className="reviews-marquee-track" ref={trackRef}>
+        <div className="reviews-marquee-track">
           {allReviews.map((review, i) => (
             <div className="reviews-marquee-card" key={i}>
               <StarRating count={review.rating} />
               <p className="review-text">{review.text}</p>
+              <div className="review-product-badge" style={{ marginTop: "12px" }}>
+                <span className="review-product-dot" style={{ background: review.color }} />
+                {review.product}
+              </div>
               <div className="review-author" style={{ marginTop: "16px" }}>
                 <div
                   className="review-avatar"
@@ -271,17 +189,14 @@ export default function Reviews() {
                     📍 {review.location}
                   </span>
                 </div>
+                <div className="review-verified" title="Verified Customer">
+                  <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+                    <circle cx="12" cy="12" r="10" fill="#4CAF50" />
+                    <path d="M8 12l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Grid of all reviews (visible below marquee on mobile or as fallback) */}
-      <div className="reviews-grid-section">
-        <div className="reviews-grid">
-          {REVIEWS.map((review, i) => (
-            <ReviewCard key={i} review={review} index={i} />
           ))}
         </div>
       </div>

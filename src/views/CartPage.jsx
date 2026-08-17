@@ -93,7 +93,7 @@ export default function CartPage() {
                       {item.originalPrice && (
                         <span className="cart-item-original">{formatCurrency(item.originalPrice)}</span>
                       )}
-                      {item.originalPrice && item.price && (
+                      {item.originalPrice && item.price && item.originalPrice > item.price && (
                         <span className="cart-item-discount">
                           {Math.round((1 - item.price / item.originalPrice) * 100)}% Off
                         </span>
@@ -160,7 +160,7 @@ export default function CartPage() {
             )}
             <div className="summary-row" style={{ fontSize: '14px' }}>
               <span>Delivery Charges</span>
-              {cartTotal >= 999 ? (
+              {finalTotal >= 999 ? (
                 <span style={{ color: '#2e7d32', fontWeight: '600' }}>Free</span>
               ) : (
                 <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Calculated at checkout</span>
