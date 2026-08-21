@@ -192,10 +192,10 @@ export default function ProductsTab() {
               {filteredInventory.length > 0 ? (
                 filteredInventory.map((product) => (
                   <tr key={product.id}>
-                    <td>
+                    <td data-label="Select" className="admin-checkbox-cell">
                       <input 
                         type="checkbox"
-                        style={{ cursor: 'pointer' }}
+                        className="admin-checkbox"
                         checked={selectedProducts.includes(product.id)}
                         onChange={(e) => {
                           if (e.target.checked) {

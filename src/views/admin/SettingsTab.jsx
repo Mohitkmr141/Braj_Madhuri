@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import './Admin.css';
-import '../../components/Checkout.css';
 
 export default function SettingsTab() {
   const [settings, setSettings] = useState({
@@ -92,40 +91,43 @@ export default function SettingsTab() {
   };
 
   if (isLoading) {
-    return <div className="admin-content-card" style={{ textAlign: 'center', padding: '40px' }}>Loading Settings...</div>;
+    return <div className="admin-card-padded" style={{ textAlign: 'center', padding: '60px' }}>Loading Settings...</div>;
   }
 
   return (
-    <div className="admin-content-card">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h2 className="admin-title" style={{ fontSize: '1.25rem' }}>Marketing & Settings</h2>
+    <div className="admin-card-padded">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
+        <div>
+          <h2 className="admin-card-title" style={{ margin: 0, fontSize: '22px' }}>Marketing & Sitewide Settings</h2>
+          <p className="text-sm text-muted" style={{ margin: '4px 0 0' }}>Manage sitewide discounts, promotion banners, and announcements</p>
+        </div>
         <button 
           onClick={handleSave} 
           disabled={isSaving}
           className="btn btn-primary"
         >
-          {isSaving ? 'Saving...' : 'Save Changes'}
+          {isSaving ? 'Saving...' : '💾 Save Settings'}
         </button>
       </div>
 
-      <div className="form-group" style={{ marginBottom: '32px' }}>
-        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '1.1rem', fontWeight: 'bold' }}>
+      <div className="form-group" style={{ marginBottom: '32px', background: 'var(--admin-bg)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
+        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '16px', fontWeight: '600', color: 'var(--text-main)' }}>
           <input 
             type="checkbox" 
             checked={settings.isSaleActive} 
             onChange={(e) => setSettings({ ...settings, isSaleActive: e.target.checked })}
-            style={{ width: '20px', height: '20px', marginRight: '12px' }}
+            style={{ width: '20px', height: '20px', marginRight: '12px', cursor: 'pointer', accentColor: 'var(--admin-maroon)' }}
           />
-          Enable Special Sale Sitewide
+          🔥 Enable Sitewide Special Sale & Promotional Discount
         </label>
-        <p style={{ color: 'var(--text-light)', marginTop: '8px', marginLeft: '32px' }}>
-          When active, this will apply the discount percentage below to all orders, and show the top announcement bar and homepage banner.
+        <p className="text-sm text-muted" style={{ marginTop: '8px', marginLeft: '32px', lineHeight: '1.5' }}>
+          When enabled, the discount percentage configured below will be applied at checkout, and the promotional sale banner will display across the store.
         </p>
       </div>
 
-      <div className="admin-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-        <div className="form-group">
-          <label>Discount Percentage (%)</label>
+      <div className="form-row">
+        <div className="form-col">
+          <label className="form-label">Discount Percentage (%)</label>
           <input 
             type="number" 
             min="0"
@@ -137,8 +139,8 @@ export default function SettingsTab() {
           />
         </div>
 
-        <div className="form-group">
-          <label>Announcement Bar Text</label>
+        <div className="form-col">
+          <label className="form-label">Announcement Bar Promo Text</label>
           <input 
             type="text" 
             value={settings.saleTitle} 
@@ -150,19 +152,19 @@ export default function SettingsTab() {
       </div>
 
       <div className="form-group" style={{ marginTop: '24px' }}>
-        <label>Homepage Sale Banner Image</label>
+        <label className="form-label">Homepage Sale Banner Image</label>
         {settings.saleBannerUrl && (
-          <div style={{ marginBottom: '16px' }}>
+          <div style={{ marginBottom: '16px', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--border-light)', maxWidth: '600px' }}>
             <img 
               src={settings.saleBannerUrl} 
               alt="Sale Banner Preview" 
-              style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '8px', border: '1px solid #ddd' }}
+              style={{ width: '100%', height: 'auto', display: 'block', maxHeight: '280px', objectFit: 'cover' }}
             />
           </div>
         )}
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <label className="btn btn-secondary" style={{ cursor: 'pointer' }}>
-            {isUploading ? 'Uploading...' : (settings.saleBannerUrl ? 'Change Banner' : 'Upload Banner')}
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <label className="btn btn-outline" style={{ cursor: 'pointer' }}>
+            {isUploading ? 'Uploading...' : (settings.saleBannerUrl ? '🔄 Change Banner Image' : '📤 Upload Banner Image')}
             <input 
               type="file" 
               accept="image/*" 
@@ -175,15 +177,14 @@ export default function SettingsTab() {
             <button 
               type="button" 
               onClick={() => setSettings({ ...settings, saleBannerUrl: '' })}
-              className="btn btn-secondary" 
-              style={{ color: 'var(--maroon)' }}
+              className="btn btn-danger btn-sm" 
             >
-              Remove
+              🗑️ Remove Banner
             </button>
           )}
         </div>
-        <p style={{ color: 'var(--text-light)', marginTop: '8px', fontSize: '0.9rem' }}>
-          This image will replace the default homepage hero banner when the sale is active.
+        <p className="text-xs text-muted" style={{ marginTop: '8px' }}>
+          Recommended size: 1920x600px. This banner replaces the hero banner on the homepage while the promotional sale is active.
         </p>
       </div>
     </div>

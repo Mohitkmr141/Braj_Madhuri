@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import './Admin.css';
-import '../../components/Checkout.css';
 import { Toaster } from 'react-hot-toast';
 import OrdersTab from './OrdersTab';
 import ProductsTab from './ProductsTab';

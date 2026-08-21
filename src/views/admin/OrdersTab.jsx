@@ -250,10 +250,10 @@ const OrdersTab = () => {
 
                 return (
                   <tr key={order.id}>
-                    <td>
+                    <td data-label="Select" className="admin-checkbox-cell">
                       <input 
                         type="checkbox"
-                        style={{ cursor: 'pointer' }}
+                        className="admin-checkbox"
                         checked={selectedOrders.includes(order.id)}
                         onChange={(e) => {
                           if (e.target.checked) {
@@ -265,40 +265,44 @@ const OrdersTab = () => {
                       />
                     </td>
                     <td data-label="Order ID">
-                      <span className="awb-badge">{order.orderNumber}</span>
-                      {order.razorpayPaymentId && (
-                        <div className="text-xs text-muted mt-1" title="Razorpay Payment ID">
-                          💳 {order.razorpayPaymentId}
-                        </div>
-                      )}
+                      <div className="order-id-cell">
+                        <span className="awb-badge">{order.orderNumber}</span>
+                        {order.razorpayPaymentId && (
+                          <div className="text-xs text-muted font-mono" title="Razorpay Payment ID">
+                            💳 {order.razorpayPaymentId}
+                          </div>
+                        )}
+                      </div>
                     </td>
-                    <td data-label="Date">{formatDate(order.createdAt)}</td>
+                    <td data-label="Date">
+                      <span className="order-date-text">{formatDate(order.createdAt)}</span>
+                    </td>
                     <td data-label="Customer">
-                      <div className="font-medium">{order.customerName || 'N/A'}</div>
-                      <div className="text-sm text-muted mt-1">
+                      <div className="font-semibold text-main">{order.customerName || 'N/A'}</div>
+                      <div className="text-xs text-muted mt-1">
                         {order.address}, {order.city} - {order.pincode}
                       </div>
                     </td>
                     <td data-label="Contact">
-                      <div>{order.phone || 'N/A'}</div>
-                      <div className="text-sm text-muted mt-1">{order.email || 'N/A'}</div>
+                      <div className="text-sm font-medium">{order.phone || 'N/A'}</div>
+                      <div className="text-xs text-muted mt-1 text-truncate">{order.email || 'N/A'}</div>
                     </td>
                     <td data-label="Items">
                       <div className="order-items-list">
                         {items.length > 0 ? items.map((item, index) => (
-                          <div key={index} className="order-item-line mb-2">
-                            <span className="order-item-qty">{item.quantity}x</span>
+                          <div key={index} className="order-item-chip">
+                            <span className="order-item-qty">{item.quantity}×</span>
                             <span className="order-item-title">
                               {item.title || item.name} 
-                              {item.size && <span className="product-size" style={{marginLeft: '6px', fontWeight: 'bold'}}>Size: {item.size}</span>}
-                              {item.color && <span className="product-color" style={{marginLeft: '6px', fontWeight: 'bold'}}>| Color: {item.color}</span>}
+                              {item.size && <span className="product-size">Size: {item.size}</span>}
+                              {item.color && <span className="product-color">Color: {item.color}</span>}
                             </span>
                           </div>
-                        )) : "No items"}
+                        )) : <span className="text-xs text-muted italic">No items</span>}
                       </div>
                     </td>
-                    <td data-label="Total" className="font-medium">
-                      <div>{formatCurrency(order.totalAmount)}</div>
+                    <td data-label="Total" className="font-semibold">
+                      <div className="text-main">{formatCurrency(order.totalAmount)}</div>
                       {(() => {
                         const itemsSubtotal = items.reduce((acc, it) => acc + ((parseFloat(it.price) || 0) * (parseInt(it.quantity, 10) || 1)), 0);
                         const shipping = parseFloat(order.shippingCost) || 0;
@@ -307,13 +311,13 @@ const OrdersTab = () => {
                         return (
                           <>
                             {discount > 0 && (
-                              <div className="text-xs" style={{ color: '#2e7d32', marginTop: '2px', fontWeight: '500' }}>
+                              <div className="text-xs text-success font-medium">
                                 Disc: −{formatCurrency(discount)}
                               </div>
                             )}
                             {shipping > 0 && (
-                              <div className="text-xs text-muted" style={{ marginTop: '1px' }}>
-                                (₹{shipping} ship)
+                              <div className="text-xs text-muted">
+                                +₹{shipping} ship
                               </div>
                             )}
                           </>
@@ -321,23 +325,12 @@ const OrdersTab = () => {
                       })()}
                     </td>
                     <td data-label="Status">
-                      <div className="flex flex-col gap-1">
+                      <div className="status-cell-wrapper">
                         <select
-                          className="status-select"
+                          className={`status-select status-select--${(order.status || 'pending').toLowerCase()}`}
                           value={order.status}
                           onChange={(e) => handleStatusChange(order.id, e.target.value)}
                           disabled={actionLoading === `${order.id}-status`}
-                          style={{
-                            fontSize: '12px',
-                            fontWeight: '600',
-                            padding: '4px 8px',
-                            borderRadius: '20px',
-                            border: '1px solid #d1d5db',
-                            background: order.status === 'Pending' ? '#e8f5e9' : order.status === 'Shipped' ? '#e3f2fd' : order.status === 'Delivered' ? '#f3e5f5' : order.status === 'Cancelled' || order.status === 'Payment_Failed' ? '#ffebee' : '#fff8e1',
-                            color: order.status === 'Pending' ? '#2e7d32' : order.status === 'Shipped' ? '#1565c0' : order.status === 'Delivered' ? '#7b1fa2' : order.status === 'Cancelled' || order.status === 'Payment_Failed' ? '#c62828' : '#f57f17',
-                            cursor: 'pointer',
-                            outline: 'none',
-                          }}
                         >
                           <option value="Pending">Paid / Pending</option>
                           <option value="Shipped">Shipped</option>
@@ -347,38 +340,27 @@ const OrdersTab = () => {
                           <option value="Payment_Failed">Payment Failed</option>
                         </select>
                         {actionLoading === `${order.id}-status` && (
-                          <span className="text-xs text-maroon">Updating...</span>
+                          <span className="text-xs text-maroon font-medium">Updating...</span>
                         )}
                       </div>
                     </td>
                     <td data-label="Actions">
                       {!order.shiprocketOrderId ? (
-                        <div className="flex flex-col gap-1">
-                          <span className="text-muted text-xs italic">Not Synced</span>
+                        <div className="shiprocket-actions-wrapper">
                           <button
                             type="button"
-                            className="btn btn-secondary"
-                            style={{ 
-                              fontSize: '11px', 
-                              padding: '4px 8px', 
-                              backgroundColor: 'var(--maroon, #4A1521)', 
-                              color: '#fff', 
-                              border: 'none', 
-                              borderRadius: '4px', 
-                              cursor: 'pointer',
-                              whiteSpace: 'nowrap'
-                            }}
+                            className="btn btn-primary btn-sm btn-shiprocket-sync"
                             onClick={() => handleShiprocketAction(order.id, 'sync_order')}
                             disabled={!!actionLoading}
                           >
-                            Sync Shiprocket
+                            🚀 Sync Shiprocket
                           </button>
                           {actionLoading === `${order.id}-sync_order` && (
-                            <span className="text-maroon text-xs">Syncing...</span>
+                            <span className="text-maroon text-xs font-medium">Syncing...</span>
                           )}
                         </div>
                       ) : (
-                        <div className="flex flex-col gap-2">
+                        <div className="shiprocket-actions-wrapper">
                           {order.awbCode && (
                             <div className="awb-badge">
                               AWB: {order.awbCode}
@@ -394,7 +376,7 @@ const OrdersTab = () => {
                             }}
                             disabled={!!actionLoading}
                           >
-                            <option value="">Select Action...</option>
+                            <option value="">⚙️ Choose Action...</option>
                             <option value="generate_awb">Generate AWB</option>
                             <option value="generate_pickup">Request Pickup</option>
                             <option value="generate_label">Download Label</option>
@@ -404,7 +386,7 @@ const OrdersTab = () => {
                             {order.awbCode && <option value="track_awb">Track AWB</option>}
                           </select>
                           {actionLoading && actionLoading.startsWith(order.id) && (
-                            <div className="text-maroon text-xs">Processing...</div>
+                            <div className="text-maroon text-xs font-medium">Processing...</div>
                           )}
                         </div>
                       )}
