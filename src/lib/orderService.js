@@ -33,21 +33,34 @@ async function decrementStockForItems(tx, cartItems) {
       let updatedVariants = Array.isArray(product.variants) ? [...product.variants] : [];
 
       if ((item.size || item.color) && updatedVariants.length > 0) {
-        let variantMatched = false;
-        updatedVariants = updatedVariants.map((v) => {
-          if (variantMatched) return v;
+        const iS = (item.size || '').trim().toLowerCase();
+        const iC = (item.color || '').trim().toLowerCase();
+
+        // Find index of exact match first
+        let targetIndex = updatedVariants.findIndex((v) => {
           const vS = (v.size || '').trim().toLowerCase();
           const vC = (v.color || '').trim().toLowerCase();
-          const iS = (item.size || '').trim().toLowerCase();
-          const iC = (item.color || '').trim().toLowerCase();
-          if ((!vS || vS === iS) && (!vC || vC === iC)) {
-            variantMatched = true;
-            const currentStock = parseInt(v.stock, 10) || 0;
-            const newStock = Math.max(0, currentStock - qty);
-            return { ...v, stock: newStock };
-          }
-          return v;
+          return (vS === iS) && (vC === iC);
         });
+
+        // Fallback: match on size or color if the other attribute is empty
+        if (targetIndex === -1) {
+          targetIndex = updatedVariants.findIndex((v) => {
+            const vS = (v.size || '').trim().toLowerCase();
+            const vC = (v.color || '').trim().toLowerCase();
+            const matchS = iS ? vS === iS : (!vS || vS === '');
+            const matchC = iC ? vC === iC : (!vC || vC === '');
+            return matchS && matchC;
+          });
+        }
+
+        let variantMatched = false;
+        if (targetIndex !== -1) {
+          variantMatched = true;
+          const currentStock = parseInt(updatedVariants[targetIndex].stock, 10) || 0;
+          const newStock = Math.max(0, currentStock - qty);
+          updatedVariants[targetIndex] = { ...updatedVariants[targetIndex], stock: newStock };
+        }
 
         await tx.product.update({
           where: { id: item.id },

@@ -2,6 +2,7 @@ import { verifyAdminToken } from '../../../../lib/auth.js';
 import { getPrisma } from '../../../../lib/prisma.js';
 import { NextResponse } from 'next/server';
 import { 
+  createShiprocketOrder,
   generateAWB, 
   generatePickup, 
   generateManifest, 
@@ -11,8 +12,6 @@ import {
   trackAWB 
 } from '../../../../lib/shiprocket.js';
 import { cookies } from 'next/headers';
-
-
 
 export async function POST(request) {
   const cookieStore = await cookies();
@@ -30,8 +29,34 @@ export async function POST(request) {
     }
 
     const order = await prisma.order.findUnique({ where: { id: orderId } });
-    if (!order || !order.shiprocketOrderId) {
-      return NextResponse.json({ success: false, error: 'Order not found or not synced with Shiprocket' }, { status: 400 });
+    if (!order) {
+      return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 });
+    }
+
+    // Allow sync_order action even when not yet synced with Shiprocket
+    if (action === 'sync_order') {
+      const srResult = await createShiprocketOrder(order);
+      if (srResult && (srResult.order_id || srResult.shipment_id)) {
+        const updated = await prisma.order.update({
+          where: { id: order.id },
+          data: {
+            shiprocketOrderId: srResult.order_id,
+            shiprocketShipmentId: srResult.shipment_id,
+          },
+        });
+        return NextResponse.json({ 
+          success: true, 
+          message: 'Successfully synced with Shiprocket', 
+          data: srResult, 
+          order: updated 
+        });
+      } else {
+        throw new Error(srResult?.message || 'Shiprocket did not return an order ID. Check address/phone details.');
+      }
+    }
+
+    if (!order.shiprocketOrderId) {
+      return NextResponse.json({ success: false, error: 'Order is not yet synced with Shiprocket. Please sync order first.' }, { status: 400 });
     }
 
     const shiprocketOrderId = order.shiprocketOrderId;
@@ -41,12 +66,8 @@ export async function POST(request) {
 
     switch (action) {
       case 'generate_awb':
-        // Generate AWB requires shipment_id, which we might not have saved yet if it's the first time
-        // Wait, Shiprocket create order response gives shipment_id. If we don't have it, we might need to fetch it.
-        // But for simplicity, we assume we either have it or Shiprocket generate AWB can accept it.
-        // Actually, createShiprocketOrder returns order_id and shipment_id. Let's see if we saved shipment_id.
         if (!shipmentId) {
-           return NextResponse.json({ success: false, error: 'shipmentId not found on order. Ensure it was saved.' }, { status: 400 });
+           return NextResponse.json({ success: false, error: 'shipmentId not found on order. Ensure order is synced.' }, { status: 400 });
         }
         result = await generateAWB(shipmentId);
         if (result && result.response && result.response.data && result.response.data.awb_code) {
@@ -99,5 +120,3 @@ export async function POST(request) {
     );
   }
 }
-
-

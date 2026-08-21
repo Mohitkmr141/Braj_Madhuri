@@ -69,6 +69,28 @@ const OrdersTab = () => {
     fetchOrders();
   }, [fetchOrders]);
 
+  const handleStatusChange = async (orderId, newStatus) => {
+    setActionLoading(`${orderId}-status`);
+    try {
+      const res = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, status: newStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Order status updated to ${newStatus}`);
+        fetchOrders();
+      } else {
+        toast.error(`Failed: ${data.error}`);
+      }
+    } catch {
+      toast.error('Network error updating status.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleShiprocketAction = async (orderId, actionName) => {
     setActionLoading(`${orderId}-${actionName}`);
     try {
@@ -299,13 +321,62 @@ const OrdersTab = () => {
                       })()}
                     </td>
                     <td data-label="Status">
-                      <span className={`status-badge ${order.status?.toLowerCase() || 'pending'}`}>
-                        {order.status === 'Payment_Pending' ? 'Pending Payment' : order.status === 'Pending' ? 'Paid / Pending' : order.status}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <select
+                          className="status-select"
+                          value={order.status}
+                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                          disabled={actionLoading === `${order.id}-status`}
+                          style={{
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            padding: '4px 8px',
+                            borderRadius: '20px',
+                            border: '1px solid #d1d5db',
+                            background: order.status === 'Pending' ? '#e8f5e9' : order.status === 'Shipped' ? '#e3f2fd' : order.status === 'Delivered' ? '#f3e5f5' : order.status === 'Cancelled' || order.status === 'Payment_Failed' ? '#ffebee' : '#fff8e1',
+                            color: order.status === 'Pending' ? '#2e7d32' : order.status === 'Shipped' ? '#1565c0' : order.status === 'Delivered' ? '#7b1fa2' : order.status === 'Cancelled' || order.status === 'Payment_Failed' ? '#c62828' : '#f57f17',
+                            cursor: 'pointer',
+                            outline: 'none',
+                          }}
+                        >
+                          <option value="Pending">Paid / Pending</option>
+                          <option value="Shipped">Shipped</option>
+                          <option value="Delivered">Delivered</option>
+                          <option value="Cancelled">Cancelled</option>
+                          <option value="Payment_Pending">Payment Pending</option>
+                          <option value="Payment_Failed">Payment Failed</option>
+                        </select>
+                        {actionLoading === `${order.id}-status` && (
+                          <span className="text-xs text-maroon">Updating...</span>
+                        )}
+                      </div>
                     </td>
                     <td data-label="Actions">
                       {!order.shiprocketOrderId ? (
-                        <div className="text-muted text-sm italic">Not Synced</div>
+                        <div className="flex flex-col gap-1">
+                          <span className="text-muted text-xs italic">Not Synced</span>
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            style={{ 
+                              fontSize: '11px', 
+                              padding: '4px 8px', 
+                              backgroundColor: 'var(--maroon, #4A1521)', 
+                              color: '#fff', 
+                              border: 'none', 
+                              borderRadius: '4px', 
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap'
+                            }}
+                            onClick={() => handleShiprocketAction(order.id, 'sync_order')}
+                            disabled={!!actionLoading}
+                          >
+                            Sync Shiprocket
+                          </button>
+                          {actionLoading === `${order.id}-sync_order` && (
+                            <span className="text-maroon text-xs">Syncing...</span>
+                          )}
+                        </div>
                       ) : (
                         <div className="flex flex-col gap-2">
                           {order.awbCode && (

@@ -74,17 +74,23 @@ export async function POST(request) {
     }
 
     // ── Finalize paid order idempotently ──────────────────────────────────────
+    // NOTE: We deliberately omit cartItems from fallbackData here.
+    // The pre-created order (written from server-verified data in /api/razorpay/create-order)
+    // should almost always be found. In the rare edge-case it is not, the fallback order
+    // is created with only formData and the Razorpay-verified amount — never from
+    // raw client-supplied cartItems which could contain tampered prices.
     const result = await finalizePaidOrder({
       razorpayOrderId: razorpay_order_id,
       razorpayPaymentId: razorpay_payment_id,
       orderNumber: orderNumber,
       fallbackData: {
         formData,
-        cartItems: cartItems || [],
+        cartItems: [],   // intentionally empty — amount verified from Razorpay API in orderService
         cartTotal: cartTotal || 0,
         shippingCost: shippingCost || 0,
       },
     });
+
 
     console.log(`[Checkout] Order ${result.order.orderNumber} confirmed. Payment ID: ${razorpay_payment_id}`);
 

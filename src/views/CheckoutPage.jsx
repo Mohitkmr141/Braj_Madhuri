@@ -173,7 +173,7 @@ export default function CheckoutPage() {
       }
       
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
+        key: orderData.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
         amount: orderData.order.amount,
         currency: orderData.order.currency,
         name: "The Braj Madhuri",

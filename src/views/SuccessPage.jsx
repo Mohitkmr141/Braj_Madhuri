@@ -6,16 +6,14 @@ import { useSearchParams } from "next/navigation";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
-  const [orderId, setOrderId] = useState("");
+  const [orderId, setOrderId] = useState(null);
   
   useEffect(() => {
     const idFromUrl = searchParams?.get("orderId");
     if (idFromUrl) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOrderId(idFromUrl);
     } else {
-      const randomId = Math.floor(Math.random() * 900000) + 100000;
-      setOrderId(`BM-${randomId}`);
+      setOrderId(null);
     }
   }, [searchParams]);
 
@@ -64,19 +62,33 @@ function SuccessContent() {
         </h1>
         
         <p style={{ color: "var(--text-muted, #6B5B53)", fontSize: "16px", lineHeight: "1.6", marginBottom: "24px" }}>
-          Thank you for choosing The Braj Madhuri. Your order has been placed successfully and is being processed.
+          Thank you for choosing The Braj Madhuri. Your order has been placed successfully and confirmation details have been sent to your email.
         </p>
         
-        <div style={{
-          background: "#f9f8f6",
-          padding: "20px",
-          borderRadius: "8px",
-          marginBottom: "32px",
-          border: "1px dashed rgba(201, 151, 42, 0.5)"
-        }}>
-          <p style={{ margin: "0", fontSize: "14px", color: "var(--text-muted)" }}>Order Reference Number:</p>
-          <p style={{ margin: "4px 0 0", fontSize: "20px", fontWeight: "700", color: "var(--maroon)" }}>{orderId}</p>
-        </div>
+        {orderId ? (
+          <div style={{
+            background: "#f9f8f6",
+            padding: "20px",
+            borderRadius: "8px",
+            marginBottom: "32px",
+            border: "1px dashed rgba(201, 151, 42, 0.5)"
+          }}>
+            <p style={{ margin: "0", fontSize: "14px", color: "var(--text-muted)" }}>Order Reference Number:</p>
+            <p style={{ margin: "4px 0 0", fontSize: "20px", fontWeight: "700", color: "var(--maroon)" }}>{orderId}</p>
+          </div>
+        ) : (
+          <div style={{
+            background: "#fdf8f0",
+            padding: "16px",
+            borderRadius: "8px",
+            marginBottom: "32px",
+            border: "1px solid rgba(201, 151, 42, 0.2)",
+            color: "var(--text-muted)",
+            fontSize: "14px"
+          }}>
+            Please check your email inbox for your order invoice and tracking updates.
+          </div>
+        )}
         
         <Link href="/shop" style={{
           display: "inline-block",

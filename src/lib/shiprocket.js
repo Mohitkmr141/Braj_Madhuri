@@ -124,7 +124,7 @@ export async function createShiprocketOrder(order) {
   const shiprocketOrderData = {
     order_id: order.orderNumber,
     order_date: new Date().toISOString().split("T")[0],
-    pickup_location: "Home",
+    pickup_location: process.env.SHIPROCKET_PICKUP_LOCATION || "Home",
     billing_customer_name: order.customerName && order.customerName.length >= 3 ? order.customerName : (order.customerName || "Guest") + " Customer",
     billing_last_name: "",
     billing_address: order.address || "No Address Provided",

@@ -28,6 +28,7 @@ export async function POST(request) {
 
     const prisma = getPrisma();
     let calculatedCartTotal = 0;
+    const verifiedCartItems = [];
 
     // 1. Strictly validate items, quantities, and prices from DB / COMBO_MAP
     for (const item of cartItems) {
@@ -56,6 +57,16 @@ export async function POST(request) {
           );
         }
         calculatedCartTotal += comboInfo.price * qty;
+        verifiedCartItems.push({
+          id: item.id,
+          title: comboInfo.title,
+          price: comboInfo.price,
+          originalPrice: null,
+          quantity: qty,
+          size: null,
+          color: null,
+          image: item.image || '/header-banner.jpg',
+        });
         continue;
       }
 
@@ -68,17 +79,34 @@ export async function POST(request) {
       }
 
       let itemPrice = product.price || 0;
+      let itemOrigPrice = product.originalPrice || product.price || 0;
+      let itemImage = product.imageUrl || (Array.isArray(product.images) && product.images[0]) || '/header-banner.jpg';
+      const itemSize = item.size ? String(item.size).trim() : null;
+      const itemColor = item.color ? String(item.color).trim() : null;
 
       // Check variant stock and pricing if applicable
-      if (item.size || item.color) {
+      if (itemSize || itemColor) {
         const variants = Array.isArray(product.variants) ? product.variants : [];
-        const matchedVariant = variants.find(v => {
+        const iS = (itemSize || '').toLowerCase();
+        const iC = (itemColor || '').toLowerCase();
+
+        // Exact match first
+        let matchedVariant = variants.find(v => {
           const vS = (v.size || '').trim().toLowerCase();
           const vC = (v.color || '').trim().toLowerCase();
-          const iS = (item.size || '').trim().toLowerCase();
-          const iC = (item.color || '').trim().toLowerCase();
-          return (!vS || vS === iS) && (!vC || vC === iC);
+          return (vS === iS) && (vC === iC);
         });
+
+        // Fallback: match on size or color if the other attribute is empty
+        if (!matchedVariant) {
+          matchedVariant = variants.find(v => {
+            const vS = (v.size || '').trim().toLowerCase();
+            const vC = (v.color || '').trim().toLowerCase();
+            const matchS = iS ? vS === iS : (!vS || vS === '');
+            const matchC = iC ? vC === iC : (!vC || vC === '');
+            return matchS && matchC;
+          });
+        }
 
         if (matchedVariant) {
           const variantStock = parseInt(matchedVariant.stock, 10) || 0;
@@ -86,7 +114,7 @@ export async function POST(request) {
             return NextResponse.json(
               {
                 success: false,
-                error: `Insufficient stock for "${item.title}". Only ${variantStock} left in this variant.`
+                error: `Insufficient stock for "${product.title}". Only ${variantStock} left in this variant.`
               },
               { status: 400 }
             );
@@ -95,20 +123,48 @@ export async function POST(request) {
             const vp = parseFloat(matchedVariant.price);
             if (!isNaN(vp) && vp >= 0) itemPrice = vp;
           }
+          if (matchedVariant.originalPrice !== undefined && matchedVariant.originalPrice !== null && matchedVariant.originalPrice !== '') {
+            const vop = parseFloat(matchedVariant.originalPrice);
+            if (!isNaN(vop) && vop >= 0) itemOrigPrice = vop;
+          }
+          if (matchedVariant.image) {
+            itemImage = matchedVariant.image;
+          }
+        } else if (variants.length > 0) {
+          // Bug 3 fix: customer specified a size/color that does not match any variant.
+          // Previously this silently fell through to product.stock. Now we reject it explicitly.
+          return NextResponse.json(
+            {
+              success: false,
+              error: `The selected size/color combination is not available for "${product.title}". Please choose a valid option.`
+            },
+            { status: 400 }
+          );
         } else if (product.stock < qty) {
           return NextResponse.json(
-            { success: false, error: `Insufficient stock for "${item.title}". Only ${product.stock} left.` },
+            { success: false, error: `Insufficient stock for "${product.title}". Only ${product.stock} left.` },
             { status: 400 }
           );
         }
+
       } else if (product.stock < qty) {
         return NextResponse.json(
-          { success: false, error: `Insufficient stock for "${item.title}". Only ${product.stock} left.` },
+          { success: false, error: `Insufficient stock for "${product.title}". Only ${product.stock} left.` },
           { status: 400 }
         );
       }
 
       calculatedCartTotal += itemPrice * qty;
+      verifiedCartItems.push({
+        id: product.id,
+        title: product.title,
+        price: itemPrice,
+        originalPrice: itemOrigPrice,
+        quantity: qty,
+        size: itemSize,
+        color: itemColor,
+        image: itemImage,
+      });
     }
 
     // 2. Fetch site settings for discounts
@@ -199,7 +255,7 @@ export async function POST(request) {
         totalAmount: totalAmount,
         paymentMethod: 'online',
         status: 'Payment_Pending',
-        cartItems: cartItems,
+        cartItems: verifiedCartItems,
         shippingCost: shippingCost,
         razorpayOrderId: rzpOrder.id,
       },
@@ -210,7 +266,8 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       order: rzpOrder,
-      orderNumber: orderNumber
+      orderNumber: orderNumber,
+      keyId: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
     console.error('Razorpay Create Order Error:', error);
