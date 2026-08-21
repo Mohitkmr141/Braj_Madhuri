@@ -12,7 +12,15 @@
     --text: #1F1A17;
     --text-muted: #6B5B53;
     --white: #FFF;
-    
+
+    /* Font Stack Variables */
+    --font-brand:      var(--font-cinzel-decorative, 'Cinzel Decorative', Cinzel, serif);
+    --font-heading:    var(--font-playfair, 'Playfair Display', Georgia, serif);
+    --font-body:       var(--font-jakarta, 'Plus Jakarta Sans', Inter, sans-serif);
+    --font-accent:     var(--font-cormorant, 'Cormorant Garamond', Georgia, serif);
+    --font-script:     var(--font-devanagari, 'Noto Sans Devanagari', sans-serif);
+    --font-mono:       'Fira Code', 'Courier New', monospace;
+
     /* Modern Aesthetic Additions */
     --shadow-soft: 0 4px 24px rgb(74 21 33 / 6%);
     --shadow-hover: 0 16px 40px rgb(74 21 33 / 12%);
@@ -45,13 +53,14 @@
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: Inter, sans-serif;
+    font-family: var(--font-body);
     background: var(--cream);
     color: var(--text);
     overflow-x: hidden;
     min-width: 320px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: 0.01em;
   }
 
   .visually-hidden {
@@ -79,7 +88,7 @@
     color: var(--gold-light);
     text-align: center;
     padding: 10px 20px;
-    font-family: 'Noto Sans Devanagari', sans-serif;
+    font-family: var(--font-script);
     font-size: 13px;
     letter-spacing: 0.5px;
   }
@@ -1571,7 +1580,7 @@
   /* ─── TYPOGRAPHY HIERARCHY & REFINEMENT ─── */
   h1, h2, h3, h4, h5, h6,
   .section-title, .page-hero__title {
-    font-family: var(--font-playfair, 'Playfair Display', Georgia, serif);
+    font-family: var(--font-heading);
     font-weight: 700;
     letter-spacing: -0.01em;
     line-height: 1.2;
@@ -1591,7 +1600,7 @@
 
   .section-eyebrow,
   .page-hero .section-eyebrow {
-    font-family: 'Noto Sans Devanagari', Inter, sans-serif;
+    font-family: var(--font-script);
     font-weight: 600;
     letter-spacing: 0.15em;
     text-transform: uppercase;
@@ -1604,7 +1613,7 @@
 
   /* Elegant italic serif accents */
   .section-title em, .page-hero__title em {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: var(--font-accent);
     font-style: italic;
     font-weight: 400;
     color: var(--gold);
@@ -1612,6 +1621,7 @@
 
   /* Subheadings & body paragraphs styling */
   .page-hero__body, .section-subtitle, .about-card__text {
+    font-family: var(--font-body);
     font-size: 18px;
     line-height: 1.65;
     font-weight: 400;

@@ -3,7 +3,14 @@ import SiteShell from "./SiteShell.jsx";
 import { ToastProvider } from "../context/ToastContext.jsx";
 import "../App.css";
 import { GoogleAnalytics } from '@next/third-parties/google';
-import { Playfair_Display, Inter } from "next/font/google";
+import {
+  Playfair_Display,
+  Inter,
+  Plus_Jakarta_Sans,
+  Cinzel_Decorative,
+  Cormorant_Garamond,
+  Noto_Sans_Devanagari,
+} from "next/font/google";
 import { unstable_cache } from "next/cache";
 
 const playfair = Playfair_Display({
@@ -16,6 +23,35 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+const cinzelDecorative = Cinzel_Decorative({
+  subsets: ["latin"],
+  variable: "--font-cinzel-decorative",
+  display: "swap",
+  weight: ["400", "700", "900"],
+});
+
+const cormorantGaramond = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-cormorant",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+const notoSansDevanagari = Noto_Sans_Devanagari({
+  subsets: ["devanagari"],
+  variable: "--font-devanagari",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const viewport = {
@@ -118,7 +154,7 @@ export default async function RootLayout({ children }) {
   };
 
   return (
-    <html lang="en-IN" className={`${playfair.variable} ${inter.variable}`}>
+    <html lang="en-IN" className={`${playfair.variable} ${inter.variable} ${plusJakartaSans.variable} ${cinzelDecorative.variable} ${cormorantGaramond.variable} ${notoSansDevanagari.variable}`}>
       <head>
         <link rel="preconnect" href="https://vdujlymtqvmztikeokje.supabase.co" crossOrigin="anonymous" />
         <script
