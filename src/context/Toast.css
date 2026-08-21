@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  z-index: 9999;
+  z-index: 10000;
   pointer-events: none;
 }
 
@@ -22,7 +22,7 @@
   min-width: 280px;
   max-width: 380px;
   backdrop-filter: blur(8px);
-  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.4s 2.6s forwards;
+  animation: toastSlideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1), toastFadeOut 0.4s 2.6s forwards;
   border-left: 4px solid var(--saffron, #D4AF37);
 }
 
@@ -70,7 +70,7 @@
   color: #fff;
 }
 
-@keyframes slideInRight {
+@keyframes toastSlideInRight {
   from {
     transform: translateX(100%);
     opacity: 0;
@@ -82,7 +82,7 @@
   }
 }
 
-@keyframes fadeOut {
+@keyframes toastFadeOut {
   from {
     opacity: 1;
   }

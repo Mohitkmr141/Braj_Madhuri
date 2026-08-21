@@ -14,7 +14,6 @@
   --transition:    .3s cubic-bezier(0.22, 1, 0.36, 1);
   --radius:        6px;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 /* === BANNER === */
 .bm-banner {
