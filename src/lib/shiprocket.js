@@ -118,6 +118,7 @@ export async function createShiprocketOrder(order) {
   if (resolvedState === "Delhi NCR") resolvedState = "Delhi";
   else if (resolvedState === "Rest of India") resolvedState = "Delhi";
 
+  const totalQty = orderItems.reduce((sum, it) => sum + (it.units || 1), 0);
   const subTotal = orderItems.reduce((acc, it) => acc + (it.selling_price * it.units), 0);
   const totalDiscount = Math.max(0, Math.round(subTotal + (order.shippingCost || 0) - (order.totalAmount || 0)));
 
@@ -146,10 +147,11 @@ export async function createShiprocketOrder(order) {
     transaction_charges: 0,
     total_discount: totalDiscount,
     sub_total: subTotal || order.totalAmount,
-    length: 10,
-    breadth: 10,
-    height: 10,
-    weight: 0.5,
+    // Estimate package dimensions dynamically based on total item count
+    length: totalQty <= 2 ? 15 : totalQty <= 5 ? 25 : 35,
+    breadth: totalQty <= 2 ? 10 : 15,
+    height: totalQty <= 2 ? 8 : totalQty <= 5 ? 12 : 18,
+    weight: Math.max(0.5, Math.round(totalQty * 0.3 * 10) / 10), // ~300g per item, min 500g
   };
 
   return shiprocketRequest("/orders/create/adhoc", "POST", shiprocketOrderData);

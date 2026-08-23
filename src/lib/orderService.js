@@ -2,6 +2,7 @@ import { getPrisma } from './prisma.js';
 import { sendOrderEmail } from './mailer.js';
 import { createShiprocketOrder } from './shiprocket.js';
 import Razorpay from 'razorpay';
+import { randomBytes } from 'crypto';
 
 /**
  * Safely decrements stock for cart items within a Prisma transaction or client.
@@ -184,7 +185,7 @@ export async function finalizePaidOrder({
       }
     }
 
-    const genOrderNumber = orderNumber || `BM-${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    const genOrderNumber = orderNumber || `BM-${Date.now().toString(36).toUpperCase()}${randomBytes(3).toString('hex').toUpperCase()}`;
     const cartItems = fallbackData.cartItems || [];
 
     try {

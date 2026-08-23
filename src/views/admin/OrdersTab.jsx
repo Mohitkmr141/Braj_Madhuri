@@ -143,6 +143,48 @@ const OrdersTab = () => {
     }
   };
 
+  const handleCleanup = async () => {
+    if (!confirm('This will mark all Payment_Pending orders older than 30 minutes as Payment_Failed and restore their stock. Continue?')) return;
+    setActionLoading('cleanup');
+    try {
+      const res = await fetch('/api/admin/cleanup-pending', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(data.message || `Cleaned ${data.cleaned} stale orders.`);
+        fetchOrders();
+      } else {
+        toast.error(`Cleanup failed: ${data.error}`);
+      }
+    } catch {
+      toast.error('Network error during cleanup.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRefund = async (orderId, orderNumber, totalAmount) => {
+    if (!confirm(`Issue a full refund of ₹${totalAmount} for order ${orderNumber}? This cannot be undone.`)) return;
+    setActionLoading(`${orderId}-refund`);
+    try {
+      const res = await fetch('/api/admin/refund', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(data.message);
+        fetchOrders();
+      } else {
+        toast.error(`Refund failed: ${data.error}`);
+      }
+    } catch {
+      toast.error('Network error during refund.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   return (
     <div className="admin-content-card">
       <div className="admin-card-header">
@@ -187,6 +229,14 @@ const OrdersTab = () => {
               {isDeleting ? 'Deleting...' : `Delete Selected (${selectedOrders.length})`}
             </button>
           )}
+          <button
+            className="filter-chip"
+            style={{ background: '#fff3cd', borderColor: '#ffc107', color: '#856404', marginLeft: selectedOrders.length > 0 ? '8px' : 'auto' }}
+            onClick={handleCleanup}
+            disabled={actionLoading === 'cleanup'}
+          >
+            {actionLoading === 'cleanup' ? 'Cleaning...' : '🧹 Cleanup Stale'}
+          </button>
         </div>
       </div>
 
@@ -388,6 +438,18 @@ const OrdersTab = () => {
                           {actionLoading && actionLoading.startsWith(order.id) && (
                             <div className="text-maroon text-xs font-medium">Processing...</div>
                           )}
+                        </div>
+                      )}
+                      {order.razorpayPaymentId && (
+                        <div style={{ marginTop: '6px' }}>
+                          <button
+                            type="button"
+                            style={{ background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 10px', fontSize: '12px', cursor: 'pointer', width: '100%' }}
+                            onClick={() => handleRefund(order.id, order.orderNumber, order.totalAmount)}
+                            disabled={!!actionLoading}
+                          >
+                            {actionLoading === `${order.id}-refund` ? 'Refunding...' : '💸 Refund'}
+                          </button>
                         </div>
                       )}
                     </td>

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
+import { randomBytes } from 'crypto';
 import { getPrisma } from '../../../../lib/prisma.js';
 
 const COMBO_MAP = {
@@ -78,8 +79,14 @@ export async function POST(request) {
         );
       }
 
-      let itemPrice = product.price || 0;
-      let itemOrigPrice = product.originalPrice || product.price || 0;
+      if (product.price === null || product.price === undefined || product.price <= 0) {
+        return NextResponse.json(
+          { success: false, error: `Product "${product.title}" does not have a valid price set. Please contact support.` },
+          { status: 400 }
+        );
+      }
+      let itemPrice = product.price;
+      let itemOrigPrice = product.originalPrice || product.price;
       let itemImage = product.imageUrl || (Array.isArray(product.images) && product.images[0]) || '/header-banner.jpg';
       const itemSize = item.size ? String(item.size).trim() : null;
       const itemColor = item.color ? String(item.color).trim() : null;
@@ -220,10 +227,8 @@ export async function POST(request) {
       );
     }
 
-    // 4. Generate unique Order Number
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    const orderNumber = `BM-${timestamp}${randomSuffix}`;
+    // 4. Generate unique Order Number (collision-free using crypto)
+    const orderNumber = `BM-${Date.now().toString(36).toUpperCase()}${randomBytes(3).toString('hex').toUpperCase()}`;
 
     // 5. Initialize Razorpay
     const razorpay = new Razorpay({
@@ -240,7 +245,6 @@ export async function POST(request) {
       amount: amountInPaise,
       currency: 'INR',
       receipt: orderNumber,
-      payment_capture: 1,
       notes: {
         orderNumber: orderNumber,
         customerName: customerName.slice(0, 40),
