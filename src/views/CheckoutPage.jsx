@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "../context/CartContext.jsx";
+import { calculateShippingFee, isDelhiNCR } from "../utils/shippingRules.js";
 import "../components/Checkout.css";
 
 const formatCurrency = (value) =>
@@ -69,13 +70,23 @@ export default function CheckoutPage() {
   const specialSaleDiscount = globalSettings?.isSaleActive ? Math.round(cartTotal * (globalSettings.saleDiscountPercentage / 100)) : 0;
   const finalDiscountedCartTotal = cartTotal - specialSaleDiscount;
 
-  // Derive shipping cost synchronously — no extra render cycle
+  // Derive whether address is Delhi-NCR (Delhi + 14 Haryana districts + 8 UP districts)
+  const isNCR = useMemo(() => {
+    return isDelhiNCR({
+      state: formData.state,
+      city: formData.city,
+      pincode: formData.pincode,
+    });
+  }, [formData.state, formData.city, formData.pincode]);
+
+  // Derive shipping cost synchronously — ₹79 for Delhi-NCR, ₹119 for Rest of India
   const shippingCost = useMemo(() => {
-    const { state } = formData;
-    if (state === "Delhi" || state === "Delhi NCR") return 79;
-    if (state) return 119;
-    return 0;
-  }, [formData]);
+    return calculateShippingFee({
+      state: formData.state,
+      city: formData.city,
+      pincode: formData.pincode,
+    });
+  }, [formData.state, formData.city, formData.pincode]);
 
   const finalTotalAmount = finalDiscountedCartTotal + shippingCost;
 
@@ -372,7 +383,7 @@ export default function CheckoutPage() {
                   <option value="">Select State / UT</option>
                   {INDIAN_STATES.map((st) => (
                     <option key={st} value={st}>
-                      {st} {(st === 'Delhi' || st === 'Delhi NCR') ? '(₹79 Shipping)' : '(₹119 Shipping)'}
+                      {st} {st === 'Delhi' ? '(₹79 Shipping)' : (st === 'Haryana' || st === 'Uttar Pradesh') ? '(₹79 NCR / ₹119 Other)' : '(₹119 Shipping)'}
                     </option>
                   ))}
                 </select>
@@ -437,13 +448,20 @@ export default function CheckoutPage() {
                   <span>− {formatCurrency(specialSaleDiscount)}</span>
                 </div>
               )}
-              <div className="summary-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
-                <span>Delivery Charges</span>
+              <div className="summary-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px', alignItems: 'center' }}>
+                <div>
+                  <span>Delivery Charges</span>
+                  {shippingCost > 0 && isNCR && (
+                    <div style={{ fontSize: '11px', color: '#2e7d32', fontWeight: '600', marginTop: '2px' }}>
+                      ✨ Delhi-NCR rate applied (₹79)
+                    </div>
+                  )}
+                </div>
                 <span>
                   {shippingCost > 0 ? (
                     formatCurrency(shippingCost)
                   ) : (
-                    <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '14px', fontFamily: "'Inter', sans-serif" }}>Select state to calculate</span>
+                    <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '14px', fontFamily: "'Inter', sans-serif" }}>Enter address to calculate</span>
                   )}
                 </span>
               </div>

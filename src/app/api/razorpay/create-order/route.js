@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { randomBytes } from 'crypto';
 import { getPrisma } from '../../../../lib/prisma.js';
+import { calculateShippingFee } from '../../../../utils/shippingRules.js';
 
 const COMBO_MAP = {
   'combo-daily-pooja-pack': { title: 'Daily Pooja Pack', price: 399 },
@@ -184,20 +185,23 @@ export async function POST(request) {
     
     const finalDiscountedTotal = Math.max(0, calculatedCartTotal - specialSaleDiscount);
 
-    // 3. Calculate shipping cost strictly from customer state
+    // 3. Calculate shipping cost strictly from customer state, city, and pincode (Delhi-NCR detection)
     const customerState = (formData?.state || state || '').trim();
+    const customerCity = (formData?.city || '').trim();
+    const customerPincode = (formData?.pincode || '').trim();
+
     if (!customerState) {
       return NextResponse.json(
         { success: false, error: 'Please select your state to calculate delivery charges.' },
         { status: 400 }
       );
     }
-    let shippingCost = 0;
-    if (customerState.toLowerCase() === "delhi" || customerState.toLowerCase() === "delhi ncr") {
-      shippingCost = 79;
-    } else {
-      shippingCost = 119;
-    }
+
+    const shippingCost = calculateShippingFee({
+      state: customerState,
+      city: customerCity,
+      pincode: customerPincode,
+    });
 
     const totalAmount = finalDiscountedTotal + shippingCost;
     const amountInPaise = Math.round(totalAmount * 100);
