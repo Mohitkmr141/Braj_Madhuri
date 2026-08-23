@@ -187,12 +187,10 @@ export async function POST(request) {
     // 3. Calculate shipping cost strictly from customer state
     const customerState = (formData?.state || state || '').trim();
     let shippingCost = 0;
-    if (finalDiscountedTotal < 999) {
-      if (customerState.toLowerCase() === "delhi" || customerState.toLowerCase() === "delhi ncr") {
-        shippingCost = 79;
-      } else {
-        shippingCost = 119;
-      }
+    if (customerState.toLowerCase() === "delhi" || customerState.toLowerCase() === "delhi ncr") {
+      shippingCost = 79;
+    } else {
+      shippingCost = 119;
     }
 
     const totalAmount = finalDiscountedTotal + shippingCost;

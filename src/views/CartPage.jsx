@@ -4,7 +4,6 @@ import React, { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "../context/CartContext.jsx";
-import FreeShippingBanner from "../components/FreeShippingBanner.jsx";
 import "../components/CartPage.css";
 
 const formatCurrency = (value) =>
@@ -68,7 +67,6 @@ export default function CartPage() {
           <div className="cart-header">
             <h1>My Cart ({cartCount})</h1>
           </div>
-          <FreeShippingBanner cartTotal={finalTotal} />
           
           <div className="cart-items-list">
             {cartItems.map((item) => {
@@ -161,11 +159,7 @@ export default function CartPage() {
             )}
             <div className="summary-row" style={{ fontSize: '14px' }}>
               <span>Delivery Charges</span>
-              {finalTotal >= 999 ? (
-                <span style={{ color: '#2e7d32', fontWeight: '600' }}>Free</span>
-              ) : (
-                <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Calculated at checkout</span>
-              )}
+              <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Calculated at checkout</span>
             </div>
             
             <div className="summary-divider" />

@@ -4,7 +4,6 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "../context/CartContext.jsx";
-import FreeShippingBanner from "../components/FreeShippingBanner.jsx";
 import "../components/Checkout.css";
 
 const formatCurrency = (value) =>
@@ -72,12 +71,11 @@ export default function CheckoutPage() {
 
   // Derive shipping cost synchronously — no extra render cycle
   const shippingCost = useMemo(() => {
-    if (finalDiscountedCartTotal >= 999) return 0;
     const { state } = formData;
     if (state === "Delhi" || state === "Delhi NCR") return 79;
     if (state) return 119;
     return 0;
-  }, [formData, finalDiscountedCartTotal]);
+  }, [formData]);
 
   const finalTotalAmount = finalDiscountedCartTotal + shippingCost;
 
@@ -280,8 +278,6 @@ export default function CheckoutPage() {
             <p>Please enter your shipping and payment details.</p>
           </div>
           
-          <FreeShippingBanner cartTotal={finalDiscountedCartTotal} />
-          
           {error && <div className="error-message">{error}</div>}
 
           {/* Shipping Address */}
@@ -376,7 +372,7 @@ export default function CheckoutPage() {
                   <option value="">Select State / UT</option>
                   {INDIAN_STATES.map((st) => (
                     <option key={st} value={st}>
-                      {st} {finalDiscountedCartTotal >= 999 ? '(Free Delivery)' : (st === 'Delhi' || st === 'Delhi NCR') ? '(₹79 Shipping)' : '(₹119 Shipping)'}
+                      {st} {(st === 'Delhi' || st === 'Delhi NCR') ? '(₹79 Shipping)' : '(₹119 Shipping)'}
                     </option>
                   ))}
                 </select>
@@ -444,9 +440,7 @@ export default function CheckoutPage() {
               <div className="summary-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
                 <span>Delivery Charges</span>
                 <span>
-                  {finalDiscountedCartTotal >= 999 ? (
-                    <span style={{ color: '#2e7d32', fontWeight: '600' }}>Free</span>
-                  ) : shippingCost > 0 ? (
+                  {shippingCost > 0 ? (
                     formatCurrency(shippingCost)
                   ) : (
                     <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '14px', fontFamily: "'Inter', sans-serif" }}>Select state to calculate</span>
