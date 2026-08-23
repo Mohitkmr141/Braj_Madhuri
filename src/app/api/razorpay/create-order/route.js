@@ -186,6 +186,12 @@ export async function POST(request) {
 
     // 3. Calculate shipping cost strictly from customer state
     const customerState = (formData?.state || state || '').trim();
+    if (!customerState) {
+      return NextResponse.json(
+        { success: false, error: 'Please select your state to calculate delivery charges.' },
+        { status: 400 }
+      );
+    }
     let shippingCost = 0;
     if (customerState.toLowerCase() === "delhi" || customerState.toLowerCase() === "delhi ncr") {
       shippingCost = 79;

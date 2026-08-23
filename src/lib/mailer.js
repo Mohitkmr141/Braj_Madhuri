@@ -120,7 +120,7 @@ function buildAdminHtml(order, itemsHtml) {
         <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;width:40%;border-radius:4px;">Order ID</td><td style="padding:8px;">${safeOrderNumber}</td></tr>
         <tr><td style="padding:8px;font-weight:bold;">Subtotal</td><td style="padding:8px;">₹${itemsTotal}</td></tr>
         ${discountAmount > 0 ? `<tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#2e7d32;">Special Sale Discount</td><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#2e7d32;">− ₹${discountAmount}</td></tr>` : ''}
-        <tr><td style="padding:8px;font-weight:bold;">Shipping Cost</td><td style="padding:8px;">${shippingCost > 0 ? `₹${shippingCost}` : 'Free'}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold;">Shipping Cost</td><td style="padding:8px;">${shippingCost > 0 ? `₹${shippingCost}` : '—'}</td></tr>
         <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#4A1521;font-size:15px;">Total Amount Paid</td><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#4A1521;font-size:15px;">₹${totalAmount}</td></tr>
         <tr><td style="padding:8px;font-weight:bold;">Payment</td><td style="padding:8px;">Online (Razorpay)</td></tr>
       </table>
@@ -157,7 +157,7 @@ function buildCustomerHtml(order, itemsHtml) {
         <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;width:40%;border-radius:4px;">Order ID</td><td style="padding:8px;font-weight:bold;color:#4A1521;">${safeOrderNumber}</td></tr>
         <tr><td style="padding:8px;font-weight:bold;">Subtotal</td><td style="padding:8px;">₹${itemsTotal}</td></tr>
         ${discountAmount > 0 ? `<tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#2e7d32;">Special Sale Discount</td><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#2e7d32;">− ₹${discountAmount}</td></tr>` : ''}
-        <tr><td style="padding:8px;font-weight:bold;">Shipping Cost</td><td style="padding:8px;">${shippingCost > 0 ? `₹${shippingCost}` : 'Free'}</td></tr>
+        <tr><td style="padding:8px;font-weight:bold;">Shipping Cost</td><td style="padding:8px;">${shippingCost > 0 ? `₹${shippingCost}` : '—'}</td></tr>
         <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#4A1521;font-size:15px;">Total Amount</td><td style="padding:8px;background:#fdf8f0;font-weight:bold;color:#4A1521;font-size:15px;">₹${totalAmount}</td></tr>
         <tr><td style="padding:8px;background:#fdf8f0;font-weight:bold;">Delivery To</td><td style="padding:8px;background:#fdf8f0;">${safeAddress}</td></tr>
       </table>
