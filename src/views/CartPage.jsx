@@ -10,7 +10,8 @@ import "../components/CartPage.css";
 const formatCurrency = (value) =>
   new Intl.NumberFormat("en-IN", {
     currency: "INR",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+    maximumFractionDigits: 2,
     style: "currency",
   }).format(value);
 

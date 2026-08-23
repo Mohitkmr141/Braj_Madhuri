@@ -10,7 +10,7 @@ const COMBO_MAP = {
 
 export async function POST(request) {
   try {
-    const { cartItems, state, formData } = await request.json();
+    const { cartItems, state, formData, expectedTotal } = await request.json();
 
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
       return NextResponse.json(
@@ -190,6 +190,20 @@ export async function POST(request) {
 
     const totalAmount = finalDiscountedTotal + shippingCost;
     const amountInPaise = Math.round(totalAmount * 100);
+
+    // expectedTotal is extracted at the top of the function now
+    if (expectedTotal !== undefined && Math.abs(Number(expectedTotal) - totalAmount) > 0.01) {
+      console.warn(`[Create-Order] Price mismatch. Client expected: ${expectedTotal}, Server calculated: ${totalAmount}`);
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Prices or stock have been updated since you added items to your cart. We have updated your cart with the latest prices. Please review and try again.',
+          priceChanged: true,
+          updatedCartItems: verifiedCartItems
+        },
+        { status: 400 }
+      );
+    }
 
     if (amountInPaise < 100) {
       return NextResponse.json(

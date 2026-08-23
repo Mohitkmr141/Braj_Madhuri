@@ -10,7 +10,8 @@ import "../components/Checkout.css";
 const formatCurrency = (value) =>
   new Intl.NumberFormat("en-IN", {
     currency: "INR",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+    maximumFractionDigits: 2,
     style: "currency",
   }).format(value);
 
@@ -67,7 +68,6 @@ export default function CheckoutPage() {
 
   const baseDiscount = totalOriginalPrice - cartTotal;
   const specialSaleDiscount = globalSettings?.isSaleActive ? Math.round(cartTotal * (globalSettings.saleDiscountPercentage / 100)) : 0;
-  const totalDiscount = baseDiscount + specialSaleDiscount;
   const finalDiscountedCartTotal = cartTotal - specialSaleDiscount;
 
   // Derive shipping cost synchronously — no extra render cycle
@@ -77,7 +77,7 @@ export default function CheckoutPage() {
     if (state === "Delhi" || state === "Delhi NCR") return 79;
     if (state) return 119;
     return 0;
-  }, [formData.state, finalDiscountedCartTotal]);
+  }, [formData, finalDiscountedCartTotal]);
 
   const finalTotalAmount = finalDiscountedCartTotal + shippingCost;
 
@@ -156,11 +156,17 @@ export default function CheckoutPage() {
       const orderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cartItems, state: formData.state, formData }),
+        body: JSON.stringify({ cartItems, state: formData.state, formData, expectedTotal: finalTotalAmount }),
       });
       if (!orderRes.ok) {
         const errData = await orderRes.json().catch(() => ({}));
         setError(errData.error || "Failed to create payment order. Please try again.");
+        if (errData.priceChanged && errData.updatedCartItems) {
+          localStorage.setItem("bm_cart_items", JSON.stringify(errData.updatedCartItems));
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        }
         setIsSubmitting(false);
         return;
       }
