@@ -11,6 +11,7 @@ import {
   printInvoice, 
   trackAWB 
 } from '../../../../lib/shiprocket.js';
+import { finalizePaidOrder } from '../../../../lib/orderService.js';
 import { cookies } from 'next/headers';
 
 export async function POST(request) {
@@ -53,6 +54,26 @@ export async function POST(request) {
       } else {
         throw new Error(srResult?.message || 'Shiprocket did not return an order ID. Check address/phone details.');
       }
+    }
+
+    // ── Force recover: verify payment with Razorpay and confirm stuck Payment_Pending order ───
+    if (action === 'force_recover') {
+      if (!order.razorpayOrderId && !order.razorpayPaymentId) {
+        return NextResponse.json({ success: false, error: 'Order has no Razorpay ID. Cannot auto-recover.' }, { status: 400 });
+      }
+      const result = await finalizePaidOrder({
+        razorpayOrderId: order.razorpayOrderId || null,
+        razorpayPaymentId: order.razorpayPaymentId || null,
+        orderNumber: order.orderNumber,
+        fallbackData: null,
+      });
+      return NextResponse.json({
+        success: true,
+        message: result.isNewOrUpdated
+          ? `Order ${result.order.orderNumber} has been confirmed. Email and Shiprocket sync triggered.`
+          : `Order ${result.order.orderNumber} was already confirmed (status: ${result.order.status}).`,
+        order: result.order,
+      });
     }
 
     if (!order.shiprocketOrderId) {

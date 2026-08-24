@@ -20,6 +20,12 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Server configuration error' }, { status: 500 });
     }
 
+    // ── Sanity check: warn if webhook secret appears to be incorrectly set ───────
+    if (webhookSecret === process.env.RAZORPAY_KEY_SECRET && process.env.RAZORPAY_WEBHOOK_SECRET === process.env.RAZORPAY_KEY_SECRET) {
+      console.warn('[Razorpay Webhook] ⚠️  WARNING: RAZORPAY_WEBHOOK_SECRET appears to be the same as RAZORPAY_KEY_SECRET.');
+      console.warn('[Razorpay Webhook] ⚠️  This is likely a misconfiguration. Please set RAZORPAY_WEBHOOK_SECRET to the secret from your Razorpay Dashboard Webhooks page.');
+    }
+
     // Verify HMAC-SHA256 signature
     const expectedSignature = crypto
       .createHmac('sha256', webhookSecret)
@@ -30,7 +36,10 @@ export async function POST(request) {
     const receivedBuf = Buffer.from(signature, 'utf8');
 
     if (expectedBuf.length !== receivedBuf.length || !crypto.timingSafeEqual(expectedBuf, receivedBuf)) {
-      console.error('[Razorpay Webhook] Invalid webhook signature mismatch.');
+      console.error('[Razorpay Webhook] ❌ Invalid webhook signature mismatch.');
+      console.error(`[Razorpay Webhook] Expected (first 8 chars): ${expectedSignature.slice(0, 8)}...`);
+      console.error(`[Razorpay Webhook] Received (first 8 chars): ${signature.slice(0, 8)}...`);
+      console.error('[Razorpay Webhook] If this keeps failing, verify RAZORPAY_WEBHOOK_SECRET matches what is set in the Razorpay Dashboard.');
       return NextResponse.json({ success: false, error: 'Invalid signature' }, { status: 400 });
     }
 

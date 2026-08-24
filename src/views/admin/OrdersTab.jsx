@@ -185,6 +185,33 @@ const OrdersTab = () => {
     }
   };
 
+  const handleForceRecover = async (orderId, razorpayOrderId, orderNumber) => {
+    if (!razorpayOrderId) {
+      toast.error('No Razorpay Order ID on this order — cannot auto-recover.');
+      return;
+    }
+    if (!confirm(`Force-recover order ${orderNumber}?\nThis will verify payment with Razorpay, confirm the order, decrement stock, and send the customer a confirmation email.`)) return;
+    setActionLoading(`${orderId}-recover`);
+    try {
+      const res = await fetch('/api/admin/shiprocket', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'force_recover', orderId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`✅ Order ${orderNumber} recovered and confirmed!`);
+        fetchOrders();
+      } else {
+        toast.error(`Recovery failed: ${data.error}`);
+      }
+    } catch {
+      toast.error('Network error during recovery.');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   return (
     <div className="admin-content-card">
       <div className="admin-card-header">
@@ -397,6 +424,17 @@ const OrdersTab = () => {
                     <td data-label="Actions">
                       {!order.shiprocketOrderId ? (
                         <div className="shiprocket-actions-wrapper">
+                          {order.status === 'Payment_Pending' && order.razorpayOrderId && (
+                            <button
+                              type="button"
+                              style={{ background: '#856404', color: '#fff', border: 'none', borderRadius: '4px', padding: '5px 10px', fontSize: '12px', cursor: 'pointer', width: '100%', marginBottom: '6px' }}
+                              onClick={() => handleForceRecover(order.id, order.razorpayOrderId, order.orderNumber)}
+                              disabled={!!actionLoading}
+                              title="Verify payment with Razorpay and confirm this order"
+                            >
+                              {actionLoading === `${order.id}-recover` ? '⏳ Recovering...' : '🔄 Recover Order'}
+                            </button>
+                          )}
                           <button
                             type="button"
                             className="btn btn-primary btn-sm btn-shiprocket-sync"

@@ -42,6 +42,8 @@ export default function CheckoutPage() {
   const [paymentMethod] = useState("online");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastPaymentId, setLastPaymentId] = useState(null); // Stores Razorpay pay_ ID on failure
+  const [isRecovering, setIsRecovering] = useState(false);
 
   const [globalSettings, setGlobalSettings] = useState(null);
 
@@ -115,6 +117,32 @@ export default function CheckoutPage() {
       script.onerror = () => resolve(false);
       document.body.appendChild(script);
     });
+  };
+
+  // ── Self-service order recovery ─────────────────────────────────────────────
+  // Called when a customer paid but never got a confirmation (browser crash/close)
+  const recoverOrder = async () => {
+    if (!lastPaymentId) return;
+    setIsRecovering(true);
+    setError("");
+    try {
+      const res = await fetch("/api/recover-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ razorpayPaymentId: lastPaymentId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        emptyCart();
+        router.push(`/success?orderId=${data.orderNumber}`);
+      } else {
+        setError(data.error || "Could not recover your order. Please contact support with your Payment ID.");
+      }
+    } catch (err) {
+      setError("Network error during recovery. Please contact support with your Payment ID: " + lastPaymentId);
+    } finally {
+      setIsRecovering(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -195,6 +223,10 @@ export default function CheckoutPage() {
         description: "Online Payment",
         order_id: orderData.order.id,
         handler: async function (response) {
+          // Save the payment ID immediately — if anything crashes below,
+          // the customer can use this to recover their order
+          const capturedPaymentId = response.razorpay_payment_id;
+          setLastPaymentId(capturedPaymentId);
           try {
             const verifyRes = await fetch("/api/checkout", {
               method: "POST",
@@ -213,7 +245,7 @@ export default function CheckoutPage() {
             });
             if (!verifyRes.ok) {
               const errData = await verifyRes.json().catch(() => ({}));
-              setError(errData.error || "Order verification failed. Please contact support.");
+              setError(errData.error || `Order verification failed. Your payment was received (ID: ${capturedPaymentId}). Click "Recover My Order" below.`);
               setIsSubmitting(false);
               return;
             }
@@ -222,12 +254,12 @@ export default function CheckoutPage() {
               emptyCart();
               router.push(`/success?orderId=${data.orderNumber}`);
             } else {
-              setError(data.error || "Payment verification failed.");
+              setError(data.error || `Payment verification failed. Your payment was received (ID: ${capturedPaymentId}). Click "Recover My Order" below.`);
               setIsSubmitting(false);
             }
           } catch (err) {
             console.error(err);
-            setError("An unexpected error occurred during verification.");
+            setError(`An unexpected error occurred. Your payment was received (ID: ${capturedPaymentId}). Click "Recover My Order" below to confirm your order.`);
             setIsSubmitting(false);
           }
         },
@@ -289,7 +321,36 @@ export default function CheckoutPage() {
             <p>Please enter your shipping and payment details.</p>
           </div>
           
-          {error && <div className="error-message">{error}</div>}
+          {error && (
+            <div className="error-message">
+              {error}
+              {lastPaymentId && (
+                <div style={{ marginTop: '12px' }}>
+                  <div style={{ fontSize: '13px', marginBottom: '8px', color: '#555' }}>
+                    Your Payment ID: <strong style={{ fontFamily: 'monospace' }}>{lastPaymentId}</strong>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={recoverOrder}
+                    disabled={isRecovering}
+                    style={{
+                      background: '#4A1521',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '10px 20px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      cursor: isRecovering ? 'not-allowed' : 'pointer',
+                      opacity: isRecovering ? 0.7 : 1,
+                    }}
+                  >
+                    {isRecovering ? '⏳ Recovering...' : '🔄 Recover My Order'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Shipping Address */}
           <div className="checkout-section">
