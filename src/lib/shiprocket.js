@@ -104,15 +104,53 @@ export async function createShiprocketOrder(order) {
   }
   if (!Array.isArray(items)) items = [];
 
-  const orderItems = items.map((item) => ({
-    name: (item.title || "Product").slice(0, 100),
-    sku: (item.id || "SKU-UNKNOWN").slice(0, 50),
-    units: parseInt(item.quantity, 10) || 1,
-    selling_price: parseFloat(item.price) || 0,
-    discount: 0,
-    tax: 0,
-    hsn: "",
-  }));
+  // ── Build unique SKU per variant & deduplicate ───────────────────────────
+  // Root cause of "SKU cannot be repeated" error:
+  // When a customer buys the same product in 2 different sizes/colors (e.g. earrings
+  // in Green AND White), both cart lines share the same product ID.
+  // Shiprocket treats the product ID as the SKU and rejects any order with duplicate SKUs.
+  //
+  // Fix: build a composite SKU = productId + size + color (unique per variant),
+  // then merge any exact duplicates by summing their quantities.
+
+  // Step 1: Build line items with a unique variant-aware SKU
+  const rawItems = items.map((item) => {
+    const size  = item.size  && item.size  !== 'null' ? String(item.size).trim()  : '';
+    const color = item.color && item.color !== 'null' ? String(item.color).trim() : '';
+
+    // Build a unique key: id + size + color (lowercase, no spaces)
+    const variantSuffix = [size, color].filter(Boolean).join('-').toLowerCase().replace(/\s+/g, '_').slice(0, 20);
+    const sku = variantSuffix
+      ? `${(item.id || 'SKU').slice(0, 28)}-${variantSuffix}`.slice(0, 50)
+      : (item.id || 'SKU-UNKNOWN').slice(0, 50);
+
+    // Build a human-readable name including size/color for packing reference
+    const nameParts = [item.title || 'Product'];
+    if (size)  nameParts.push(`Size:${size}`);
+    if (color) nameParts.push(`Color:${color}`);
+
+    return {
+      name: nameParts.join(' ').slice(0, 100),
+      sku,
+      units: parseInt(item.quantity, 10) || 1,
+      selling_price: parseFloat(item.price) || 0,
+      discount: 0,
+      tax: 0,
+      hsn: '',
+    };
+  });
+
+  // Step 2: Merge any lines that still share an identical SKU (exact duplicates)
+  // by summing their units. This prevents crashes from any edge-case duplicates.
+  const skuMap = new Map();
+  for (const lineItem of rawItems) {
+    if (skuMap.has(lineItem.sku)) {
+      skuMap.get(lineItem.sku).units += lineItem.units;
+    } else {
+      skuMap.set(lineItem.sku, { ...lineItem });
+    }
+  }
+  const orderItems = Array.from(skuMap.values());
 
   let resolvedState = (order.state || "Delhi").trim();
   if (resolvedState === "Delhi NCR") resolvedState = "Delhi";
