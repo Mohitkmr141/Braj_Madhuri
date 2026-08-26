@@ -233,31 +233,39 @@ export async function finalizePaidOrder({
 
   console.log(`[OrderService] Order ${finalizedOrder.orderNumber} successfully finalized with status: ${finalizedOrder.status}`);
 
-  // 4. Background tasks: Trigger Email & Shiprocket if updated in this call
+  // 4. Background tasks: Trigger Email & Shiprocket if updated in this call (Non-blocking)
   if (isNewOrUpdated && finalizedOrder.status === 'Pending') {
-    await Promise.allSettled([
-      sendOrderEmail(finalizedOrder).then((emailResult) => {
-        if (!emailResult.success && !emailResult.skipped) {
-          console.error(`[OrderService] Email delivery issue for order ${finalizedOrder.orderNumber}:`, emailResult);
-        }
-      }).catch((err) => {
-        console.error(`[OrderService] Email error for order ${finalizedOrder.orderNumber}:`, err.message);
-      }),
+    // Run fulfillment asynchronously in the background so the customer gets instant checkout response (<200ms)
+    (async () => {
+      try {
+        await Promise.allSettled([
+          sendOrderEmail(finalizedOrder).then((emailResult) => {
+            if (!emailResult.success && !emailResult.skipped) {
+              console.error(`[OrderService] Email delivery issue for order ${finalizedOrder.orderNumber}:`, emailResult);
+            }
+          }).catch((err) => {
+            console.error(`[OrderService] Email error for order ${finalizedOrder.orderNumber}:`, err.message);
+          }),
 
-      createShiprocketOrder(finalizedOrder).then(async (srResult) => {
-        if (srResult?.order_id) {
-          await prisma.order.update({
-            where: { id: finalizedOrder.id },
-            data: {
-              shiprocketOrderId: srResult.order_id,
-              shiprocketShipmentId: srResult.shipment_id,
-            },
-          }).catch((err) => console.error('[OrderService] Failed to update Shiprocket IDs:', err.message));
-        }
-      }).catch((err) => {
-        console.error('[OrderService] Shiprocket order creation error:', err.message);
-      }),
-    ]);
+          createShiprocketOrder(finalizedOrder).then(async (srResult) => {
+            if (srResult?.order_id) {
+              await prisma.order.update({
+                where: { id: finalizedOrder.id },
+                data: {
+                  shiprocketOrderId: srResult.order_id,
+                  shiprocketShipmentId: srResult.shipment_id,
+                },
+              }).catch((err) => console.error('[OrderService] Failed to update Shiprocket IDs:', err.message));
+              console.log(`[OrderService] ✅ Shiprocket order created for ${finalizedOrder.orderNumber}: ID ${srResult.order_id}`);
+            }
+          }).catch((err) => {
+            console.error(`[OrderService] Shiprocket order creation error for ${finalizedOrder.orderNumber}:`, err.message);
+          }),
+        ]);
+      } catch (bgErr) {
+        console.error(`[OrderService] Background fulfillment error for order ${finalizedOrder.orderNumber}:`, bgErr);
+      }
+    })();
   }
 
   return { success: true, order: finalizedOrder, isNewOrUpdated };

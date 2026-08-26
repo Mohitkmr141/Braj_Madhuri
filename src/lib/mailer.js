@@ -233,46 +233,49 @@ export const sendOrderEmail = async (order) => {
   const adminEmail = process.env.EMAIL_USER?.trim();
   const customerEmail = order.email?.trim();
 
-  // 1. Send admin notification (with retry)
-  const adminResult = await withRetry(
-    () =>
-      getTransporter().sendMail({
-        from: `"The Braj Madhuri" <${adminEmail}>`,
-        to: adminEmail,
-        subject: `🛍️ New Order [${order.orderNumber}]`,
-        html: buildAdminHtml(order, itemsHtml),
-      }),
-    3,
-    1000
-  ).then(() => {
-    console.log(`[Email] ✅ Admin order email sent for ${order.orderNumber}`);
-    return { ok: true };
-  }).catch((err) => {
-    console.error(`[Email] ❌ Admin order email FAILED for ${order.orderNumber}:`, err.message);
-    return { ok: false, error: err.message };
-  });
-
-  // 2. Send customer confirmation (with retry)
-  let customerResult = { ok: true, skipped: true };
-  if (customerEmail) {
-    customerResult = await withRetry(
+  // Send admin notification & customer confirmation concurrently
+  const [adminRes, customerRes] = await Promise.allSettled([
+    withRetry(
       () =>
         getTransporter().sendMail({
           from: `"The Braj Madhuri" <${adminEmail}>`,
-          to: customerEmail,
-          subject: `Order Confirmed — The Braj Madhuri [${order.orderNumber}]`,
-          html: buildCustomerHtml(order, itemsHtml),
+          to: adminEmail,
+          subject: `🛍️ New Order [${order.orderNumber}]`,
+          html: buildAdminHtml(order, itemsHtml),
         }),
       3,
       1000
     ).then(() => {
-      console.log(`[Email] ✅ Customer email sent to ${customerEmail} for order ${order.orderNumber}`);
+      console.log(`[Email] ✅ Admin order email sent for ${order.orderNumber}`);
       return { ok: true };
     }).catch((err) => {
-      console.error(`[Email] ❌ Customer email FAILED to ${customerEmail} for order ${order.orderNumber}:`, err.message);
+      console.error(`[Email] ❌ Admin order email FAILED for ${order.orderNumber}:`, err.message);
       return { ok: false, error: err.message };
-    });
-  }
+    }),
+
+    customerEmail
+      ? withRetry(
+          () =>
+            getTransporter().sendMail({
+              from: `"The Braj Madhuri" <${adminEmail}>`,
+              to: customerEmail,
+              subject: `Order Confirmed — The Braj Madhuri [${order.orderNumber}]`,
+              html: buildCustomerHtml(order, itemsHtml),
+            }),
+          3,
+          1000
+        ).then(() => {
+          console.log(`[Email] ✅ Customer email sent to ${customerEmail} for order ${order.orderNumber}`);
+          return { ok: true };
+        }).catch((err) => {
+          console.error(`[Email] ❌ Customer email FAILED to ${customerEmail} for order ${order.orderNumber}:`, err.message);
+          return { ok: false, error: err.message };
+        })
+      : Promise.resolve({ ok: true, skipped: true }),
+  ]);
+
+  const adminResult = adminRes.status === 'fulfilled' ? adminRes.value : { ok: false, error: adminRes.reason };
+  const customerResult = customerRes.status === 'fulfilled' ? customerRes.value : { ok: false, error: customerRes.reason };
 
   return {
     success: adminResult.ok,

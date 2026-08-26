@@ -175,7 +175,7 @@ export async function createShiprocketOrder(order) {
     billing_phone: (() => {
       let p = order.phone ? order.phone.replace(/\D/g, "") : "";
       if (p.length < 10) return "9999999999";
-      return p.slice(-15);
+      return p.slice(-10);
     })(),
     shipping_is_billing: true,
     order_items: orderItems,
