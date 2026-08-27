@@ -216,8 +216,37 @@ export default function ProductsTab() {
                       {product.subcategory?.title && <span className="product-subcategory"> - {product.subcategory.title}</span>}
                     </td>
                     <td data-label="Price">{formatCurrency(product.price)}</td>
-                    <td data-label="Current Stock" className={product.stock > 0 ? 'text-success' : 'text-danger'}>
-                      {product.stock || 0}
+                    <td data-label="Current Stock">
+                      {(() => {
+                        const variants = Array.isArray(product.variants) ? product.variants : [];
+                        if (variants.length > 0) {
+                          const totalVariantStock = variants.reduce((sum, v) => sum + (parseInt(v.stock, 10) || 0), 0);
+                          const outOfStockCount = variants.filter(v => (parseInt(v.stock, 10) || 0) <= 0).length;
+
+                          return (
+                            <div>
+                              <div className={totalVariantStock > 0 ? 'text-success font-semibold' : 'text-danger font-semibold'} style={{ fontSize: '14px' }}>
+                                {totalVariantStock} units
+                              </div>
+                              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                                across {variants.length} variant{variants.length > 1 ? 's' : ''}
+                              </div>
+                              {outOfStockCount > 0 && (
+                                <div style={{ fontSize: '11px', color: '#c62828', fontWeight: '600', marginTop: '3px', background: '#ffebee', padding: '1px 6px', borderRadius: '4px', display: 'inline-block' }}>
+                                  ⚠️ {outOfStockCount} variant{outOfStockCount > 1 ? 's' : ''} out of stock
+                                </div>
+                              )}
+                            </div>
+                          );
+                        }
+
+                        const stockNum = parseInt(product.stock, 10) || 0;
+                        return (
+                          <span className={stockNum > 0 ? 'text-success font-semibold' : 'text-danger font-semibold'}>
+                            {stockNum}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td data-label="Actions">
                       <div className="action-button-group vertical">
