@@ -16,7 +16,21 @@ export async function POST(request) {
       );
     }
 
-    const emailLower = email.toLowerCase().trim();
+    const emailLower = String(email).toLowerCase().trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailLower)) {
+      return NextResponse.json(
+        { success: false, error: "Please provide a valid email address" },
+        { status: 400 }
+      );
+    }
+
+    if (typeof password !== 'string' || password.length < 6) {
+      return NextResponse.json(
+        { success: false, error: "Password must be at least 6 characters long" },
+        { status: 400 }
+      );
+    }
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({

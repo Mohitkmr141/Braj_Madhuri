@@ -28,7 +28,7 @@ export default function CartPage() {
   const totalOriginalPrice = useMemo(() => {
     return cartItems.reduce((acc, item) => {
       // If no originalPrice is available, fallback to current price to avoid zero-savings bugs
-      const itemOriginal = item.originalPrice || item.price || 250;
+      const itemOriginal = item.originalPrice ?? item.price ?? 0;
       return acc + itemOriginal * item.quantity;
     }, 0);
   }, [cartItems]);
@@ -88,7 +88,7 @@ export default function CartPage() {
                     {item.color && <div className="cart-item-size">Color: {item.color}</div>}
                     
                     <div className="cart-item-pricing">
-                      <span className="cart-item-price">{formatCurrency(item.price || 250)}</span>
+                      <span className="cart-item-price">{formatCurrency(item.price ?? 0)}</span>
                       {item.originalPrice && (
                         <span className="cart-item-original">{formatCurrency(item.originalPrice)}</span>
                       )}

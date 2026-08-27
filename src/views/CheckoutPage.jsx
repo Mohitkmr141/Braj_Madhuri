@@ -63,7 +63,7 @@ export default function CheckoutPage() {
 
   const totalOriginalPrice = useMemo(() => {
     return cartItems.reduce((acc, item) => {
-      const itemOriginal = item.originalPrice || item.price || 250;
+      const itemOriginal = item.originalPrice ?? item.price ?? 0;
       return acc + itemOriginal * item.quantity;
     }, 0);
   }, [cartItems]);

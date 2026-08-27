@@ -41,17 +41,27 @@ export default function SiteShell({ children, initialCategories }) {
     }
   }, [cartItems, wishlistItems, isClient]);
 
+  // Helper to normalize and compare cart/wishlist items consistently
+  const isItemMatch = (item, id, size, color) => {
+    const normSizeA = item.size ? String(item.size).trim() : null;
+    const normSizeB = size ? String(size).trim() : null;
+    const normColorA = item.color ? String(item.color).trim() : null;
+    const normColorB = color ? String(color).trim() : null;
+
+    return item.id === id && normSizeA === normSizeB && (color === undefined || normColorA === normColorB);
+  };
+
   const addToCart = useCallback((product) => {
     setCartItems((prev) => {
       if (typeof product === 'number') {
         product = { id: `legacy-${Date.now()}`, title: 'Item', price: product, image: '', originalPrice: null };
       }
       
-      const existing = prev.find((item) => item.id === product.id && item.size === product.size && item.color === product.color);
+      const existing = prev.find((item) => isItemMatch(item, product.id, product.size, product.color));
       if (existing) {
         addToast(`Increased quantity of ${product.title || 'Item'}`);
         return prev.map((item) =>
-          item.id === product.id && item.size === product.size && item.color === product.color
+          isItemMatch(item, product.id, product.size, product.color)
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -64,23 +74,23 @@ export default function SiteShell({ children, initialCategories }) {
   const updateQuantity = useCallback((id, size, quantity, color) => {
     setCartItems((prev) =>
       quantity < 1
-        ? prev.filter((item) => !(item.id === id && item.size === size && item.color === color))
+        ? prev.filter((item) => !isItemMatch(item, id, size, color))
         : prev.map((item) =>
-            item.id === id && item.size === size && item.color === color ? { ...item, quantity } : item
+            isItemMatch(item, id, size, color) ? { ...item, quantity } : item
           )
     );
   }, []);
 
   const removeFromCart = useCallback((id, size, color) => {
-    setCartItems((prev) => prev.filter((item) => !(item.id === id && item.size === size && item.color === color)));
+    setCartItems((prev) => prev.filter((item) => !isItemMatch(item, id, size, color)));
   }, []);
 
   const emptyCart = useCallback(() => {
     setCartItems([]);
   }, []);
 
-  const cartCount = useMemo(() => cartItems.reduce((acc, item) => acc + item.quantity, 0), [cartItems]);
-  const cartTotal = useMemo(() => cartItems.reduce((acc, item) => acc + ((item.price ?? 0) * item.quantity), 0), [cartItems]);
+  const cartCount = useMemo(() => cartItems.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0), [cartItems]);
+  const cartTotal = useMemo(() => cartItems.reduce((acc, item) => acc + ((Number(item.price) || 0) * (Number(item.quantity) || 1)), 0), [cartItems]);
 
   const cartAnnouncement = useMemo(() => {
     if (cartCount === 0) {
@@ -105,7 +115,7 @@ export default function SiteShell({ children, initialCategories }) {
 
   const addToWishlist = useCallback((product) => {
     setWishlistItems((prev) => {
-      const existing = prev.find((item) => item.id === product.id && item.size === product.size && item.color === product.color);
+      const existing = prev.find((item) => isItemMatch(item, product.id, product.size, product.color));
       if (existing) return prev;
       addToast(`${product.title || 'Item'} added to wishlist!`);
       return [...prev, product];
@@ -114,14 +124,14 @@ export default function SiteShell({ children, initialCategories }) {
 
   const removeFromWishlist = useCallback((productId, size, color) => {
     setWishlistItems((prev) => {
-      const item = prev.find(i => i.id === productId && i.size === size && (color === undefined || i.color === color));
+      const item = prev.find(i => isItemMatch(i, productId, size, color));
       if (item) addToast(`${item.title || 'Item'} removed from wishlist`, 'error');
-      return prev.filter((item) => !(item.id === productId && item.size === size && (color === undefined || item.color === color)));
+      return prev.filter((item) => !isItemMatch(item, productId, size, color));
     });
   }, [addToast]);
 
   const isInWishlist = useCallback((id, size, color) => {
-    return wishlistItems.some((item) => item.id === id && item.size === size && (color === undefined || item.color === color));
+    return wishlistItems.some((item) => isItemMatch(item, id, size, color));
   }, [wishlistItems]);
 
   const wishlistCount = useMemo(() => wishlistItems.length, [wishlistItems]);

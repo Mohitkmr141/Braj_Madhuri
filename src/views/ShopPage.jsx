@@ -6,12 +6,14 @@ import CategoryGalleries from "../components/Categories.jsx";
 import CategoryGrid from "../components/CategoryGrid.jsx";
 import SubcategoryPage from "../components/SubcategoryPage.jsx";
 import { useCart } from "../context/CartContext.jsx";
+import { useProducts } from "../context/ProductsContext.jsx";
 import CATEGORIES from "../data/categoriesData.js";
 
 function ShopPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { addToCart } = useCart();
+  const { categories } = useProducts();
   const activeCategory = searchParams.get("category");
   const searchQuery = searchParams.get("search");
   const activeProductId = searchParams.get("product");
@@ -21,8 +23,10 @@ function ShopPage() {
   const [catId, subName] = isSubcategory
     ? activeCategory.split("::", 2)
     : [null, null];
-  const catLabel =
-    CATEGORIES.find((c) => c.id === catId)?.label ?? catId ?? "";
+  
+  const dynamicCat = (categories || []).find((c) => c.id === catId);
+  const staticCat = CATEGORIES.find((c) => c.id === catId);
+  const catLabel = dynamicCat?.title || staticCat?.label || catId || "";
 
   const handleExploreCategory = (folder) => {
     if (folder) {

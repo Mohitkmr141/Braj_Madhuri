@@ -157,7 +157,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
       if (!isNaN(p)) return p;
     }
     const baseP = parseFloat(product.price);
-    return !isNaN(baseP) ? baseP : 250;
+    return !isNaN(baseP) ? baseP : 0;
   }, [activeVariant, product.price]);
 
   const displayOriginalPrice = useMemo(() => {
