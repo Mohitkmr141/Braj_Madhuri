@@ -3,8 +3,11 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useCart } from "../context/CartContext.jsx";
 import { calculateShippingFee, isDelhiNCR } from "../utils/shippingRules.js";
+import CheckoutHeader from "../components/CheckoutHeader.jsx";
 import "../components/Checkout.css";
 
 const formatCurrency = (value) =>
@@ -26,8 +29,12 @@ const INDIAN_STATES = [
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const { cartItems, cartCount, cartTotal, emptyCart } = useCart();
   
+  // Accordion Step State: 1 = Address, 2 = Order Summary, 3 = Payment
+  const [currentStep, setCurrentStep] = useState(1);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -42,8 +49,9 @@ export default function CheckoutPage() {
   const [paymentMethod] = useState("online");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [lastPaymentId, setLastPaymentId] = useState(null); // Stores Razorpay pay_ ID on failure
+  const [lastPaymentId, setLastPaymentId] = useState(null);
   const [isRecovering, setIsRecovering] = useState(false);
+  const [showMobileBreakdown, setShowMobileBreakdown] = useState(false);
 
   const [globalSettings, setGlobalSettings] = useState(null);
 
@@ -52,14 +60,33 @@ export default function CheckoutPage() {
       if (d.success) setGlobalSettings(d.settings);
     });
 
-    // Preload Razorpay script on checkout mount to avoid network latency at click
+    // Try prefilling from localStorage or session
+    try {
+      const saved = localStorage.getItem("bm_saved_address");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setFormData(prev => ({ ...prev, ...parsed }));
+      } else if (session?.user) {
+        const nameParts = (session.user.name || "").split(" ");
+        setFormData(prev => ({
+          ...prev,
+          firstName: nameParts[0] || "",
+          lastName: nameParts.slice(1).join(" ") || "",
+          email: session.user.email || "",
+        }));
+      }
+    } catch (e) {
+      console.error("Failed to load saved address", e);
+    }
+
+    // Preload Razorpay script on checkout mount
     if (!document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.async = true;
       document.body.appendChild(script);
     }
-  }, []);
+  }, [session]);
 
   const totalOriginalPrice = useMemo(() => {
     return cartItems.reduce((acc, item) => {
@@ -70,9 +97,10 @@ export default function CheckoutPage() {
 
   const baseDiscount = totalOriginalPrice - cartTotal;
   const specialSaleDiscount = globalSettings?.isSaleActive ? Math.round(cartTotal * (globalSettings.saleDiscountPercentage / 100)) : 0;
+  const totalDiscount = baseDiscount + specialSaleDiscount;
   const finalDiscountedCartTotal = cartTotal - specialSaleDiscount;
 
-  // Derive whether address is Delhi-NCR (Delhi + 14 Haryana districts + 8 UP districts)
+  // Derive whether address is Delhi-NCR
   const isNCR = useMemo(() => {
     return isDelhiNCR({
       state: formData.state,
@@ -81,7 +109,7 @@ export default function CheckoutPage() {
     });
   }, [formData.state, formData.city, formData.pincode]);
 
-  // Derive shipping cost synchronously — ₹79 for Delhi-NCR, ₹119 for Rest of India
+  // Derive shipping cost: ₹79 for Delhi-NCR, ₹119 for Rest of India
   const shippingCost = useMemo(() => {
     return calculateShippingFee({
       state: formData.state,
@@ -99,12 +127,10 @@ export default function CheckoutPage() {
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
-      // If already loaded and available, resolve immediately
       if (typeof window !== 'undefined' && window.Razorpay) {
         resolve(true);
         return;
       }
-      // If script tag exists but Razorpay not yet on window, wait for its load
       const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
       if (existing) {
         existing.addEventListener('load', () => resolve(true));
@@ -119,8 +145,51 @@ export default function CheckoutPage() {
     });
   };
 
+  // ── Validate and Confirm Address Step ──────────────────────────────────────
+  const handleConfirmAddress = (e) => {
+    if (e) e.preventDefault();
+    setError("");
+
+    if (!formData.firstName || !formData.address || !formData.city || !formData.pincode || !formData.phone || !formData.email || !formData.state) {
+      setError("Please fill in all required address fields.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const phoneDigits = formData.phone.replace(/\D/g, '');
+    if (phoneDigits.length !== 10) {
+      setError("Please enter a valid 10-digit mobile number.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const pincodeDigits = formData.pincode.replace(/\D/g, '');
+    if (pincodeDigits.length !== 6) {
+      setError("Please enter a valid 6-digit pincode.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    // Save to localStorage for convenience
+    try {
+      localStorage.setItem("bm_saved_address", JSON.stringify(formData));
+    } catch (err) {
+      console.error(err);
+    }
+
+    // Proceed to Step 2 (Order Summary)
+    setCurrentStep(2);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   // ── Self-service order recovery ─────────────────────────────────────────────
-  // Called when a customer paid but never got a confirmation (browser crash/close)
   const recoverOrder = async () => {
     if (!lastPaymentId) return;
     setIsRecovering(true);
@@ -145,37 +214,15 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // ── Trigger Razorpay Payment (Step 3) ──────────────────────────────────────
+  const handlePaymentSubmit = async (e) => {
+    if (e) e.preventDefault();
     setError("");
     
-    // Validation
+    // Double check validation
     if (!formData.firstName || !formData.address || !formData.city || !formData.pincode || !formData.phone || !formData.email || !formData.state) {
-      setError("Please fill in all required fields.");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError("Please enter a valid email address.");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
-    // Phone validation (10 digits)
-    const phoneDigits = formData.phone.replace(/\D/g, '');
-    if (phoneDigits.length !== 10) {
-      setError("Please enter a valid 10-digit phone number.");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
-    // Pincode validation (6 digits)
-    const pincodeDigits = formData.pincode.replace(/\D/g, '');
-    if (pincodeDigits.length !== 6) {
-      setError("Please enter a valid 6-digit pincode.");
+      setError("Please fill in all required shipping address fields.");
+      setCurrentStep(1);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -184,7 +231,7 @@ export default function CheckoutPage() {
     
     const res = await loadRazorpayScript();
     if (!res) {
-      setError("Razorpay SDK failed to load. Are you online?");
+      setError("Razorpay SDK failed to load. Please check your internet connection.");
       setIsSubmitting(false);
       return;
     }
@@ -220,11 +267,9 @@ export default function CheckoutPage() {
         amount: orderData.order.amount,
         currency: orderData.order.currency,
         name: "The Braj Madhuri",
-        description: "Online Payment",
+        description: "Devotional Essentials Order",
         order_id: orderData.order.id,
         handler: async function (response) {
-          // Save the payment ID immediately — if anything crashes below,
-          // the customer can use this to recover their order
           const capturedPaymentId = response.razorpay_payment_id;
           setLastPaymentId(capturedPaymentId);
           try {
@@ -269,7 +314,7 @@ export default function CheckoutPage() {
           contact: formData.phone,
         },
         theme: {
-          color: "#c9972a", 
+          color: "#4A1521", 
         },
         modal: {
           ondismiss: function () {
@@ -301,308 +346,539 @@ export default function CheckoutPage() {
   if (cartCount === 0 && !isSubmitting) {
     return (
       <div className="checkout-wrapper">
-        <div className="checkout-container" style={{ display: 'block', textAlign: 'center', paddingTop: '100px' }}>
-          <h2>Your cart is empty.</h2>
-          <p style={{ marginTop: '16px', color: 'var(--text-muted)' }}>You need items in your cart to checkout.</p>
+        <CheckoutHeader activeStep={1} />
+        <div className="checkout-empty-state">
+          <h2>Your bag is empty</h2>
+          <p>You need items in your cart to proceed with checkout.</p>
           <button 
-            className="complete-order-btn" 
-            style={{ maxWidth: '300px', margin: '30px auto' }}
+            className="checkout-return-btn" 
             onClick={() => router.push("/shop")}
           >
-            Return to Shop
+            Explore Devotional Collection
           </button>
         </div>
       </div>
     );
   }
 
+  // Header active step: 1 (Bag) -> 2 (Address) -> 3 (Summary) -> 4 (Payment)
+  const headerActiveStep = currentStep + 1;
+
   return (
-    <div className="checkout-wrapper reveal">
-      <form onSubmit={handleSubmit} className="checkout-container">
-        
-        {/* Left Column: Forms */}
-        <div className="checkout-main">
-          <div className="checkout-header">
-            <h1>Secure Checkout</h1>
-            <p>Your details are protected with 256-bit SSL encryption.</p>
-          </div>
+    <div className="checkout-page-root">
+      {/* Flipkart & Amazon Style Dedicated Checkout Header */}
+      <CheckoutHeader 
+        activeStep={headerActiveStep} 
+        onStepClick={(stepIndex) => setCurrentStep(stepIndex)} 
+      />
+
+      <div className="checkout-wrapper reveal">
+        <div className="checkout-container">
           
-          {error && (
-            <div className="error-message">
-              {error}
-              {lastPaymentId && (
-                <div style={{ marginTop: '12px' }}>
-                  <div style={{ fontSize: '13px', marginBottom: '8px' }}>
-                    Your Payment ID: <strong style={{ fontFamily: 'monospace' }}>{lastPaymentId}</strong>
+          {/* Left Column: Multi-Step Accordion Flow */}
+          <div className="checkout-main">
+            {error && (
+              <div className="checkout-error-banner">
+                <div className="checkout-error-icon">⚠️</div>
+                <div className="checkout-error-content">
+                  <div>{error}</div>
+                  {lastPaymentId && (
+                    <div className="checkout-recovery-box">
+                      <div>Payment Reference: <code>{lastPaymentId}</code></div>
+                      <button
+                        type="button"
+                        onClick={recoverOrder}
+                        disabled={isRecovering}
+                        className="checkout-recovery-btn"
+                      >
+                        {isRecovering ? '⏳ Recovering...' : '🔄 Recover My Order'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ════ STEP 1: DELIVERY ADDRESS ════ */}
+            <div className={`checkout-accordion-card ${currentStep === 1 ? 'active' : ''} ${currentStep > 1 ? 'completed' : ''}`}>
+              <div className="checkout-step-header" onClick={() => currentStep > 1 && setCurrentStep(1)}>
+                <div className="checkout-step-title-group">
+                  <span className={`checkout-step-badge ${currentStep > 1 ? 'completed' : ''}`}>
+                    {currentStep > 1 ? '✓' : '1'}
+                  </span>
+                  <div className="checkout-step-heading-wrap">
+                    <h3>Delivery Address</h3>
+                    {currentStep > 1 && (
+                      <span className="checkout-step-subtitle">
+                        {formData.firstName} {formData.lastName} · {formData.city}, {formData.state} - {formData.pincode}
+                      </span>
+                    )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={recoverOrder}
-                    disabled={isRecovering}
-                    style={{
-                      background: '#4A1521',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '8px',
-                      padding: '10px 20px',
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      cursor: isRecovering ? 'not-allowed' : 'pointer',
-                      opacity: isRecovering ? 0.7 : 1,
+                </div>
+                {currentStep > 1 && (
+                  <button 
+                    type="button" 
+                    className="checkout-change-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentStep(1);
                     }}
                   >
-                    {isRecovering ? '⏳ Recovering...' : '🔄 Recover My Order'}
+                    Change
                   </button>
+                )}
+              </div>
+
+              {/* Step 1 Active Form */}
+              {currentStep === 1 && (
+                <div className="checkout-step-content">
+                  <form onSubmit={handleConfirmAddress}>
+                    <div className="form-grid">
+                      <div className="form-group">
+                        <label htmlFor="firstName">First Name *</label>
+                        <input
+                          type="text"
+                          id="firstName"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          autoComplete="given-name"
+                          placeholder="e.g. Rahul"
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="lastName">Last Name</label>
+                        <input
+                          type="text"
+                          id="lastName"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          autoComplete="family-name"
+                          placeholder="e.g. Sharma"
+                        />
+                      </div>
+                      <div className="form-group full-width">
+                        <label htmlFor="email">Email Address (for order confirmation) *</label>
+                        <input
+                          type="email"
+                          id="email"
+                          name="email"
+                          inputMode="email"
+                          autoComplete="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="you@example.com"
+                          required
+                        />
+                      </div>
+                      <div className="form-group full-width">
+                        <label htmlFor="phone">Mobile Number (10 Digits) *</label>
+                        <input
+                          type="tel"
+                          id="phone"
+                          name="phone"
+                          inputMode="tel"
+                          autoComplete="tel"
+                          maxLength={10}
+                          placeholder="9876543210"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                      <div className="form-group full-width">
+                        <label htmlFor="address">Address (Flat / House No / Building / Street) *</label>
+                        <input
+                          type="text"
+                          id="address"
+                          name="address"
+                          autoComplete="street-address"
+                          value={formData.address}
+                          onChange={handleInputChange}
+                          placeholder="e.g. Flat 302, Radha Krishna Heights, Raman Reti"
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="city">City / District *</label>
+                        <input
+                          type="text"
+                          id="city"
+                          name="city"
+                          autoComplete="address-level2"
+                          value={formData.city}
+                          onChange={handleInputChange}
+                          placeholder="e.g. Mathura"
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="state">State *</label>
+                        <select
+                          id="state"
+                          name="state"
+                          autoComplete="address-level1"
+                          value={formData.state}
+                          onChange={handleInputChange}
+                          required
+                        >
+                          <option value="">Select State / UT</option>
+                          {INDIAN_STATES.map((st) => (
+                            <option key={st} value={st}>
+                              {st} {st === 'Delhi' ? '(₹79 NCR Shipping)' : (st === 'Haryana' || st === 'Uttar Pradesh') ? '(₹79 NCR / ₹119 Other)' : '(₹119 Shipping)'}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="form-group full-width">
+                        <label htmlFor="pincode">6-Digit Pincode *</label>
+                        <input
+                          type="text"
+                          id="pincode"
+                          name="pincode"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          maxLength={6}
+                          autoComplete="postal-code"
+                          placeholder="e.g. 281121"
+                          value={formData.pincode}
+                          onChange={handleInputChange}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Dynamic NCR Delivery Tag */}
+                    {formData.state && (
+                      <div className={`checkout-delivery-zone-badge ${isNCR ? 'ncr' : 'national'}`}>
+                        {isNCR ? (
+                          <>✨ <strong>Delhi-NCR Express Logistics Zone (₹79 Shipping)</strong></>
+                        ) : (
+                          <>🚚 <strong>All-India Standard Logistics Zone (₹119 Shipping)</strong></>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="checkout-step-actions">
+                      <button type="submit" className="checkout-step-next-btn">
+                        Deliver to this Address & Continue ➔
+                      </button>
+                    </div>
+                  </form>
                 </div>
               )}
             </div>
-          )}
 
-          {/* Shipping Address */}
-          <div className="checkout-section">
-            <h2>
-              <span className="checkout-section-number">1</span>
-              Shipping Address
-            </h2>
-            <div className="form-grid">
-              <div className="form-group">
-                <label htmlFor="firstName">First Name *</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  autoComplete="given-name"
-                  placeholder="Rahul"
-                  required
-                />
+            {/* ════ STEP 2: ORDER SUMMARY / ITEMS REVIEW ════ */}
+            <div className={`checkout-accordion-card ${currentStep === 2 ? 'active' : ''} ${currentStep > 2 ? 'completed' : ''} ${currentStep < 2 ? 'disabled' : ''}`}>
+              <div className="checkout-step-header" onClick={() => currentStep > 2 && setCurrentStep(2)}>
+                <div className="checkout-step-title-group">
+                  <span className={`checkout-step-badge ${currentStep > 2 ? 'completed' : ''}`}>
+                    {currentStep > 2 ? '✓' : '2'}
+                  </span>
+                  <div className="checkout-step-heading-wrap">
+                    <h3>Order Summary</h3>
+                    {currentStep !== 2 && (
+                      <span className="checkout-step-subtitle">
+                        {cartCount} {cartCount === 1 ? 'item' : 'items'} in your devotional order
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {currentStep > 2 && (
+                  <button 
+                    type="button" 
+                    className="checkout-change-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentStep(2);
+                    }}
+                  >
+                    Change
+                  </button>
+                )}
               </div>
-              <div className="form-group">
-                <label htmlFor="lastName">Last Name</label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  autoComplete="family-name"
-                  placeholder="Sharma"
-                />
+
+              {/* Step 2 Active Item List */}
+              {currentStep === 2 && (
+                <div className="checkout-step-content">
+                  <div className="checkout-review-items">
+                    {cartItems.map((item) => (
+                      <div key={`${item.id}-${item.size || ''}-${item.color || ''}`} className="checkout-review-item">
+                        <div className="checkout-review-img">
+                          <Image
+                            src={item.image || '/header-banner.jpg'}
+                            alt={item.title}
+                            fill
+                            style={{ objectFit: 'cover' }}
+                            sizes="72px"
+                          />
+                        </div>
+                        <div className="checkout-review-info">
+                          <div className="checkout-review-title">{item.title}</div>
+                          {(item.size || item.color) && (
+                            <div className="checkout-review-meta">
+                              {item.size && <span className="review-meta-tag">Size: {item.size}</span>}
+                              {item.color && <span className="review-meta-tag">Color: {item.color}</span>}
+                            </div>
+                          )}
+                          <div className="checkout-review-pricing">
+                            <span className="review-price">{formatCurrency(item.price ?? 0)}</span>
+                            <span className="review-qty">× {item.quantity}</span>
+                            <span className="review-total">= {formatCurrency((item.price ?? 0) * item.quantity)}</span>
+                          </div>
+                          <div className="checkout-delivery-timeline">
+                            🚚 Estimated Delivery: <strong>3–5 Business Days</strong>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="checkout-step-note">
+                    📧 Order confirmation and tracking updates will be sent to <strong>{formData.email || 'your email'}</strong>
+                  </div>
+
+                  <div className="checkout-step-actions">
+                    <button 
+                      type="button" 
+                      onClick={() => setCurrentStep(3)} 
+                      className="checkout-step-next-btn"
+                    >
+                      Proceed to Payment Options ➔
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* ════ STEP 3: PAYMENT OPTIONS ════ */}
+            <div className={`checkout-accordion-card ${currentStep === 3 ? 'active' : ''} ${currentStep < 3 ? 'disabled' : ''}`}>
+              <div className="checkout-step-header">
+                <div className="checkout-step-title-group">
+                  <span className="checkout-step-badge">3</span>
+                  <div className="checkout-step-heading-wrap">
+                    <h3>Payment Options</h3>
+                    {currentStep === 3 && (
+                      <span className="checkout-step-subtitle">
+                        100% Safe & Secure Online Payment (Razorpay)
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-              <div className="form-group full-width">
-                <label htmlFor="email">Email Address *</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="you@example.com"
-                  required
-                />
+
+              {/* Step 3 Active Payment Form */}
+              {currentStep === 3 && (
+                <div className="checkout-step-content">
+                  <div className="checkout-payment-card selected">
+                    <div className="payment-card-header">
+                      <div className="payment-card-icon">🔒</div>
+                      <div className="payment-card-details">
+                        <div className="payment-card-title">Razorpay Secure Online Checkout</div>
+                        <div className="payment-card-desc">
+                          UPI (Google Pay, PhonePe, Paytm, BHIM), Cards (Visa, Mastercard, RuPay), NetBanking & Wallets
+                        </div>
+                      </div>
+                      <div className="payment-secure-tag">100% SECURE</div>
+                    </div>
+
+                    <div className="payment-supported-strip">
+                      <span>UPI</span>
+                      <span>•</span>
+                      <span>Google Pay</span>
+                      <span>•</span>
+                      <span>PhonePe</span>
+                      <span>•</span>
+                      <span>Paytm</span>
+                      <span>•</span>
+                      <span>Cards & NetBanking</span>
+                    </div>
+                  </div>
+
+                  <button 
+                    type="button" 
+                    onClick={handlePaymentSubmit} 
+                    className="checkout-complete-btn" 
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <span className="btn-spinner-content">
+                        <span className="btn-spinner" /> Processing Payment...
+                      </span>
+                    ) : (
+                      <span>🔒 Complete Order & Pay {formatCurrency(finalTotalAmount)}</span>
+                    )}
+                  </button>
+
+                  <div className="checkout-guarantee-note">
+                    🛡️ Your transaction is encrypted with 256-bit SSL encryption. We never store card details.
+                  </div>
+                </div>
+              )}
+            </div>
+
+          </div>
+
+          {/* Right Column: Synchronized Price Details Card */}
+          <div className="checkout-summary">
+            <div className="checkout-summary-card">
+              <div className="checkout-summary-header">
+                <h3>Price Details ({cartCount} {cartCount === 1 ? 'Item' : 'Items'})</h3>
               </div>
-              <div className="form-group full-width">
-                <label htmlFor="phone">Phone Number (10 Digits) *</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  maxLength={10}
-                  placeholder="9876543210"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  required
-                />
+              <div className="checkout-summary-body">
+                <div className="summary-row">
+                  <span>Total MRP</span>
+                  <span>{formatCurrency(totalOriginalPrice)}</span>
+                </div>
+                
+                {baseDiscount > 0 && (
+                  <div className="summary-row summary-row--green">
+                    <span>Discount on MRP</span>
+                    <span>− {formatCurrency(baseDiscount)}</span>
+                  </div>
+                )}
+
+                {specialSaleDiscount > 0 && (
+                  <div className="summary-row summary-row--green">
+                    <span>Special Sale ({globalSettings?.saleDiscountPercentage}%)</span>
+                    <span>− {formatCurrency(specialSaleDiscount)}</span>
+                  </div>
+                )}
+
+                <div className="summary-row">
+                  <div>
+                    <span>Delivery Charges</span>
+                    {shippingCost > 0 && isNCR && (
+                      <div className="summary-sub-tag">✨ Delhi-NCR Logistics Rate</div>
+                    )}
+                  </div>
+                  <span>
+                    {shippingCost > 0 ? (
+                      formatCurrency(shippingCost)
+                    ) : (
+                      <span className="summary-delivery-note">Enter address</span>
+                    )}
+                  </span>
+                </div>
+                
+                <div className="summary-divider" />
+
+                <div className="summary-total">
+                  <span>Total Payable</span>
+                  <span className="summary-total-price">{formatCurrency(finalTotalAmount)}</span>
+                </div>
+
+                {totalDiscount > 0 && (
+                  <div className="checkout-savings-msg">
+                    🎉 You are saving {formatCurrency(totalDiscount)} on this order
+                  </div>
+                )}
               </div>
-              <div className="form-group full-width">
-                <label htmlFor="address">Address (House No, Building, Street) *</label>
-                <input
-                  type="text"
-                  id="address"
-                  name="address"
-                  autoComplete="street-address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  placeholder="e.g. 14, Shivaji Nagar, MG Road"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="city">City *</label>
-                <input
-                  type="text"
-                  id="city"
-                  name="city"
-                  autoComplete="address-level2"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  placeholder="e.g. Mathura"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="state">State *</label>
-                <select
-                  id="state"
-                  name="state"
-                  autoComplete="address-level1"
-                  value={formData.state}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="">Select State / UT</option>
-                  {INDIAN_STATES.map((st) => (
-                    <option key={st} value={st}>
-                      {st} {st === 'Delhi' ? '(₹79 Shipping)' : (st === 'Haryana' || st === 'Uttar Pradesh') ? '(₹79 NCR / ₹119 Other)' : '(₹119 Shipping)'}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group full-width">
-                <label htmlFor="pincode">Pincode *</label>
-                <input
-                  type="text"
-                  id="pincode"
-                  name="pincode"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength={6}
-                  autoComplete="postal-code"
-                  placeholder="6-digit pincode"
-                  value={formData.pincode}
-                  onChange={handleInputChange}
-                  required
-                />
+
+              {/* Trust badges */}
+              <div className="checkout-trust-box">
+                <div className="checkout-trust-item">
+                  <span>🔒</span>
+                  <span>256-bit SSL</span>
+                </div>
+                <div className="checkout-trust-item">
+                  <span>🛡️</span>
+                  <span>Razorpay Verified</span>
+                </div>
+                <div className="checkout-trust-item">
+                  <span>✨</span>
+                  <span>100% Authentic</span>
+                </div>
               </div>
             </div>
           </div>
+          
+        </div>
+      </div>
 
-          {/* Payment Method */}
-          <div className="checkout-section">
-            <h2>
-              <span className="checkout-section-number">2</span>
-              Payment Method
-            </h2>
-            <div className="payment-options">
-              <label className={`payment-option ${paymentMethod === 'online' ? 'selected' : ''}`}>
-                <input 
-                  type="radio" 
-                  name="paymentMethod" 
-                  value="online" 
-                  checked={paymentMethod === 'online'} 
-                  readOnly 
-                />
-                <div>
-                  <span className="payment-option-label">🔒 Online Payment (Razorpay)</span>
-                  <span className="payment-option-desc">Pay securely using UPI, Credit/Debit Card, Wallets, or Netbanking. Your data is 100% safe.</span>
-                </div>
-              </label>
-            </div>
+      {/* Mobile Sticky Action Bar */}
+      <div className="checkout-mobile-sticky-bar">
+        <div className="checkout-mobile-price-peek" onClick={() => setShowMobileBreakdown(!showMobileBreakdown)}>
+          <div className="mobile-total-label">Payable Amount</div>
+          <div className="mobile-total-price">
+            {formatCurrency(finalTotalAmount)}
+            <span className="mobile-view-breakup">View Details ▴</span>
           </div>
         </div>
 
-        {/* Right Column: Order Summary */}
-        <div className="checkout-summary">
-          <div className="checkout-summary-card">
-            <div className="checkout-summary-header">
-              <h3>Order Summary ({cartCount} item{cartCount > 1 ? 's' : ''})</h3>
+        {currentStep === 1 && (
+          <button 
+            type="button" 
+            onClick={handleConfirmAddress} 
+            className="checkout-mobile-action-btn"
+          >
+            Deliver Here ➔
+          </button>
+        )}
+
+        {currentStep === 2 && (
+          <button 
+            type="button" 
+            onClick={() => setCurrentStep(3)} 
+            className="checkout-mobile-action-btn"
+          >
+            Continue ➔
+          </button>
+        )}
+
+        {currentStep === 3 && (
+          <button 
+            type="button" 
+            onClick={handlePaymentSubmit} 
+            disabled={isSubmitting}
+            className="checkout-mobile-action-btn checkout-mobile-action-btn--pay"
+          >
+            {isSubmitting ? "Processing..." : `Pay ${formatCurrency(finalTotalAmount)}`}
+          </button>
+        )}
+      </div>
+
+      {/* Mobile Breakdown Modal */}
+      {showMobileBreakdown && (
+        <div className="checkout-modal-backdrop" onClick={() => setShowMobileBreakdown(false)}>
+          <div className="checkout-modal-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="checkout-modal-header">
+              <h3>Price Breakdown</h3>
+              <button className="checkout-modal-close" onClick={() => setShowMobileBreakdown(false)}>✕</button>
             </div>
-            <div className="checkout-summary-body">
-
-              {/* Item list */}
-              <div className="checkout-summary-items">
-                {cartItems.map((item) => (
-                  <div key={`${item.id}-${item.size || ''}-${item.color || ''}`} className="checkout-summary-item">
-                    <div className="checkout-summary-item-img">
-                      <Image
-                        src={item.image || '/header-banner.jpg'}
-                        alt={item.title}
-                        fill
-                        style={{ objectFit: 'cover' }}
-                        sizes="56px"
-                      />
-                    </div>
-                    <div className="checkout-summary-item-info">
-                      <div className="checkout-summary-item-title">{item.title}</div>
-                      {(item.size || item.color) && (
-                        <div className="checkout-summary-item-meta">
-                          {item.size && `Size: ${item.size}`}{item.size && item.color ? ' · ' : ''}{item.color && `Color: ${item.color}`} · Qty: {item.quantity}
-                        </div>
-                      )}
-                      {!item.size && !item.color && (
-                        <div className="checkout-summary-item-meta">Qty: {item.quantity}</div>
-                      )}
-                      <div className="checkout-summary-item-price">{formatCurrency((item.price ?? 0) * item.quantity)}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="checkout-summary-divider" />
-
-              <div className="checkout-summary-row">
-                <span>Items ({cartCount})</span>
+            <div className="checkout-modal-body">
+              <div className="summary-row">
+                <span>Total MRP ({cartCount} items)</span>
                 <span>{formatCurrency(totalOriginalPrice)}</span>
               </div>
-              <div className="checkout-summary-row checkout-summary-row--green">
-                <span>Product Discount</span>
-                <span>− {formatCurrency(baseDiscount)}</span>
-              </div>
+              {baseDiscount > 0 && (
+                <div className="summary-row summary-row--green">
+                  <span>Product Discount</span>
+                  <span>− {formatCurrency(baseDiscount)}</span>
+                </div>
+              )}
               {specialSaleDiscount > 0 && (
-                <div className="checkout-summary-row checkout-summary-row--green">
-                  <span>{globalSettings?.saleDiscountPercentage}% Special Sale</span>
+                <div className="summary-row summary-row--green">
+                  <span>Special Sale</span>
                   <span>− {formatCurrency(specialSaleDiscount)}</span>
                 </div>
               )}
-              <div className="checkout-summary-row">
-                <div>
-                  <span>Delivery Charges</span>
-                  {shippingCost > 0 && isNCR && (
-                    <div style={{ fontSize: '11px', color: '#16a34a', fontWeight: '600', marginTop: '2px' }}>
-                      ✨ Delhi-NCR rate (₹79)
-                    </div>
-                  )}
-                </div>
-                <span>
-                  {shippingCost > 0 ? (
-                    formatCurrency(shippingCost)
-                  ) : (
-                    <span style={{ color: '#9a7c50', fontStyle: 'italic', fontSize: '12px' }}>Enter address</span>
-                  )}
-                </span>
+              <div className="summary-row">
+                <span>Delivery Charges</span>
+                <span>{shippingCost > 0 ? formatCurrency(shippingCost) : 'Enter address'}</span>
               </div>
-              
-              <div className="checkout-summary-total">
-                <span>Total Amount</span>
-                <span style={{ color: 'var(--maroon, #4a1521)' }}>{formatCurrency(finalTotalAmount)}</span>
+              <div className="summary-divider" />
+              <div className="summary-total">
+                <span>Total Payable</span>
+                <span>{formatCurrency(finalTotalAmount)}</span>
               </div>
-              
-              <button 
-                type="submit" 
-                className="complete-order-btn" 
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? '⏳ Processing...' : '🔒 Complete Order'}
-              </button>
-            </div>
-
-            {/* Trust badges */}
-            <div className="checkout-trust">
-              <div className="checkout-trust-item">🔒 SSL Secure</div>
-              <div className="checkout-trust-item">🛡️ Razorpay</div>
-              <div className="checkout-trust-item">↩️ Easy Returns</div>
             </div>
           </div>
         </div>
-        
-      </form>
+      )}
     </div>
   );
 }
-
-

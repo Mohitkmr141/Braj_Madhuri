@@ -217,13 +217,14 @@ export default function SiteShell({ children, initialCategories }) {
   }, [pathname]);
 
   const isAdminRoute = pathname?.startsWith('/admin');
+  const isCheckoutRoute = pathname === '/checkout';
 
   return (
     <SessionProvider>
       <ProductsProvider initialCategories={initialCategories}>
         <CartProvider value={contextValue}>
           <WishlistProvider value={wishlistContextValue}>
-            {!isAdminRoute && (
+            {!isAdminRoute && !isCheckoutRoute && (
               <>
                 <p className="visually-hidden" aria-live="polite">
                   {cartAnnouncement}
@@ -232,10 +233,10 @@ export default function SiteShell({ children, initialCategories }) {
               </>
             )}
             {children}
-            {!isAdminRoute && (
+            {!isAdminRoute && !isCheckoutRoute && (
               <>
                 <Footer />
-                <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />
+                {pathname !== '/cart' && <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />}
                 <FloatingWhatsApp />
                 <SaleModalBanner />
               </>

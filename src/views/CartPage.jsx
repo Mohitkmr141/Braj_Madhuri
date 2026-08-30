@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext.jsx";
 import "../components/CartPage.css";
 
@@ -15,9 +16,12 @@ const formatCurrency = (value) =>
   }).format(value);
 
 export default function CartPage() {
+  const router = useRouter();
   const { cartItems, cartCount, cartTotal, updateQuantity, removeFromCart } = useCart();
 
   const [globalSettings, setGlobalSettings] = useState(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showPriceDetailsModal, setShowPriceDetailsModal] = useState(false);
 
   useEffect(() => {
     fetch('/api/settings').then(r => r.json()).then(d => {
@@ -34,7 +38,6 @@ export default function CartPage() {
 
   const totalOriginalPrice = useMemo(() => {
     return cartItems.reduce((acc, item) => {
-      // If no originalPrice is available, fallback to current price to avoid zero-savings bugs
       const itemOriginal = item.originalPrice ?? item.price ?? 0;
       return acc + itemOriginal * item.quantity;
     }, 0);
@@ -44,6 +47,13 @@ export default function CartPage() {
   const specialSaleDiscount = globalSettings?.isSaleActive ? Math.round(cartTotal * (globalSettings.saleDiscountPercentage / 100)) : 0;
   const totalDiscount = baseDiscount + specialSaleDiscount;
   const finalTotal = cartTotal - specialSaleDiscount;
+
+  const handleProceedToCheckout = (e) => {
+    if (e) e.preventDefault();
+    if (hasOutOfStockItems || isTransitioning) return;
+    setIsTransitioning(true);
+    router.push("/checkout");
+  };
 
   if (cartCount === 0) {
     return (
@@ -57,7 +67,7 @@ export default function CartPage() {
             </svg>
           </div>
           <h1 className="cart-empty-title">Your Cart is Empty</h1>
-          <p className="cart-empty-subtitle">Looks like you haven&apos;t added anything to your cart yet. Discover our premium collections.</p>
+          <p className="cart-empty-subtitle">Looks like you haven&apos;t added anything to your cart yet. Discover our premium devotional collections.</p>
           <Link href="/shop" className="cart-empty-btn">
             Explore Collection
           </Link>
@@ -68,11 +78,40 @@ export default function CartPage() {
 
   return (
     <div className="cart-page-wrapper">
+      {/* Flipkart & Amazon style Progress Stepper */}
+      <div className="cart-progress-header">
+        <div className="cart-progress-track">
+          <div className="cart-step-node active">
+            <div className="cart-step-bubble">1</div>
+            <span className="cart-step-name">My Bag</span>
+          </div>
+          <div className="cart-step-line" />
+          <div className="cart-step-node">
+            <div className="cart-step-bubble">2</div>
+            <span className="cart-step-name">Address</span>
+          </div>
+          <div className="cart-step-line" />
+          <div className="cart-step-node">
+            <div className="cart-step-bubble">3</div>
+            <span className="cart-step-name">Payment</span>
+          </div>
+        </div>
+      </div>
+
       <div className="cart-page-container reveal">
-        {/* Left Column */}
+        {/* Left Column: Cart Items */}
         <div className="cart-items-section">
           <div className="cart-header">
-            <h1>My Cart ({cartCount})</h1>
+            <div className="cart-header-title-group">
+              <h1>Shopping Bag</h1>
+              <span className="cart-header-count">{cartCount} {cartCount === 1 ? 'item' : 'items'}</span>
+            </div>
+            <div className="cart-header-trust">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              <span>100% Genuine Products</span>
+            </div>
           </div>
           
           <div className="cart-items-list">
@@ -96,8 +135,12 @@ export default function CartPage() {
                   </div>
                   <div className="cart-item-details">
                     <h3 className="cart-item-title">{item.title}</h3>
-                    {item.size && <div className="cart-item-size">Size: {item.size}</div>}
-                    {item.color && <div className="cart-item-size">Color: {item.color}</div>}
+                    {(item.size || item.color) && (
+                      <div className="cart-item-variants">
+                        {item.size && <span className="cart-item-size">Size: {item.size}</span>}
+                        {item.color && <span className="cart-item-size">Color: {item.color}</span>}
+                      </div>
+                    )}
 
                     {isOutOfStock && (
                       <span className="cart-stock-badge cart-stock-badge--soldout">
@@ -117,7 +160,7 @@ export default function CartPage() {
                     
                     <div className="cart-item-pricing">
                       <span className="cart-item-price">{formatCurrency(item.price ?? 0)}</span>
-                      {item.originalPrice && (
+                      {item.originalPrice && item.originalPrice > (item.price ?? 0) && (
                         <span className="cart-item-original">{formatCurrency(item.originalPrice)}</span>
                       )}
                       {item.originalPrice && item.price && item.originalPrice > item.price && (
@@ -167,11 +210,11 @@ export default function CartPage() {
           </div>
         </div>
 
-        {/* Right Column */}
+        {/* Right Column: Synchronized Price Details */}
         <div className="cart-summary-section">
           <div className="cart-summary-card">
             <div className="cart-summary-header">
-              <h2>Price Details</h2>
+              <h2>Price Details ({cartCount} {cartCount === 1 ? 'Item' : 'Items'})</h2>
             </div>
             <div className="cart-summary-body">
               {hasOutOfStockItems && (
@@ -182,29 +225,34 @@ export default function CartPage() {
               )}
 
               <div className="summary-row">
-                <span>Price ({cartCount} item{cartCount > 1 ? 's' : ''})</span>
+                <span>Total MRP</span>
                 <span>{formatCurrency(totalOriginalPrice)}</span>
               </div>
-              <div className="summary-row summary-row--green">
-                <span>Product Discount</span>
-                <span>− {formatCurrency(baseDiscount)}</span>
-              </div>
+              
+              {baseDiscount > 0 && (
+                <div className="summary-row summary-row--green">
+                  <span>Discount on MRP</span>
+                  <span>− {formatCurrency(baseDiscount)}</span>
+                </div>
+              )}
+
               {specialSaleDiscount > 0 && (
                 <div className="summary-row summary-row--green">
-                  <span>{globalSettings?.saleDiscountPercentage}% Special Sale</span>
+                  <span>Special Sale ({globalSettings?.saleDiscountPercentage}%)</span>
                   <span>− {formatCurrency(specialSaleDiscount)}</span>
                 </div>
               )}
-              <div className="summary-row" style={{ fontSize: '13px' }}>
-                <span>Delivery Charges</span>
-                <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Calculated at checkout</span>
+
+              <div className="summary-row">
+                <span>Delivery Fee</span>
+                <span className="summary-delivery-note">Calculated at Address</span>
               </div>
               
               <div className="summary-divider" />
               
               <div className="summary-total">
                 <span>Total Amount</span>
-                <span>{formatCurrency(finalTotal)}</span>
+                <span className="summary-total-price">{formatCurrency(finalTotal)}</span>
               </div>
               
               {hasOutOfStockItems ? (
@@ -213,22 +261,127 @@ export default function CartPage() {
                   disabled 
                   className="place-order-btn place-order-btn--disabled" 
                 >
-                  Remove Sold Out Items to Checkout
+                  Remove Sold Out Items
                 </button>
               ) : (
-                <Link href="/checkout" className="place-order-btn">
-                  Place Order
-                </Link>
+                <button 
+                  type="button"
+                  onClick={handleProceedToCheckout} 
+                  className={`place-order-btn ${isTransitioning ? 'place-order-btn--loading' : ''}`}
+                  disabled={isTransitioning}
+                >
+                  {isTransitioning ? (
+                    <span className="btn-spinner-content">
+                      <span className="btn-spinner" /> Proceeding to Checkout...
+                    </span>
+                  ) : (
+                    <span>Proceed to Buy ➔</span>
+                  )}
+                </button>
               )}
             </div>
+
             {totalDiscount > 0 && (
               <div className="cart-savings-msg">
-                🎉 You will save {formatCurrency(totalDiscount)} on this order
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M8 12l2 2 4-4" />
+                </svg>
+                <span>You will save {formatCurrency(totalDiscount)} on this order</span>
               </div>
             )}
+
+            <div className="cart-trust-strip">
+              <div className="cart-trust-item">
+                <span className="trust-icon">🛡️</span>
+                <span>Safe Payments</span>
+              </div>
+              <div className="cart-trust-item">
+                <span className="trust-icon">🚚</span>
+                <span>Fast Shipping</span>
+              </div>
+              <div className="cart-trust-item">
+                <span className="trust-icon">✨</span>
+                <span>Original Braj</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Mobile Sticky Bottom Bar (Flipkart / Amazon style) */}
+      <div className="cart-mobile-sticky-bar">
+        <div className="cart-mobile-price-peek" onClick={() => setShowPriceDetailsModal(!showPriceDetailsModal)}>
+          <div className="mobile-total-label">Total Amount</div>
+          <div className="mobile-total-price">
+            {formatCurrency(finalTotal)}
+            <span className="mobile-view-breakup">View Details ▴</span>
+          </div>
+        </div>
+
+        {hasOutOfStockItems ? (
+          <button 
+            type="button" 
+            disabled 
+            className="cart-mobile-checkout-btn cart-mobile-checkout-btn--disabled"
+          >
+            Remove Sold Out Items
+          </button>
+        ) : (
+          <button 
+            type="button" 
+            onClick={handleProceedToCheckout} 
+            disabled={isTransitioning}
+            className="cart-mobile-checkout-btn"
+          >
+            {isTransitioning ? "Proceeding..." : "Proceed to Buy ➔"}
+          </button>
+        )}
+      </div>
+
+      {/* Mobile Price Details Bottom Sheet */}
+      {showPriceDetailsModal && (
+        <div className="cart-modal-backdrop" onClick={() => setShowPriceDetailsModal(false)}>
+          <div className="cart-modal-sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="cart-modal-header">
+              <h3>Price Breakdown</h3>
+              <button className="cart-modal-close" onClick={() => setShowPriceDetailsModal(false)}>✕</button>
+            </div>
+            <div className="cart-modal-body">
+              <div className="summary-row">
+                <span>Total MRP ({cartCount} items)</span>
+                <span>{formatCurrency(totalOriginalPrice)}</span>
+              </div>
+              {baseDiscount > 0 && (
+                <div className="summary-row summary-row--green">
+                  <span>Product Discount</span>
+                  <span>− {formatCurrency(baseDiscount)}</span>
+                </div>
+              )}
+              {specialSaleDiscount > 0 && (
+                <div className="summary-row summary-row--green">
+                  <span>Special Sale</span>
+                  <span>− {formatCurrency(specialSaleDiscount)}</span>
+                </div>
+              )}
+              <div className="summary-row">
+                <span>Delivery Charges</span>
+                <span style={{ color: '#7a4f28', fontStyle: 'italic' }}>Calculated at Address</span>
+              </div>
+              <div className="summary-divider" />
+              <div className="summary-total">
+                <span>Final Total</span>
+                <span>{formatCurrency(finalTotal)}</span>
+              </div>
+              {totalDiscount > 0 && (
+                <div className="cart-modal-savings">
+                  🎉 Total Savings: {formatCurrency(totalDiscount)}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
