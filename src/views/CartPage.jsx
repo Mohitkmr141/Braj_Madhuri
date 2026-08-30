@@ -169,64 +169,67 @@ export default function CartPage() {
 
         {/* Right Column */}
         <div className="cart-summary-section">
-          <div className="cart-summary-header">
-            <h2>Price Details</h2>
-          </div>
-          <div className="cart-summary-body">
-            {hasOutOfStockItems && (
-              <div className="cart-alert-warning">
-                <span>⚠️ One or more items are out of stock. Please remove them to place your order.</span>
-              </div>
-            )}
+          <div className="cart-summary-card">
+            <div className="cart-summary-header">
+              <h2>Price Details</h2>
+            </div>
+            <div className="cart-summary-body">
+              {hasOutOfStockItems && (
+                <div className="cart-alert-warning">
+                  <span>⚠️</span>
+                  <span>One or more items are out of stock. Please remove them to place your order.</span>
+                </div>
+              )}
 
-            <div className="summary-row">
-              <span>Price ({cartCount} item{cartCount > 1 ? 's' : ''})</span>
-              <span>{formatCurrency(totalOriginalPrice)}</span>
-            </div>
-            <div className="summary-row summary-row--green">
-              <span>Product Discount</span>
-              <span>− {formatCurrency(baseDiscount)}</span>
-            </div>
-            {specialSaleDiscount > 0 && (
+              <div className="summary-row">
+                <span>Price ({cartCount} item{cartCount > 1 ? 's' : ''})</span>
+                <span>{formatCurrency(totalOriginalPrice)}</span>
+              </div>
               <div className="summary-row summary-row--green">
-                <span>{globalSettings?.saleDiscountPercentage}% Special Sale</span>
-                <span>− {formatCurrency(specialSaleDiscount)}</span>
+                <span>Product Discount</span>
+                <span>− {formatCurrency(baseDiscount)}</span>
+              </div>
+              {specialSaleDiscount > 0 && (
+                <div className="summary-row summary-row--green">
+                  <span>{globalSettings?.saleDiscountPercentage}% Special Sale</span>
+                  <span>− {formatCurrency(specialSaleDiscount)}</span>
+                </div>
+              )}
+              <div className="summary-row" style={{ fontSize: '13px' }}>
+                <span>Delivery Charges</span>
+                <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Calculated at checkout</span>
+              </div>
+              
+              <div className="summary-divider" />
+              
+              <div className="summary-total">
+                <span>Total Amount</span>
+                <span>{formatCurrency(finalTotal)}</span>
+              </div>
+              
+              {hasOutOfStockItems ? (
+                <button 
+                  type="button" 
+                  disabled 
+                  className="place-order-btn place-order-btn--disabled" 
+                >
+                  Remove Sold Out Items to Checkout
+                </button>
+              ) : (
+                <Link href="/checkout" className="place-order-btn">
+                  Place Order
+                </Link>
+              )}
+            </div>
+            {totalDiscount > 0 && (
+              <div className="cart-savings-msg">
+                🎉 You will save {formatCurrency(totalDiscount)} on this order
               </div>
             )}
-            <div className="summary-row" style={{ fontSize: '14px' }}>
-              <span>Delivery Charges</span>
-              <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontFamily: "'Inter', sans-serif" }}>Calculated at checkout</span>
-            </div>
-            
-            <div className="summary-divider" />
-            
-            <div className="summary-total">
-              <span>Total Amount</span>
-              <span>{formatCurrency(finalTotal)}</span>
-            </div>
-            
-            {hasOutOfStockItems ? (
-              <button 
-                type="button" 
-                disabled 
-                className="place-order-btn place-order-btn--disabled" 
-                style={{ display: 'block', width: '100%', textAlign: 'center', marginTop: '16px' }}
-              >
-                Remove Sold Out Items to Checkout
-              </button>
-            ) : (
-              <Link href="/checkout" className="place-order-btn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
-                Place Order
-              </Link>
-            )}
           </div>
-          {totalDiscount > 0 && (
-            <div className="cart-savings-msg">
-              You will save {formatCurrency(totalDiscount)} on this order
-            </div>
-          )}
         </div>
       </div>
     </div>
   );
 }
+

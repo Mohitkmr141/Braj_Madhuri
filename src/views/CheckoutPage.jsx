@@ -318,7 +318,7 @@ export default function CheckoutPage() {
         <div className="checkout-main">
           <div className="checkout-header">
             <h1>Secure Checkout</h1>
-            <p>Please enter your shipping and payment details.</p>
+            <p>Your details are protected with 256-bit SSL encryption.</p>
           </div>
           
           {error && (
@@ -326,7 +326,7 @@ export default function CheckoutPage() {
               {error}
               {lastPaymentId && (
                 <div style={{ marginTop: '12px' }}>
-                  <div style={{ fontSize: '13px', marginBottom: '8px', color: '#555' }}>
+                  <div style={{ fontSize: '13px', marginBottom: '8px' }}>
                     Your Payment ID: <strong style={{ fontFamily: 'monospace' }}>{lastPaymentId}</strong>
                   </div>
                   <button
@@ -337,7 +337,7 @@ export default function CheckoutPage() {
                       background: '#4A1521',
                       color: '#fff',
                       border: 'none',
-                      borderRadius: '6px',
+                      borderRadius: '8px',
                       padding: '10px 20px',
                       fontSize: '14px',
                       fontWeight: '600',
@@ -354,7 +354,10 @@ export default function CheckoutPage() {
 
           {/* Shipping Address */}
           <div className="checkout-section">
-            <h2>Shipping Address</h2>
+            <h2>
+              <span className="checkout-section-number">1</span>
+              Shipping Address
+            </h2>
             <div className="form-grid">
               <div className="form-group">
                 <label htmlFor="firstName">First Name *</label>
@@ -365,6 +368,7 @@ export default function CheckoutPage() {
                   value={formData.firstName}
                   onChange={handleInputChange}
                   autoComplete="given-name"
+                  placeholder="Rahul"
                   required
                 />
               </div>
@@ -377,6 +381,7 @@ export default function CheckoutPage() {
                   value={formData.lastName}
                   onChange={handleInputChange}
                   autoComplete="family-name"
+                  placeholder="Sharma"
                 />
               </div>
               <div className="form-group full-width">
@@ -389,6 +394,7 @@ export default function CheckoutPage() {
                   autoComplete="email"
                   value={formData.email}
                   onChange={handleInputChange}
+                  placeholder="you@example.com"
                   required
                 />
               </div>
@@ -401,7 +407,7 @@ export default function CheckoutPage() {
                   inputMode="tel"
                   autoComplete="tel"
                   maxLength={10}
-                  placeholder="e.g. 9876543210"
+                  placeholder="9876543210"
                   value={formData.phone}
                   onChange={handleInputChange}
                   required
@@ -416,6 +422,7 @@ export default function CheckoutPage() {
                   autoComplete="street-address"
                   value={formData.address}
                   onChange={handleInputChange}
+                  placeholder="e.g. 14, Shivaji Nagar, MG Road"
                   required
                 />
               </div>
@@ -428,6 +435,7 @@ export default function CheckoutPage() {
                   autoComplete="address-level2"
                   value={formData.city}
                   onChange={handleInputChange}
+                  placeholder="e.g. Mathura"
                   required
                 />
               </div>
@@ -449,7 +457,7 @@ export default function CheckoutPage() {
                   ))}
                 </select>
               </div>
-              <div className="form-group" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div className="form-group full-width">
                 <label htmlFor="pincode">Pincode *</label>
                 <input
                   type="text"
@@ -470,7 +478,10 @@ export default function CheckoutPage() {
 
           {/* Payment Method */}
           <div className="checkout-section">
-            <h2>Payment Method</h2>
+            <h2>
+              <span className="checkout-section-number">2</span>
+              Payment Method
+            </h2>
             <div className="payment-options">
               <label className={`payment-option ${paymentMethod === 'online' ? 'selected' : ''}`}>
                 <input 
@@ -481,8 +492,8 @@ export default function CheckoutPage() {
                   readOnly 
                 />
                 <div>
-                  <span className="payment-option-label">Online Payment</span>
-                  <span className="payment-option-desc">Pay securely using UPI, Credit/Debit Card, or Netbanking.</span>
+                  <span className="payment-option-label">🔒 Online Payment (Razorpay)</span>
+                  <span className="payment-option-desc">Pay securely using UPI, Credit/Debit Card, Wallets, or Netbanking. Your data is 100% safe.</span>
                 </div>
               </label>
             </div>
@@ -490,31 +501,64 @@ export default function CheckoutPage() {
         </div>
 
         {/* Right Column: Order Summary */}
-        <div className="checkout-sidebar">
-          <div className="checkout-section checkout-summary">
-            <h2>Order Summary</h2>
-            
-            <div className="cart-summary-body">
-              <div className="summary-row">
+        <div className="checkout-summary">
+          <div className="checkout-summary-card">
+            <div className="checkout-summary-header">
+              <h3>Order Summary ({cartCount} item{cartCount > 1 ? 's' : ''})</h3>
+            </div>
+            <div className="checkout-summary-body">
+
+              {/* Item list */}
+              <div className="checkout-summary-items">
+                {cartItems.map((item) => (
+                  <div key={`${item.id}-${item.size || ''}-${item.color || ''}`} className="checkout-summary-item">
+                    <div className="checkout-summary-item-img">
+                      <Image
+                        src={item.image || '/header-banner.jpg'}
+                        alt={item.title}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        sizes="56px"
+                      />
+                    </div>
+                    <div className="checkout-summary-item-info">
+                      <div className="checkout-summary-item-title">{item.title}</div>
+                      {(item.size || item.color) && (
+                        <div className="checkout-summary-item-meta">
+                          {item.size && `Size: ${item.size}`}{item.size && item.color ? ' · ' : ''}{item.color && `Color: ${item.color}`} · Qty: {item.quantity}
+                        </div>
+                      )}
+                      {!item.size && !item.color && (
+                        <div className="checkout-summary-item-meta">Qty: {item.quantity}</div>
+                      )}
+                      <div className="checkout-summary-item-price">{formatCurrency((item.price ?? 0) * item.quantity)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="checkout-summary-divider" />
+
+              <div className="checkout-summary-row">
                 <span>Items ({cartCount})</span>
                 <span>{formatCurrency(totalOriginalPrice)}</span>
               </div>
-              <div className="summary-row summary-row--green" style={{ color: '#2e7d32', display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
+              <div className="checkout-summary-row checkout-summary-row--green">
                 <span>Product Discount</span>
                 <span>− {formatCurrency(baseDiscount)}</span>
               </div>
               {specialSaleDiscount > 0 && (
-                <div className="summary-row summary-row--green" style={{ color: '#2e7d32', display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px' }}>
+                <div className="checkout-summary-row checkout-summary-row--green">
                   <span>{globalSettings?.saleDiscountPercentage}% Special Sale</span>
                   <span>− {formatCurrency(specialSaleDiscount)}</span>
                 </div>
               )}
-              <div className="summary-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '15px', alignItems: 'center' }}>
+              <div className="checkout-summary-row">
                 <div>
                   <span>Delivery Charges</span>
                   {shippingCost > 0 && isNCR && (
-                    <div style={{ fontSize: '11px', color: '#2e7d32', fontWeight: '600', marginTop: '2px' }}>
-                      ✨ Delhi-NCR rate applied (₹79)
+                    <div style={{ fontSize: '11px', color: '#16a34a', fontWeight: '600', marginTop: '2px' }}>
+                      ✨ Delhi-NCR rate (₹79)
                     </div>
                   )}
                 </div>
@@ -522,16 +566,14 @@ export default function CheckoutPage() {
                   {shippingCost > 0 ? (
                     formatCurrency(shippingCost)
                   ) : (
-                    <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '14px', fontFamily: "'Inter', sans-serif" }}>Enter address to calculate</span>
+                    <span style={{ color: '#9a7c50', fontStyle: 'italic', fontSize: '12px' }}>Enter address</span>
                   )}
                 </span>
               </div>
               
-              <div style={{ height: '1px', background: 'rgba(0,0,0,0.1)', margin: '16px 0' }} />
-              
-              <div className="summary-total" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '700', fontSize: '18px', color: 'var(--maroon)' }}>
+              <div className="checkout-summary-total">
                 <span>Total Amount</span>
-                <span>{formatCurrency(finalTotalAmount)}</span>
+                <span style={{ color: 'var(--maroon, #4a1521)' }}>{formatCurrency(finalTotalAmount)}</span>
               </div>
               
               <button 
@@ -539,8 +581,15 @@ export default function CheckoutPage() {
                 className="complete-order-btn" 
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Processing..." : "Complete Order"}
+                {isSubmitting ? '⏳ Processing...' : '🔒 Complete Order'}
               </button>
+            </div>
+
+            {/* Trust badges */}
+            <div className="checkout-trust">
+              <div className="checkout-trust-item">🔒 SSL Secure</div>
+              <div className="checkout-trust-item">🛡️ Razorpay</div>
+              <div className="checkout-trust-item">↩️ Easy Returns</div>
             </div>
           </div>
         </div>
@@ -549,3 +598,5 @@ export default function CheckoutPage() {
     </div>
   );
 }
+
+
