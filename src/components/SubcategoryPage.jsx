@@ -369,7 +369,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
             <div className="quick-view-info-panel">
               <h3 className="quick-view-title">{displayTitle}</h3>
               {product.subheading && (
-                <div style={{ marginTop: "-8px", marginBottom: "16px", color: "var(--text-muted)", fontSize: "15px", fontWeight: "500", fontFamily: "var(--font-sans, 'Inter', sans-serif)" }}>
+                <div className="quick-view-subheading">
                   {product.subheading}
                 </div>
               )}
@@ -468,14 +468,8 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
                   className={`wishlist-quick-btn ${isFav ? 'active' : ''}`}
                   onClick={handleToggleWishlist}
                   aria-label={isFav ? "Remove from wishlist" : "Add to wishlist"}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    width: '46px', borderRadius: '4px', border: `1px solid ${isFav ? 'var(--maroon)' : '#ccc'}`,
-                    background: isFav ? 'var(--maroon)' : '#fff', cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
                 >
-                  <svg viewBox="0 0 24 24" fill={isFav ? "#fff" : "none"} stroke={isFav ? "#fff" : "#333"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
+                  <svg viewBox="0 0 24 24" fill={isFav ? "var(--maroon)" : "none"} stroke={isFav ? "var(--maroon)" : "#9a7c50"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '20px', height: '20px' }}>
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                   </svg>
                 </button>
@@ -490,7 +484,7 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
       <div className="subcat-info-panel">
         <h3 className="subcat-product-title">{displayTitle}</h3>
         {product.subheading && (
-          <div style={{ marginTop: "-4px", marginBottom: "12px", color: "var(--text-muted)", fontSize: "14px", fontWeight: "500", fontFamily: "var(--font-sans, 'Inter', sans-serif)" }}>
+          <div className="subcat-subheading">
             {product.subheading}
           </div>
         )}
@@ -700,13 +694,13 @@ export default function SubcategoryPage({
           {products.length} product{products.length !== 1 ? "s" : ""} available
         </p>
         <div className="subcat-divider" />
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '15px' }}>
-          <label htmlFor="price-sort-subcat" style={{ marginRight: '10px', alignSelf: 'center', fontWeight: 'bold' }}>Sort by Price:</label>
+        <div className="sort-control-row">
+          <label htmlFor="price-sort-subcat" className="sort-control-label">Sort by Price:</label>
           <select 
             id="price-sort-subcat" 
+            className="sort-control-select"
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
-            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', background: '#fff', cursor: 'pointer' }}
           >
             <option value="default">Default</option>
             <option value="low-to-high">Low to High</option>
