@@ -283,7 +283,13 @@ export default function CheckoutPage() {
         setError(`Payment Failed: ${response.error.description}`);
         setIsSubmitting(false);
       });
-      rzp1.open();
+      try {
+        rzp1.open();
+      } catch (openErr) {
+        console.error('[Razorpay] rzp.open() failed:', openErr);
+        setError('Could not open payment gateway. Please refresh the page and try again.');
+        setIsSubmitting(false);
+      }
       
     } catch (err) {
       console.error(err);

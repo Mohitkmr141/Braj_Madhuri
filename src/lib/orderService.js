@@ -188,6 +188,10 @@ export async function finalizePaidOrder({
     const genOrderNumber = orderNumber || `BM-${Date.now().toString(36).toUpperCase()}${randomBytes(3).toString('hex').toUpperCase()}`;
     const cartItems = fallbackData.cartItems || [];
 
+    if (cartItems.length === 0) {
+      console.error(`[OrderService] ⚠️ ALERT: Fallback order creation for Razorpay Order ${razorpayOrderId} has EMPTY cartItems — stock will NOT be decremented. This indicates the pre-created order was not found in DB.`);
+    }
+
     try {
       finalizedOrder = await prisma.$transaction(async (tx) => {
         // Decrement stock
