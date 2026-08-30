@@ -25,6 +25,13 @@ export default function CartPage() {
     });
   }, []);
 
+  const hasOutOfStockItems = useMemo(() => {
+    return cartItems.some((item) => {
+      const itemStock = typeof item.maxStock === 'number' ? item.maxStock : (typeof item.stock === 'number' ? item.stock : 9999);
+      return itemStock <= 0;
+    });
+  }, [cartItems]);
+
   const totalOriginalPrice = useMemo(() => {
     return cartItems.reduce((acc, item) => {
       // If no originalPrice is available, fallback to current price to avoid zero-savings bugs
@@ -71,8 +78,13 @@ export default function CartPage() {
           <div className="cart-items-list">
             {cartItems.map((item) => {
               const itemKey = `${item.id}-${item.size || 'default'}-${item.color || 'default'}`;
+              const itemStock = typeof item.maxStock === 'number' ? item.maxStock : (typeof item.stock === 'number' ? item.stock : 9999);
+              const isOutOfStock = itemStock <= 0;
+              const isMaxReached = item.quantity >= itemStock && itemStock < 9999;
+              const isLowStock = !isMaxReached && itemStock > 0 && itemStock <= 3;
+
               return (
-                <div key={itemKey} className="cart-item-card">
+                <div key={itemKey} className="cart-item-card" style={isOutOfStock ? { opacity: 0.7, background: '#fafafa' } : {}}>
                   <div className="cart-item-img">
                     <Image
                       src={item.image || "/header-banner.jpg"}
@@ -86,6 +98,22 @@ export default function CartPage() {
                     <h3 className="cart-item-title">{item.title}</h3>
                     {item.size && <div className="cart-item-size">Size: {item.size}</div>}
                     {item.color && <div className="cart-item-size">Color: {item.color}</div>}
+
+                    {isOutOfStock && (
+                      <span className="cart-stock-badge cart-stock-badge--soldout">
+                        ⚠️ Sold Out — Please Remove
+                      </span>
+                    )}
+                    {isMaxReached && !isOutOfStock && (
+                      <span className="cart-stock-badge cart-stock-badge--max">
+                        Max Available Stock ({itemStock})
+                      </span>
+                    )}
+                    {isLowStock && (
+                      <span className="cart-stock-badge cart-stock-badge--low">
+                        Only {itemStock} Left in Stock
+                      </span>
+                    )}
                     
                     <div className="cart-item-pricing">
                       <span className="cart-item-price">{formatCurrency(item.price ?? 0)}</span>
@@ -116,9 +144,11 @@ export default function CartPage() {
                           aria-label="Quantity" 
                         />
                         <button 
-                          className="qty-btn" 
+                          className={`qty-btn ${isMaxReached || isOutOfStock ? 'qty-btn--disabled' : ''}`}
                           onClick={() => updateQuantity(item.id, item.size, item.quantity + 1, item.color)}
+                          disabled={isMaxReached || isOutOfStock}
                           aria-label="Increase quantity"
+                          title={isMaxReached ? `Maximum quantity of ${itemStock} reached` : 'Increase quantity'}
                         >
                           +
                         </button>
@@ -143,6 +173,12 @@ export default function CartPage() {
             <h2>Price Details</h2>
           </div>
           <div className="cart-summary-body">
+            {hasOutOfStockItems && (
+              <div className="cart-alert-warning">
+                <span>⚠️ One or more items are out of stock. Please remove them to place your order.</span>
+              </div>
+            )}
+
             <div className="summary-row">
               <span>Price ({cartCount} item{cartCount > 1 ? 's' : ''})</span>
               <span>{formatCurrency(totalOriginalPrice)}</span>
@@ -169,9 +205,20 @@ export default function CartPage() {
               <span>{formatCurrency(finalTotal)}</span>
             </div>
             
-            <Link href="/checkout" className="place-order-btn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
-              Place Order
-            </Link>
+            {hasOutOfStockItems ? (
+              <button 
+                type="button" 
+                disabled 
+                className="place-order-btn place-order-btn--disabled" 
+                style={{ display: 'block', width: '100%', textAlign: 'center', marginTop: '16px' }}
+              >
+                Remove Sold Out Items to Checkout
+              </button>
+            ) : (
+              <Link href="/checkout" className="place-order-btn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
+                Place Order
+              </Link>
+            )}
           </div>
           {totalDiscount > 0 && (
             <div className="cart-savings-msg">

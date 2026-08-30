@@ -61,7 +61,9 @@ function ComboPacks({ addToCart }) {
                     image: '/header-banner.jpg', // Placeholder for combos since they don't have images in data
                     price: combo.price,
                     originalPrice: null,
-                    size: null
+                    size: null,
+                    stock: 50,
+                    maxStock: 50,
                   })}
                 >
                   Add

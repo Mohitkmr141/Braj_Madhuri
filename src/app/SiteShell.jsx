@@ -54,32 +54,60 @@ export default function SiteShell({ children, initialCategories }) {
   const addToCart = useCallback((product) => {
     setCartItems((prev) => {
       if (typeof product === 'number') {
-        product = { id: `legacy-${Date.now()}`, title: 'Item', price: product, image: '', originalPrice: null };
+        product = { id: `legacy-${Date.now()}`, title: 'Item', price: product, image: '', originalPrice: null, maxStock: 9999 };
       }
       
+      const availableStock = typeof product.maxStock === 'number' 
+        ? product.maxStock 
+        : (typeof product.stock === 'number' ? product.stock : 9999);
+
       const existing = prev.find((item) => isItemMatch(item, product.id, product.size, product.color));
+      
       if (existing) {
+        const itemMax = typeof existing.maxStock === 'number' ? existing.maxStock : availableStock;
+        if (existing.quantity >= itemMax) {
+          addToast(`Only ${itemMax} unit${itemMax === 1 ? '' : 's'} available in stock`);
+          return prev;
+        }
+
         addToast(`Increased quantity of ${product.title || 'Item'}`);
         return prev.map((item) =>
           isItemMatch(item, product.id, product.size, product.color)
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + 1, maxStock: itemMax }
             : item
         );
       }
+
+      if (availableStock <= 0) {
+        addToast(`${product.title || 'Item'} is currently out of stock`);
+        return prev;
+      }
+
       addToast(`${product.title || 'Item'} added to cart!`);
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, maxStock: availableStock, quantity: 1 }];
     });
   }, [addToast]);
 
   const updateQuantity = useCallback((id, size, quantity, color) => {
-    setCartItems((prev) =>
-      quantity < 1
-        ? prev.filter((item) => !isItemMatch(item, id, size, color))
-        : prev.map((item) =>
-            isItemMatch(item, id, size, color) ? { ...item, quantity } : item
-          )
-    );
-  }, []);
+    setCartItems((prev) => {
+      if (quantity < 1) {
+        return prev.filter((item) => !isItemMatch(item, id, size, color));
+      }
+
+      const target = prev.find((item) => isItemMatch(item, id, size, color));
+      const itemMax = target && typeof target.maxStock === 'number' ? target.maxStock : 9999;
+
+      let finalQty = quantity;
+      if (finalQty > itemMax) {
+        finalQty = Math.max(1, itemMax);
+        addToast(`Maximum available stock (${itemMax}) reached`);
+      }
+
+      return prev.map((item) =>
+        isItemMatch(item, id, size, color) ? { ...item, quantity: finalQty, maxStock: itemMax } : item
+      );
+    });
+  }, [addToast]);
 
   const removeFromCart = useCallback((id, size, color) => {
     setCartItems((prev) => prev.filter((item) => !isItemMatch(item, id, size, color)));

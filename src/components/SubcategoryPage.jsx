@@ -55,11 +55,6 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
     return list;
   }, [product?.size, product?.sizes, product?.variants]);
 
-  const hasParsedSizes = parsedSizes.length > 0;
-  const [selectedSize, setSelectedSize] = useState(() => hasParsedSizes ? parsedSizes[0] : (product?.size || ""));
-  const [flashing, flash] = useCartFlash();
-  const [isZoomed, setIsZoomed] = useState(false);
-
   // Extract colors from product.colors or variants
   const parsedColors = useMemo(() => {
     let list = Array.isArray(product?.colors) && product.colors.length > 0 ? product.colors : [];
@@ -70,21 +65,86 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
     return list;
   }, [product?.colors, product?.variants]);
 
+  const hasParsedSizes = parsedSizes.length > 0;
   const hasColors = parsedColors.length > 0;
-  const [selectedColor, setSelectedColor] = useState(() => hasColors ? parsedColors[0] : "");
+
+  // Find the first in-stock variant if variants exist
+  const defaultVariant = useMemo(() => {
+    if (Array.isArray(product?.variants) && product.variants.length > 0) {
+      const inStock = product.variants.find(v => (parseInt(v.stock, 10) || 0) > 0);
+      return inStock || product.variants[0];
+    }
+    return null;
+  }, [product?.variants]);
+
+  const [selectedSize, setSelectedSize] = useState(() => {
+    if (defaultVariant?.size) return defaultVariant.size;
+    return hasParsedSizes ? parsedSizes[0] : (product?.size || "");
+  });
+
+  const [selectedColor, setSelectedColor] = useState(() => {
+    if (defaultVariant?.color) return defaultVariant.color;
+    return hasColors ? parsedColors[0] : "";
+  });
+
+  const [flashing, flash] = useCartFlash();
+  const [isZoomed, setIsZoomed] = useState(false);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const revealRef = useScrollReveal();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Reset selections when the product itself changes (e.g. navigating between categories)
   useEffect(() => {
-    setSelectedSize(parsedSizes.length > 0 ? parsedSizes[0] : (product?.size || ""));
-    setSelectedColor(parsedColors.length > 0 ? parsedColors[0] : "");
+    if (defaultVariant) {
+      if (defaultVariant.size) setSelectedSize(defaultVariant.size);
+      if (defaultVariant.color) setSelectedColor(defaultVariant.color);
+    } else {
+      setSelectedSize(hasParsedSizes ? parsedSizes[0] : (product?.size || ""));
+      setSelectedColor(hasColors ? parsedColors[0] : "");
+    }
     setCurrentImageIndex(0);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product.id]);
 
   const isFav = isInWishlist(product.id, selectedSize, hasColors ? selectedColor : undefined);
+
+  // Real-time stock status for each size given selected color
+  const getSizeStockInfo = useCallback((size) => {
+    if (!Array.isArray(product?.variants) || product.variants.length === 0) {
+      const baseSt = parseInt(product?.stock, 10) || 0;
+      return { stock: baseSt, isSoldOut: baseSt <= 0, isLowStock: baseSt > 0 && baseSt <= 3 };
+    }
+    const sLow = (size || '').trim().toLowerCase();
+    const cLow = (selectedColor || '').trim().toLowerCase();
+    
+    const match = product.variants.find(v => {
+      const vS = (v.size || '').trim().toLowerCase();
+      const vC = (v.color || '').trim().toLowerCase();
+      return vS === sLow && (!cLow || !vC || vC === cLow);
+    }) || product.variants.find(v => (v.size || '').trim().toLowerCase() === sLow);
+
+    const st = match ? (parseInt(match.stock, 10) || 0) : (parseInt(product?.stock, 10) || 0);
+    return { stock: st, isSoldOut: st <= 0, isLowStock: st > 0 && st <= 3 };
+  }, [product?.variants, product?.stock, selectedColor]);
+
+  // Real-time stock status for each color given selected size
+  const getColorStockInfo = useCallback((color) => {
+    if (!Array.isArray(product?.variants) || product.variants.length === 0) {
+      const baseSt = parseInt(product?.stock, 10) || 0;
+      return { stock: baseSt, isSoldOut: baseSt <= 0, isLowStock: baseSt > 0 && baseSt <= 3 };
+    }
+    const cLow = (color || '').trim().toLowerCase();
+    const sLow = (selectedSize || '').trim().toLowerCase();
+
+    const match = product.variants.find(v => {
+      const vS = (v.size || '').trim().toLowerCase();
+      const vC = (v.color || '').trim().toLowerCase();
+      return vC === cLow && (!sLow || !vS || vS === sLow);
+    }) || product.variants.find(v => (v.color || '').trim().toLowerCase() === cLow);
+
+    const st = match ? (parseInt(match.stock, 10) || 0) : (parseInt(product?.stock, 10) || 0);
+    return { stock: st, isSoldOut: st <= 0, isLowStock: st > 0 && st <= 3 };
+  }, [product?.variants, product?.stock, selectedSize]);
 
   const activeVariant = useMemo(() => {
     if (!Array.isArray(product.variants) || product.variants.length === 0) return null;
@@ -194,7 +254,9 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
       price: displayPrice,
       originalPrice: displayOriginalPrice,
       size: hasParsedSizes ? selectedSize : product.size,
-      color: hasColors ? selectedColor : undefined
+      color: hasColors ? selectedColor : undefined,
+      stock: displayStock,
+      maxStock: displayStock,
     });
     flash("btn");
   };
@@ -330,34 +392,62 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
               </p>
 
               {hasParsedSizes && (
-                <div style={{ marginBottom: "15px" }}>
-                  <label htmlFor={`size-select-zoom-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Size:</label>
-                  <select 
-                    id={`size-select-zoom-${product.id}`}
-                    value={selectedSize} 
-                    onChange={(e) => setSelectedSize(e.target.value)}
-                    style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
-                  >
-                    {parsedSizes.map(size => (
-                      <option key={size} value={size}>{size}</option>
-                    ))}
-                  </select>
+                <div className="variant-select-section" style={{ marginBottom: "16px" }}>
+                  <label className="variant-label">
+                    Select Size: <span className="variant-label-val">{selectedSize || 'Standard'}</span>
+                  </label>
+                  <div className="variant-pill-grid">
+                    {parsedSizes.map((size) => {
+                      const { stock, isSoldOut, isLowStock } = getSizeStockInfo(size);
+                      const isSelected = selectedSize === size;
+                      return (
+                        <button
+                          key={size}
+                          type="button"
+                          className={`variant-pill ${isSelected ? 'variant-pill--active' : ''} ${isSoldOut ? 'variant-pill--soldout' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedSize(size);
+                          }}
+                          title={isSoldOut ? `${size} (Sold Out)` : isLowStock ? `${size} (Only ${stock} left)` : `${size} (In Stock)`}
+                        >
+                          <span className={isSoldOut && !isSelected ? 'variant-pill-text-strike' : ''}>{size}</span>
+                          {isSoldOut && <span className="variant-pill-badge variant-pill-badge--soldout">Sold Out</span>}
+                          {!isSoldOut && isLowStock && <span className="variant-pill-badge variant-pill-badge--low">{stock} left</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
               {hasColors && (
-                <div style={{ marginBottom: "15px" }}>
-                  <label htmlFor={`color-select-zoom-${product.id}`} style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}>Select Color:</label>
-                  <select 
-                    id={`color-select-zoom-${product.id}`}
-                    value={selectedColor} 
-                    onChange={(e) => setSelectedColor(e.target.value)}
-                    style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
-                  >
-                    {parsedColors.map(color => (
-                      <option key={color} value={color}>{color}</option>
-                    ))}
-                  </select>
+                <div className="variant-select-section" style={{ marginBottom: "16px" }}>
+                  <label className="variant-label">
+                    Select Color: <span className="variant-label-val">{selectedColor}</span>
+                  </label>
+                  <div className="variant-pill-grid">
+                    {parsedColors.map((color) => {
+                      const { stock, isSoldOut, isLowStock } = getColorStockInfo(color);
+                      const isSelected = selectedColor === color;
+                      return (
+                        <button
+                          key={color}
+                          type="button"
+                          className={`variant-pill ${isSelected ? 'variant-pill--active' : ''} ${isSoldOut ? 'variant-pill--soldout' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedColor(color);
+                          }}
+                          title={isSoldOut ? `${color} (Sold Out)` : isLowStock ? `${color} (Only ${stock} left)` : `${color} (In Stock)`}
+                        >
+                          <span className={isSoldOut && !isSelected ? 'variant-pill-text-strike' : ''}>{color}</span>
+                          {isSoldOut && <span className="variant-pill-badge variant-pill-badge--soldout">Sold Out</span>}
+                          {!isSoldOut && isLowStock && <span className="variant-pill-badge variant-pill-badge--low">{stock} left</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
@@ -428,47 +518,63 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
 
         {/* Options Row */}
         {(hasColors || hasParsedSizes) && (
-          <div style={{ display: 'flex', gap: '12px', marginTop: '16px', marginBottom: '4px' }}>
-            {hasColors && (
-              <div style={{ flex: 1, position: 'relative' }}>
-                <label htmlFor={`color-select-${product.id}`} style={{ display: 'block', marginBottom: '6px', fontSize: '11px', color: '#777', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Color</label>
-                <div style={{ position: 'relative' }}>
-                  <select 
-                    id={`color-select-${product.id}`}
-                    value={selectedColor} 
-                    onChange={(e) => { e.stopPropagation(); setSelectedColor(e.target.value); }}
-                    onClick={(e) => e.stopPropagation()}
-                    style={{ appearance: 'none', WebkitAppearance: 'none', width: '100%', padding: '8px 28px 8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontSize: '13px', color: '#111827', outline: 'none', transition: 'all 0.2s ease', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}
-                    onMouseOver={(e) => e.target.style.borderColor = '#d1d5db'}
-                    onMouseOut={(e) => e.target.style.borderColor = '#e5e7eb'}
-                  >
-                    {parsedColors.map(color => (
-                      <option key={color} value={color}>{color}</option>
-                    ))}
-                  </select>
-                  <svg style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9ca3af' }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          <div style={{ marginTop: '12px', marginBottom: '8px' }}>
+            {hasParsedSizes && (
+              <div className="variant-select-section" style={{ marginTop: '6px' }}>
+                <label className="variant-label">
+                  Size: <span className="variant-label-val">{selectedSize || 'Standard'}</span>
+                </label>
+                <div className="variant-pill-grid">
+                  {parsedSizes.map((size) => {
+                    const { stock, isSoldOut, isLowStock } = getSizeStockInfo(size);
+                    const isSelected = selectedSize === size;
+                    return (
+                      <button
+                        key={size}
+                        type="button"
+                        className={`variant-pill ${isSelected ? 'variant-pill--active' : ''} ${isSoldOut ? 'variant-pill--soldout' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedSize(size);
+                        }}
+                        title={isSoldOut ? `${size} (Sold Out)` : isLowStock ? `${size} (Only ${stock} left)` : `${size} (In Stock)`}
+                      >
+                        <span className={isSoldOut && !isSelected ? 'variant-pill-text-strike' : ''}>{size}</span>
+                        {isSoldOut && <span className="variant-pill-badge variant-pill-badge--soldout">Sold Out</span>}
+                        {!isSoldOut && isLowStock && <span className="variant-pill-badge variant-pill-badge--low">{stock} left</span>}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {hasParsedSizes && (
-              <div style={{ flex: 1, position: 'relative' }}>
-                <label htmlFor={`size-select-card-${product.id}`} style={{ display: 'block', marginBottom: '6px', fontSize: '11px', color: '#777', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Size</label>
-                <div style={{ position: 'relative' }}>
-                  <select 
-                    id={`size-select-card-${product.id}`}
-                    value={selectedSize} 
-                    onChange={(e) => { e.stopPropagation(); setSelectedSize(e.target.value); }}
-                    onClick={(e) => e.stopPropagation()}
-                    style={{ appearance: 'none', WebkitAppearance: 'none', width: '100%', padding: '8px 28px 8px 12px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontSize: '13px', color: '#111827', outline: 'none', transition: 'all 0.2s ease', boxShadow: '0 1px 2px rgba(0,0,0,0.02)' }}
-                    onMouseOver={(e) => e.target.style.borderColor = '#d1d5db'}
-                    onMouseOut={(e) => e.target.style.borderColor = '#e5e7eb'}
-                  >
-                    {parsedSizes.map(size => (
-                      <option key={size} value={size}>{size}</option>
-                    ))}
-                  </select>
-                  <svg style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9ca3af' }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            {hasColors && (
+              <div className="variant-select-section" style={{ marginTop: '8px' }}>
+                <label className="variant-label">
+                  Color: <span className="variant-label-val">{selectedColor}</span>
+                </label>
+                <div className="variant-pill-grid">
+                  {parsedColors.map((color) => {
+                    const { stock, isSoldOut, isLowStock } = getColorStockInfo(color);
+                    const isSelected = selectedColor === color;
+                    return (
+                      <button
+                        key={color}
+                        type="button"
+                        className={`variant-pill ${isSelected ? 'variant-pill--active' : ''} ${isSoldOut ? 'variant-pill--soldout' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedColor(color);
+                        }}
+                        title={isSoldOut ? `${color} (Sold Out)` : isLowStock ? `${color} (Only ${stock} left)` : `${color} (In Stock)`}
+                      >
+                        <span className={isSoldOut && !isSelected ? 'variant-pill-text-strike' : ''}>{color}</span>
+                        {isSoldOut && <span className="variant-pill-badge variant-pill-badge--soldout">Sold Out</span>}
+                        {!isSoldOut && isLowStock && <span className="variant-pill-badge variant-pill-badge--low">{stock} left</span>}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
