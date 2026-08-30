@@ -5,8 +5,6 @@ import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-
-
 export async function GET() {
   const cookieStore = await cookies();
   const session = cookieStore.get('admin_session');
@@ -19,6 +17,10 @@ export async function GET() {
     const products = await prisma.product.findMany({
       orderBy: {
         title: 'asc'
+      },
+      include: {
+        category: true,
+        subcategory: true,
       }
     });
 
@@ -41,15 +43,35 @@ export async function PATCH(request) {
 
   const prisma = getPrisma();
   try {
-    const { id, stock } = await request.json();
+    const { id, stock, variants } = await request.json();
 
-    if (typeof stock !== 'number') {
-      return NextResponse.json({ success: false, error: 'Invalid stock value' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Product ID is required' }, { status: 400 });
+    }
+
+    const updateData = {};
+    if (typeof stock === 'number') {
+      updateData.stock = Math.max(0, parseInt(stock, 10));
+    }
+
+    if (Array.isArray(variants)) {
+      updateData.variants = variants;
+      if (typeof stock !== 'number') {
+        updateData.stock = variants.reduce((sum, v) => sum + (parseInt(v.stock, 10) || 0), 0);
+      }
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ success: false, error: 'No valid stock or variant data provided' }, { status: 400 });
     }
 
     const updatedProduct = await prisma.product.update({
       where: { id },
-      data: { stock }
+      data: updateData,
+      include: {
+        category: true,
+        subcategory: true,
+      }
     });
 
     return NextResponse.json({ success: true, product: updatedProduct });
@@ -61,5 +83,3 @@ export async function PATCH(request) {
     );
   }
 }
-
-
