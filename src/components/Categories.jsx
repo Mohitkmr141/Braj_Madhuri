@@ -483,7 +483,7 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
                 ) : null}
               </div>
 
-              <p className="quick-view-description" style={{ display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <p className="quick-view-description">
                 {displayDesc}
               </p>
 

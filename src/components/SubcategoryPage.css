@@ -713,6 +713,7 @@
 
 .quick-view-image-panel {
   flex: 1;
+  flex-shrink: 0;
   background: #f7f0e8;
   position: relative;
   min-height: 300px;
@@ -729,6 +730,7 @@
   flex-direction: column;
   overflow-y: auto;
   gap: 0;
+  min-height: 0;
 }
 
 .quick-view-title {
