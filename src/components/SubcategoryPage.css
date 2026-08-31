@@ -452,7 +452,7 @@
   white-space: nowrap;
 }
 
-.variant-pill:hover:not(.variant-pill--soldout):not(.variant-pill--active) {
+.variant-pill:hover:not(.variant-pill--soldout, .variant-pill--active) {
   border-color: var(--gold, #c9972a);
   color: #2e1a0a;
   background: #fdf8ed;
@@ -847,7 +847,7 @@
   }
 
   .quick-view-info-panel {
-    padding: 24px 20px 24px;
+    padding: 24px 20px;
   }
 
   .quick-view-title {

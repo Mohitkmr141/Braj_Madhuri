@@ -166,10 +166,7 @@
 
 /* ─── The actual image ─────────────────────────────────────────────────── */
 .category-img-wrapper img {
-  position: relative;
   z-index: 1;
-  width: 100% !important;
-  height: 100% !important;
   object-fit: contain;
   object-position: center;
   filter: drop-shadow(0 4px 8px rgb(80 45 10 / 14%));

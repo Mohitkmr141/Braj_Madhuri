@@ -48,6 +48,23 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
     }
   }, [categories, loadedFromContext]);
 
+  const gridRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!openSubcat) return;
+    const handleClickOutside = (e) => {
+      if (gridRef.current && !gridRef.current.contains(e.target)) {
+        setOpenSubcat(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [openSubcat]);
+
   const handleCategoryClick = (cat) => {
     const subcats = cat.subcategories || [];
     if (subcats.length > 0) {
@@ -70,7 +87,7 @@ export default function CategoryGrid({ activeCategory, onExplore }) {
         <div className="section-divider" />
       </div>
 
-      <div className="category-grid">
+      <div ref={gridRef} className="category-grid">
         {categoriesList.map((cat, index) => {
           const imgSrc = cat.imageUrl;
           const isActive = activeCategory === cat.id;

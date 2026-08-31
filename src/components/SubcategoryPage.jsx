@@ -89,6 +89,17 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
 
   const [flashing, flash] = useCartFlash();
   const [isZoomed, setIsZoomed] = useState(false);
+
+  useEffect(() => {
+    if (isZoomed) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isZoomed]);
+
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const revealRef = useScrollReveal();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);

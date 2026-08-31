@@ -195,28 +195,16 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
           </button>
         </div>
         <nav className="bm-drawer__nav">
-          {NAV_ITEMS.map(([item, to]) => (
-            <Link
-              key={item}
-              href={to}
-              onClick={closeMenu}
-              className={`bm-drawer__link${isActive(to) ? " active" : ""}`}
-            >
-              {item}
-            </Link>
-          ))}
-          <div className="bm-drawer__divider" />
           {user ? (
-            <button
-              type="button"
-              className="bm-drawer__link bm-drawer__link--logout"
-              onClick={() => {
-                signOut();
-                closeMenu();
-              }}
-            >
-              Sign Out ({user.name || user.email})
-            </button>
+            <div className="bm-drawer__user-card">
+              <div className="bm-drawer__user-avatar">
+                {(user.name || user.email || "U").charAt(0).toUpperCase()}
+              </div>
+              <div className="bm-drawer__user-meta">
+                <span className="bm-drawer__user-name">{user.name || "Devotee"}</span>
+                <span className="bm-drawer__user-email">{user.email}</span>
+              </div>
+            </div>
           ) : (
             <div className="bm-drawer__auth-group">
               <Link
@@ -234,6 +222,35 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
                 Create Account
               </Link>
             </div>
+          )}
+
+          <div className="bm-drawer__divider" />
+
+          {NAV_ITEMS.map(([item, to]) => (
+            <Link
+              key={item}
+              href={to}
+              onClick={closeMenu}
+              className={`bm-drawer__link${isActive(to) ? " active" : ""}`}
+            >
+              {item}
+            </Link>
+          ))}
+
+          {user && (
+            <>
+              <div className="bm-drawer__divider" />
+              <button
+                type="button"
+                className="bm-drawer__link bm-drawer__link--logout"
+                onClick={() => {
+                  signOut();
+                  closeMenu();
+                }}
+              >
+                ← Sign Out
+              </button>
+            </>
           )}
         </nav>
       </aside>
@@ -266,20 +283,6 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           )}
-
-          <div className="bm-banner__ham">
-            <button
-              type="button"
-              className={`bm-hamburger ${menuOpen ? "open" : ""}`}
-              onClick={() => setMenuOpen((v) => !v)}
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={menuOpen}
-            >
-              <span />
-              <span />
-              <span />
-            </button>
-          </div>
         </div>
       )}
 
@@ -535,25 +538,6 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
                 </span>
               )}
             </Link>
-
-            {/* User Icon or Compact Sign In */}
-            {user ? (
-              <button
-                type="button"
-                className="bm-mobile-user-btn"
-                onClick={() => signOut()}
-                aria-label="Sign out"
-                title={`Signed in as ${user.name || user.email}`}
-              >
-                <span>
-                  {(user.name || user.email || "U").charAt(0).toUpperCase()}
-                </span>
-              </button>
-            ) : (
-              <Link href="/login" className="bm-mobile-signin-btn">
-                Sign In
-              </Link>
-            )}
 
             {/* Hamburger */}
             <button

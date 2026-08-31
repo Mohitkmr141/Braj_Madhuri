@@ -1163,7 +1163,7 @@
     background: transparent !important;
     width: 100%;
     overflow-wrap: break-word;
-    word-break: break-word;
+    word-break: normal;
   }
 
   /* Label above each mobile field */

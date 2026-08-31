@@ -1,11 +1,11 @@
 import React from "react";
 import "./FloatingWhatsApp.css";
 
-const FloatingWhatsApp = () => {
+const FloatingWhatsApp = ({ isCart = false }) => {
   return (
     <a
       href="https://wa.me/918448904455"
-      className="floating-whatsapp"
+      className={`floating-whatsapp${isCart ? " floating-whatsapp--cart" : ""}`}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"

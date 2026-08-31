@@ -130,7 +130,8 @@
 }
 
 @media (width <= 420px) {
-  .image-grid { grid-template-columns: 1fr; gap: 14px; }
+  .image-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .galleries-wrapper { padding: 20px 8px 60px; }
 }
 
 /* ── Card ───────────────────────────────────────────────────── */
@@ -256,7 +257,6 @@
   object-fit: contain;
   object-position: center;
   display: block;
-  position: relative;
   z-index: 1;
   transition: transform 0.35s var(--ease-premium), opacity 0.3s ease;
 }
@@ -584,8 +584,53 @@
 
   .slide-btn {
     opacity: 1;
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
+  }
+}
+
+@media (width <= 480px) {
+  .image-card {
+    border-radius: 12px;
+  }
+
+  .image-card-img-wrapper {
+    padding: 10px;
+  }
+
+  .image-card-info {
+    padding: 10px 8px 12px;
+    gap: 4px;
+  }
+
+  .item-title {
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .item-price {
+    font-size: 15px;
+  }
+
+  .item-original-price {
+    font-size: 11.5px;
+  }
+
+  .gallery-cart-btn {
+    font-size: 12px;
+    padding-block: 8px;
+    margin-top: 8px;
+    border-radius: 6px;
+  }
+
+  .discount-badge {
+    font-size: 9.5px;
+    padding: 3px 8px 3px 12px;
+  }
+
+  .new-badge {
+    font-size: 9.5px;
+    padding: 3px 12px 3px 8px;
   }
 }
 

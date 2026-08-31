@@ -150,6 +150,16 @@ export default function CategoryGalleries({
 
 function ProductCard({ product, addToCart, autoOpen, priority = false }) {
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(autoOpen || false);
+
+  useEffect(() => {
+    if (isQuickViewOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isQuickViewOpen]);
   
   const parsedSizes = useMemo(() => {
     let list = typeof product?.size === 'string' && product.size.trim().length > 0 

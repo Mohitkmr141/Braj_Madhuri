@@ -51,58 +51,6 @@
   display: block;
 }
 
-.bm-banner__ham {
-  position: absolute;
-  top: 14px;
-  left: clamp(12px, 3vw, 36px);
-  z-index: 10;
-}
-
-@media (min-width: 768px) {
-  .bm-banner__ham {
-    display: none;
-  }
-}
-
-.bm-hamburger {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 40px;
-  height: 40px;
-  background: rgba(74, 21, 33, 0.9);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  padding: 11px 9px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-  transition: var(--transition);
-}
-
-.bm-hamburger:hover {
-  background: #4a1521;
-  border-color: var(--clr-gold);
-}
-
-.bm-hamburger span {
-  display: block;
-  height: 2px;
-  border-radius: 2px;
-  background: #fff;
-  transition: transform var(--transition), opacity var(--transition);
-  transform-origin: center;
-}
-
-.bm-hamburger.open span:nth-child(1) {
-  transform: translateY(6px) rotate(45deg);
-}
-.bm-hamburger.open span:nth-child(2) {
-  opacity: 0;
-}
-.bm-hamburger.open span:nth-child(3) {
-  transform: translateY(-6px) rotate(-45deg);
-}
 
 /* =====================================================================
    MAIN STICKY NAV BAR (Modern Red / Maroon Design)
@@ -392,71 +340,28 @@
 .bm-nav__mobile-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 /* Mobile Icon Buttons */
 .bm-nav__mobile-actions .bm-icon-btn {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 9px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .bm-nav__mobile-actions .bm-icon-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 19px;
+  height: 19px;
 }
 
 .bm-icon-btn--cart {
   background: rgba(212, 175, 55, 0.15) !important;
   border-color: rgba(212, 175, 55, 0.4) !important;
   color: var(--clr-gold-light) !important;
-}
-
-/* Mobile Sign In Pill */
-.bm-mobile-signin-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  color: #ffffff;
-  font-family: var(--font-body);
-  font-size: 11.5px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-decoration: none;
-  padding: 0 11px;
-  height: 34px;
-  border-radius: var(--radius-pill);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-  white-space: nowrap;
-  transition: var(--transition);
-}
-
-.bm-mobile-signin-btn:hover {
-  background: linear-gradient(135deg, #e5be44 0%, #c99414 100%);
-  color: #ffffff;
-}
-
-/* Mobile User Avatar */
-.bm-mobile-user-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-pill);
-  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
-  color: #ffffff;
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 /* Mobile Hamburger in Nav Bar */
@@ -810,12 +715,62 @@
   margin: 12px 20px;
 }
 
+.bm-drawer__user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: #fdf6ee;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.bm-drawer__user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.bm-drawer__user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bm-drawer__user-name {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--clr-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bm-drawer__user-email {
+  font-size: 12px;
+  color: #7a4f28;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .bm-drawer__auth-group {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 10px 20px;
-  margin-top: auto;
+  padding: 14px 20px;
+  background: #fdfaf5;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
 }
 
 .bm-drawer__auth-btn {
@@ -832,9 +787,9 @@
 }
 
 .bm-drawer__auth-btn--login {
-  background: #fdf6ee;
+  background: #ffffff;
   color: var(--clr-primary);
-  border: 1px solid rgba(74, 21, 33, 0.2);
+  border: 1.5px solid rgba(74, 21, 33, 0.25);
 }
 
 .bm-drawer__auth-btn--signup {

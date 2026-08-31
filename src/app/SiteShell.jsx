@@ -237,7 +237,7 @@ export default function SiteShell({ children, initialCategories }) {
               <>
                 <Footer />
                 {pathname !== '/cart' && <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />}
-                <FloatingWhatsApp />
+                <FloatingWhatsApp isCart={pathname === '/cart'} />
                 <SaleModalBanner />
               </>
             )}
