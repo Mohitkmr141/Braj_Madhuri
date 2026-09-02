@@ -7,6 +7,9 @@
   background: var(--cream, #fdfbf7);
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: clip;
 }
 
 /* ── Page Wrapper ──────────────────────────────────────────────────────────── */
@@ -14,15 +17,25 @@
   flex: 1;
   padding: 32px 24px 100px;
   font-family: var(--font-jakarta, 'Plus Jakarta Sans', Inter, sans-serif);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .checkout-container {
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 380px;
   gap: 28px;
   align-items: flex-start;
+  box-sizing: border-box;
+}
+
+.checkout-main {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* ── Error Banner ──────────────────────────────────────────────────────────── */
@@ -224,14 +237,19 @@
 /* ── Form Grid ─────────────────────────────────────────────────────────────── */
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 7px;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-group.full-width {
@@ -683,14 +701,18 @@
   }
 
   .form-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 14px;
+    width: 100%;
   }
 
   .form-group input,
   .form-group select,
   .form-group textarea {
     font-size: 16px; /* Prevents iOS Safari auto-zoom on input focus */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .checkout-step-actions {
