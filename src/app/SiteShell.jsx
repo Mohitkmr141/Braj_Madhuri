@@ -224,23 +224,25 @@ export default function SiteShell({ children, initialCategories }) {
       <ProductsProvider initialCategories={initialCategories}>
         <CartProvider value={contextValue}>
           <WishlistProvider value={wishlistContextValue}>
-            {!isAdminRoute && !isCheckoutRoute && (
-              <>
-                <p className="visually-hidden" aria-live="polite">
-                  {cartAnnouncement}
-                </p>
-                <Header cartCount={cartCount} cartTotal={cartTotal} wishlistCount={wishlistCount} />
-              </>
-            )}
-            {children}
-            {!isAdminRoute && !isCheckoutRoute && (
-              <>
-                <Footer />
-                {pathname !== '/cart' && <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />}
-                <FloatingWhatsApp isCart={pathname === '/cart'} />
-                <SaleModalBanner />
-              </>
-            )}
+            <div id="site-wrapper">
+              {!isAdminRoute && !isCheckoutRoute && (
+                <>
+                  <p className="visually-hidden" aria-live="polite">
+                    {cartAnnouncement}
+                  </p>
+                  <Header cartCount={cartCount} cartTotal={cartTotal} wishlistCount={wishlistCount} />
+                </>
+              )}
+              {children}
+              {!isAdminRoute && !isCheckoutRoute && (
+                <>
+                  <Footer />
+                  {pathname !== '/cart' && <FloatingCart cartCount={cartCount} cartTotal={cartTotal} />}
+                  <FloatingWhatsApp isCart={pathname === '/cart'} />
+                  <SaleModalBanner />
+                </>
+              )}
+            </div>
           </WishlistProvider>
         </CartProvider>
       </ProductsProvider>
