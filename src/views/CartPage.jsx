@@ -301,7 +301,7 @@ export default function CartPage() {
                 <span>Fast Shipping</span>
               </div>
               <div className="cart-trust-item">
-                <span className="trust-icon">✨</span>
+                <span className="trust-icon">🪷</span>
                 <span>Original Braj</span>
               </div>
             </div>

@@ -3,7 +3,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useCart } from "../context/CartContext.jsx";
 import { calculateShippingFee, isDelhiNCR } from "../utils/shippingRules.js";
@@ -32,6 +31,9 @@ export default function CheckoutPage() {
   const { data: session } = useSession();
   const { cartItems, cartCount, cartTotal, emptyCart } = useCart();
   
+  // Prevent hydration flash before client-side cart is loaded
+  const [isMounted, setIsMounted] = useState(false);
+
   // Accordion Step State: 1 = Address, 2 = Order Summary, 3 = Payment
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -56,9 +58,16 @@ export default function CheckoutPage() {
   const [globalSettings, setGlobalSettings] = useState(null);
 
   useEffect(() => {
-    fetch('/api/settings').then(r => r.json()).then(d => {
-      if (d.success) setGlobalSettings(d.settings);
-    });
+    setIsMounted(true);
+
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) setGlobalSettings(d.settings);
+      })
+      .catch(e => {
+        console.error("Failed to load settings:", e);
+      });
 
     // Try prefilling from localStorage or session
     try {
@@ -76,7 +85,7 @@ export default function CheckoutPage() {
         }));
       }
     } catch (e) {
-      console.error("Failed to load saved address", e);
+      console.error("Failed to load saved address:", e);
     }
 
     // Preload Razorpay script on checkout mount
@@ -91,14 +100,16 @@ export default function CheckoutPage() {
   const totalOriginalPrice = useMemo(() => {
     return cartItems.reduce((acc, item) => {
       const itemOriginal = item.originalPrice ?? item.price ?? 0;
-      return acc + itemOriginal * item.quantity;
+      return acc + itemOriginal * (item.quantity || 1);
     }, 0);
   }, [cartItems]);
 
-  const baseDiscount = totalOriginalPrice - cartTotal;
-  const specialSaleDiscount = globalSettings?.isSaleActive ? Math.round(cartTotal * (globalSettings.saleDiscountPercentage / 100)) : 0;
+  const baseDiscount = Math.max(0, totalOriginalPrice - cartTotal);
+  const specialSaleDiscount = (globalSettings?.isSaleActive && globalSettings?.saleDiscountPercentage > 0)
+    ? Math.round(cartTotal * (Number(globalSettings.saleDiscountPercentage) / 100))
+    : 0;
   const totalDiscount = baseDiscount + specialSaleDiscount;
-  const finalDiscountedCartTotal = cartTotal - specialSaleDiscount;
+  const finalDiscountedCartTotal = Math.max(0, cartTotal - specialSaleDiscount);
 
   // Derive whether address is Delhi-NCR
   const isNCR = useMemo(() => {
@@ -122,6 +133,16 @@ export default function CheckoutPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (name === "phone") {
+      const digits = value.replace(/\D/g, "").slice(0, 10);
+      setFormData(prev => ({ ...prev, phone: digits }));
+      return;
+    }
+    if (name === "pincode") {
+      const digits = value.replace(/\D/g, "").slice(0, 6);
+      setFormData(prev => ({ ...prev, pincode: digits }));
+      return;
+    }
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -150,38 +171,58 @@ export default function CheckoutPage() {
     if (e) e.preventDefault();
     setError("");
 
-    if (!formData.firstName || !formData.address || !formData.city || !formData.pincode || !formData.phone || !formData.email || !formData.state) {
+    const cleanFirstName = (formData.firstName || "").trim();
+    const cleanLastName = (formData.lastName || "").trim();
+    const cleanEmail = (formData.email || "").trim();
+    const cleanPhone = (formData.phone || "").replace(/\D/g, "");
+    const cleanAddress = (formData.address || "").trim();
+    const cleanCity = (formData.city || "").trim();
+    const cleanState = (formData.state || "").trim();
+    const cleanPincode = (formData.pincode || "").replace(/\D/g, "");
+
+    if (!cleanFirstName || !cleanAddress || !cleanCity || !cleanPincode || !cleanPhone || !cleanEmail || !cleanState) {
       setError("Please fill in all required address fields.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    if (!emailRegex.test(cleanEmail)) {
       setError("Please enter a valid email address.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
-    const phoneDigits = formData.phone.replace(/\D/g, '');
-    if (phoneDigits.length !== 10) {
+    if (cleanPhone.length !== 10) {
       setError("Please enter a valid 10-digit mobile number.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
-    const pincodeDigits = formData.pincode.replace(/\D/g, '');
-    if (pincodeDigits.length !== 6) {
+    if (cleanPincode.length !== 6) {
       setError("Please enter a valid 6-digit pincode.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
+    const sanitizedData = {
+      firstName: cleanFirstName,
+      lastName: cleanLastName,
+      email: cleanEmail,
+      phone: cleanPhone,
+      address: cleanAddress,
+      city: cleanCity,
+      state: cleanState,
+      pincode: cleanPincode,
+    };
+
+    setFormData(sanitizedData);
+
     // Save to localStorage for convenience
     try {
-      localStorage.setItem("bm_saved_address", JSON.stringify(formData));
+      localStorage.setItem("bm_saved_address", JSON.stringify(sanitizedData));
     } catch (err) {
-      console.error(err);
+      console.error("Failed to save address to localStorage:", err);
     }
 
     // Proceed to Step 2 (Order Summary)
@@ -208,6 +249,7 @@ export default function CheckoutPage() {
         setError(data.error || "Could not recover your order. Please contact support with your Payment ID.");
       }
     } catch (err) {
+      console.error("[RecoverOrder] Error:", err);
       setError("Network error during recovery. Please contact support with your Payment ID: " + lastPaymentId);
     } finally {
       setIsRecovering(false);
@@ -220,7 +262,15 @@ export default function CheckoutPage() {
     setError("");
     
     // Double check validation
-    if (!formData.firstName || !formData.address || !formData.city || !formData.pincode || !formData.phone || !formData.email || !formData.state) {
+    const cleanFirstName = (formData.firstName || "").trim();
+    const cleanAddress = (formData.address || "").trim();
+    const cleanCity = (formData.city || "").trim();
+    const cleanPincode = (formData.pincode || "").replace(/\D/g, "");
+    const cleanPhone = (formData.phone || "").replace(/\D/g, "");
+    const cleanEmail = (formData.email || "").trim();
+    const cleanState = (formData.state || "").trim();
+
+    if (!cleanFirstName || !cleanAddress || !cleanCity || !cleanPincode || !cleanPhone || !cleanEmail || !cleanState) {
       setError("Please fill in all required shipping address fields.");
       setCurrentStep(1);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -232,6 +282,7 @@ export default function CheckoutPage() {
     const res = await loadRazorpayScript();
     if (!res) {
       setError("Razorpay SDK failed to load. Please check your internet connection.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
       setIsSubmitting(false);
       return;
     }
@@ -240,11 +291,18 @@ export default function CheckoutPage() {
       const orderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cartItems, state: formData.state, formData, expectedTotal: finalTotalAmount }),
+        body: JSON.stringify({ 
+          cartItems, 
+          state: cleanState, 
+          formData: { ...formData, firstName: cleanFirstName, email: cleanEmail, phone: cleanPhone, address: cleanAddress, city: cleanCity, state: cleanState, pincode: cleanPincode }, 
+          expectedTotal: finalTotalAmount 
+        }),
       });
+
       if (!orderRes.ok) {
         const errData = await orderRes.json().catch(() => ({}));
         setError(errData.error || "Failed to create payment order. Please try again.");
+        window.scrollTo({ top: 0, behavior: "smooth" });
         if (errData.priceChanged && errData.updatedCartItems) {
           localStorage.setItem("bm_cart_items", JSON.stringify(errData.updatedCartItems));
           setTimeout(() => {
@@ -254,16 +312,26 @@ export default function CheckoutPage() {
         setIsSubmitting(false);
         return;
       }
+
       const orderData = await orderRes.json();
       
       if (!orderData.success) {
         setError(orderData.error || "Failed to create order.");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const razorpayKey = orderData.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+      if (!razorpayKey) {
+        setError("Payment gateway key is not configured. Please contact support.");
+        window.scrollTo({ top: 0, behavior: "smooth" });
         setIsSubmitting(false);
         return;
       }
       
       const options = {
-        key: orderData.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
+        key: razorpayKey, 
         amount: orderData.order.amount,
         currency: orderData.order.currency,
         name: "The Braj Madhuri",
@@ -277,7 +345,7 @@ export default function CheckoutPage() {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                formData,
+                formData: { ...formData, firstName: cleanFirstName, email: cleanEmail, phone: cleanPhone, address: cleanAddress, city: cleanCity, state: cleanState, pincode: cleanPincode },
                 cartItems,
                 cartTotal: finalTotalAmount,
                 shippingCost,
@@ -288,30 +356,35 @@ export default function CheckoutPage() {
                 razorpay_signature: response.razorpay_signature,
               }),
             });
+
             if (!verifyRes.ok) {
               const errData = await verifyRes.json().catch(() => ({}));
               setError(errData.error || `Order verification failed. Your payment was received (ID: ${capturedPaymentId}). Click "Recover My Order" below.`);
+              window.scrollTo({ top: 0, behavior: "smooth" });
               setIsSubmitting(false);
               return;
             }
+
             const data = await verifyRes.json();
             if (data.success) {
               emptyCart();
               router.push(`/success?orderId=${data.orderNumber}`);
             } else {
               setError(data.error || `Payment verification failed. Your payment was received (ID: ${capturedPaymentId}). Click "Recover My Order" below.`);
+              window.scrollTo({ top: 0, behavior: "smooth" });
               setIsSubmitting(false);
             }
           } catch (err) {
-            console.error(err);
+            console.error("[Verification Error]:", err);
             setError(`An unexpected error occurred. Your payment was received (ID: ${capturedPaymentId}). Click "Recover My Order" below to confirm your order.`);
+            window.scrollTo({ top: 0, behavior: "smooth" });
             setIsSubmitting(false);
           }
         },
         prefill: {
-          name: `${formData.firstName} ${formData.lastName}`.trim(),
-          email: formData.email,
-          contact: formData.phone,
+          name: `${cleanFirstName} ${formData.lastName || ""}`.trim(),
+          email: cleanEmail,
+          contact: cleanPhone,
         },
         theme: {
           color: "#4A1521", 
@@ -325,23 +398,41 @@ export default function CheckoutPage() {
       
       const rzp1 = new window.Razorpay(options);
       rzp1.on('payment.failed', function (response){
-        setError(`Payment Failed: ${response.error.description}`);
+        const desc = response?.error?.description || response?.error?.reason || response?.error?.message || "Transaction was not completed.";
+        setError(`Payment Failed: ${desc}`);
+        window.scrollTo({ top: 0, behavior: "smooth" });
         setIsSubmitting(false);
       });
+
       try {
         rzp1.open();
       } catch (openErr) {
         console.error('[Razorpay] rzp.open() failed:', openErr);
         setError('Could not open payment gateway. Please refresh the page and try again.');
+        window.scrollTo({ top: 0, behavior: "smooth" });
         setIsSubmitting(false);
       }
       
     } catch (err) {
-      console.error(err);
-      setError("An unexpected error occurred. Please try again.");
+      console.error("[Payment Submit Error]:", err);
+      setError("An unexpected error occurred while initiating payment. Please try again.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
       setIsSubmitting(false);
     }
   };
+
+  // Initial client mount skeleton
+  if (!isMounted) {
+    return (
+      <div className="checkout-page-root">
+        <CheckoutHeader activeStep={2} />
+        <div className="checkout-wrapper" style={{ minHeight: "60vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: "36px", height: "36px", border: "3px solid #E8C96B", borderTopColor: "#4A1521", borderRadius: "50%", animation: "bmSpin 0.8s linear infinite" }} />
+          <style>{`@keyframes bmSpin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      </div>
+    );
+  }
 
   if (cartCount === 0 && !isSubmitting) {
     return (
@@ -351,6 +442,7 @@ export default function CheckoutPage() {
           <h2>Your bag is empty</h2>
           <p>You need items in your cart to proceed with checkout.</p>
           <button 
+            type="button"
             className="checkout-return-btn" 
             onClick={() => router.push("/shop")}
           >
@@ -610,7 +702,7 @@ export default function CheckoutPage() {
                         <div className="checkout-review-img">
                           <Image
                             src={item.image || '/header-banner.jpg'}
-                            alt={item.title}
+                            alt={item.title || 'Devotional item'}
                             fill
                             style={{ objectFit: 'cover' }}
                             sizes="72px"
@@ -626,8 +718,8 @@ export default function CheckoutPage() {
                           )}
                           <div className="checkout-review-pricing">
                             <span className="review-price">{formatCurrency(item.price ?? 0)}</span>
-                            <span className="review-qty">× {item.quantity}</span>
-                            <span className="review-total">= {formatCurrency((item.price ?? 0) * item.quantity)}</span>
+                            <span className="review-qty">× {item.quantity || 1}</span>
+                            <span className="review-total">= {formatCurrency((item.price ?? 0) * (item.quantity || 1))}</span>
                           </div>
                           <div className="checkout-delivery-timeline">
                             🚚 Estimated Delivery: <strong>3–5 Business Days</strong>
@@ -644,7 +736,10 @@ export default function CheckoutPage() {
                   <div className="checkout-step-actions">
                     <button 
                       type="button" 
-                      onClick={() => setCurrentStep(3)} 
+                      onClick={() => {
+                        setCurrentStep(3);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }} 
                       className="checkout-step-next-btn"
                     >
                       Proceed to Payment Options ➔
@@ -789,7 +884,7 @@ export default function CheckoutPage() {
                   <span>Razorpay Verified</span>
                 </div>
                 <div className="checkout-trust-item">
-                  <span>✨</span>
+                  <span>🪷</span>
                   <span>100% Authentic</span>
                 </div>
               </div>
@@ -822,7 +917,10 @@ export default function CheckoutPage() {
         {currentStep === 2 && (
           <button 
             type="button" 
-            onClick={() => setCurrentStep(3)} 
+            onClick={() => {
+              setCurrentStep(3);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }} 
             className="checkout-mobile-action-btn"
           >
             Continue ➔
@@ -847,11 +945,11 @@ export default function CheckoutPage() {
           <div className="checkout-modal-sheet" onClick={(e) => e.stopPropagation()}>
             <div className="checkout-modal-header">
               <h3>Price Breakdown</h3>
-              <button className="checkout-modal-close" onClick={() => setShowMobileBreakdown(false)}>✕</button>
+              <button type="button" className="checkout-modal-close" onClick={() => setShowMobileBreakdown(false)}>✕</button>
             </div>
             <div className="checkout-modal-body">
               <div className="summary-row">
-                <span>Total MRP ({cartCount} items)</span>
+                <span>Total MRP ({cartCount} {cartCount === 1 ? 'item' : 'items'})</span>
                 <span>{formatCurrency(totalOriginalPrice)}</span>
               </div>
               {baseDiscount > 0 && (
