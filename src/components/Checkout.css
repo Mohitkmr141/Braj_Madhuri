@@ -258,6 +258,8 @@
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   appearance: none;
   -webkit-appearance: none;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-group input::placeholder,
@@ -720,6 +722,33 @@
   .checkout-mobile-price-peek {
     cursor: pointer;
     user-select: none;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .mobile-total-label {
+    font-size: 11px;
+    color: #7a4f28;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .mobile-total-price {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--maroon, #4a1521);
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .mobile-view-breakup {
+    font-size: 11px;
+    color: var(--gold, #c9972a);
+    font-weight: 600;
   }
 
   .checkout-mobile-action-btn {

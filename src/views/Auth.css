@@ -249,6 +249,7 @@
   color: #2c1a0e;
   outline: none;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
 }
 
 .auth-input:hover {

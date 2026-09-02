@@ -195,15 +195,42 @@
 
 @media (max-width: 600px) {
   .checkout-nav-header {
-    padding: 10px 14px;
+    padding: 10px 12px;
+  }
+
+  .checkout-nav-container {
+    gap: 12px;
+  }
+
+  .checkout-back-link {
+    padding: 6px;
   }
 
   .checkout-back-text {
     display: none;
   }
 
+  .checkout-brand-group {
+    gap: 8px;
+  }
+
   .checkout-brand-name {
-    font-size: 17px;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+
+  .checkout-stepper-track {
+    gap: 6px;
+  }
+
+  .checkout-step-bubble {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+
+  .checkout-step-line {
+    width: 14px;
   }
 
   .checkout-trust-badge {
