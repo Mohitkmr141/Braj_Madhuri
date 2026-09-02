@@ -11,6 +11,7 @@ function triggerRevalidation() {
     revalidateTag('categories');
     revalidatePath('/shop');
     revalidatePath('/api/products');
+    revalidatePath('/bestsellers');
   } catch (e) {
     // ignore in non-cached environments
   }
@@ -120,6 +121,7 @@ export async function POST(request) {
         subheading: data.subheading || null,
         folderName: "custom", // default for UI created products
         fileName: "custom", // default for UI created products
+        isBestseller: data.isBestseller === true,
       }
     });
 
@@ -169,6 +171,7 @@ export async function PUT(request) {
         description: data.description || null,
         size: data.size || null,
         subheading: data.subheading || null,
+        isBestseller: data.isBestseller !== undefined ? Boolean(data.isBestseller) : undefined,
       }
     });
 
@@ -219,5 +222,3 @@ export async function DELETE(request) {
     );
   }
 }
-
-

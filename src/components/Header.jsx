@@ -12,6 +12,7 @@ import "./Header.css";
 const NAV_ITEMS = [
   ["Home", "/"],
   ["Shop", "/shop"],
+  ["Bestsellers 🔥", "/bestsellers"],
   ["About Us", "/about"],
   ["Contact Us", "/contact"],
 ];

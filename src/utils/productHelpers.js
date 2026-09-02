@@ -30,7 +30,16 @@ export function resolveFilter(filterFolder, searchQuery, allProducts) {
   let title = "Devotional Essentials";
   let isAll = true;
 
-  if (filterFolder) {
+  if (filterFolder === "bestsellers") {
+    const pinned = allProducts.filter(p => p.isBestseller);
+    const topSellers = allProducts
+      .filter(p => !p.isBestseller)
+      .sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0))
+      .slice(0, 20);
+    products = [...pinned, ...topSellers];
+    title = "Our Bestsellers 🔥";
+    isAll = false;
+  } else if (filterFolder) {
     // If it's a subcategory compound key: "categoryId::SubName"
     if (filterFolder.includes("::")) {
       const [catId, subName] = filterFolder.split("::", 2);
@@ -96,15 +105,37 @@ export function getEffectivePrice(product) {
   return parseFloat(product.price) || 0;
 }
 
+export function isProductOutOfStock(product) {
+  const variants = Array.isArray(product.variants) ? product.variants : [];
+  if (variants.length > 0) {
+    const total = variants.reduce((sum, v) => sum + (parseInt(v.stock, 10) || 0), 0);
+    return total <= 0;
+  }
+  return (parseInt(product.stock, 10) || 0) <= 0;
+}
+
 /**
  * Sorts products based on sort order ("low-to-high" or "high-to-low").
  * Uses effective variant price when variants exist.
+ * Pushes out-of-stock items to the bottom.
  */
 export function sortProducts(products, sortOrder) {
+  let sorted = [...products];
+
   if (sortOrder === "low-to-high") {
-    return [...products].sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
+    sorted.sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
   } else if (sortOrder === "high-to-low") {
-    return [...products].sort((a, b) => getEffectivePrice(b) - getEffectivePrice(a));
+    sorted.sort((a, b) => getEffectivePrice(b) - getEffectivePrice(a));
   }
-  return products;
+
+  // Push out of stock to bottom, maintaining relative sorted order otherwise
+  sorted.sort((a, b) => {
+    const aOut = isProductOutOfStock(a);
+    const bOut = isProductOutOfStock(b);
+    if (aOut && !bOut) return 1;
+    if (!aOut && bOut) return -1;
+    return 0;
+  });
+
+  return sorted;
 }

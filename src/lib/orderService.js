@@ -67,13 +67,17 @@ async function decrementStockForItems(tx, cartItems) {
           where: { id: item.id },
           data: {
             stock: { decrement: qty },
+            salesCount: { increment: qty },
             ...(variantMatched ? { variants: updatedVariants } : {}),
           },
         });
       } else {
         await tx.product.update({
           where: { id: item.id },
-          data: { stock: { decrement: qty } },
+          data: {
+            stock: { decrement: qty },
+            salesCount: { increment: qty },
+          },
         });
       }
     } catch (err) {

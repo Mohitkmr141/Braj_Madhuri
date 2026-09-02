@@ -48,6 +48,8 @@ model Product {
   images        String[]  @default([])
   variants      Json?     @default("[]")
   stock         Int       @default(10)
+  isBestseller  Boolean   @default(false)
+  salesCount    Int       @default(0)
 
   category      Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)

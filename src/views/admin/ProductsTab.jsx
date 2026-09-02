@@ -145,8 +145,11 @@ export default function ProductsTab() {
     let outOfStock = 0;
     let lowStock = 0;
     let inStock = 0;
+    let bestsellers = 0;
 
     for (const p of inventory) {
+      if (p.isBestseller) bestsellers++;
+      
       if (isProductOutOfStock(p)) {
         outOfStock++;
       } else if (isProductLowStock(p)) {
@@ -155,7 +158,7 @@ export default function ProductsTab() {
         inStock++;
       }
     }
-    return { total, outOfStock, lowStock, inStock };
+    return { total, outOfStock, lowStock, inStock, bestsellers };
   }, [inventory, isProductOutOfStock, isProductLowStock]);
 
   const handleSaveSimpleStock = async (productId) => {
@@ -245,6 +248,7 @@ export default function ProductsTab() {
     );
     if (!matchesSearch) return false;
 
+    if (stockFilter === 'bestseller') return product.isBestseller;
     if (stockFilter === 'out_of_stock') return isProductOutOfStock(product);
     if (stockFilter === 'low_stock') return isProductLowStock(product);
     if (stockFilter === 'in_stock') return !isProductOutOfStock(product) && !isProductLowStock(product);
@@ -311,6 +315,13 @@ export default function ProductsTab() {
         >
           🟢 In Stock <span className="pill-count">{metrics.inStock}</span>
         </button>
+        <button 
+          className={`inventory-filter-pill ${stockFilter === 'bestseller' ? 'active' : ''}`}
+          onClick={() => setStockFilter('bestseller')}
+          style={{ borderColor: 'var(--admin-gold, #fbc02d)', color: 'var(--admin-gold, #fbc02d)' }}
+        >
+          ⭐ Pinned Bestsellers <span className="pill-count">{metrics.bestsellers}</span>
+        </button>
       </div>
 
       <div className="admin-toolbar">
@@ -376,6 +387,7 @@ export default function ProductsTab() {
                 <th>Name</th>
                 <th>Category</th>
                 <th>Price</th>
+                <th>Sales</th>
                 <th>Current Stock (Quick-Edit)</th>
                 <th>Actions</th>
               </tr>
@@ -407,6 +419,7 @@ export default function ProductsTab() {
                       <td data-label="Product ID">{product.id}</td>
                       <td data-label="Name">
                         <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>{product.title}</span>
+                        {product.isBestseller && <span style={{ marginLeft: '6px', fontSize: '12px' }}>⭐</span>}
                         {product.size && <span className="product-size"> ({product.size})</span>}
                       </td>
                       <td data-label="Category">
@@ -414,6 +427,9 @@ export default function ProductsTab() {
                         {product.subcategory?.title && <span className="product-subcategory"> - {product.subcategory.title}</span>}
                       </td>
                       <td data-label="Price">{formatCurrency(product.price)}</td>
+                      <td data-label="Sales" style={{ fontWeight: 'bold', color: 'var(--admin-primary)' }}>
+                        {product.salesCount || 0}
+                      </td>
                       <td data-label="Current Stock">
                         {hasVariants ? (
                           <div>
@@ -561,6 +577,29 @@ export default function ProductsTab() {
                         <div className="action-button-group vertical">
                           <button
                             className="btn btn-outline btn-sm"
+                            onClick={async () => {
+                              try {
+                                const res = await fetch('/api/admin/products/bestseller', {
+                                  method: 'PATCH',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ id: product.id, isBestseller: !product.isBestseller })
+                                });
+                                const data = await res.json();
+                                if (data.success) {
+                                  toast.success(`Product ${!product.isBestseller ? 'pinned as' : 'removed from'} bestsellers!`);
+                                  setInventory(prev => prev.map(p => p.id === product.id ? { ...p, isBestseller: !p.isBestseller } : p));
+                                } else {
+                                  toast.error(data.error);
+                                }
+                              } catch {
+                                toast.error('Error toggling bestseller');
+                              }
+                            }}
+                          >
+                            {product.isBestseller ? '⭐ Unpin' : '⭐ Pin'}
+                          </button>
+                          <button
+                            className="btn btn-outline btn-sm"
                             onClick={() => handleOpenModal(product)}
                           >
                             Edit Full
@@ -578,7 +617,7 @@ export default function ProductsTab() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="7" className="text-center" style={{ padding: '24px' }}>
+                  <td colSpan="8" className="text-center" style={{ padding: '24px' }}>
                     No products found matching this filter.
                   </td>
                 </tr>

@@ -293,6 +293,11 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
     <article ref={revealRef} className="subcat-product-card reveal" onClick={() => setIsZoomed(true)} style={{ cursor: 'pointer' }}>
       {/* ── Image panel ─────────────────────────────────────── */}
       <div className="subcat-img-panel">
+        {product.isBestseller && (
+          <span className="bestseller-badge" style={{ position: 'absolute', top: '10px', left: '10px', background: '#fbc02d', color: '#000', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', zIndex: 2, boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+            🔥 Bestseller
+          </span>
+        )}
         {mainImage ? (
           <Image
             src={mainImage}

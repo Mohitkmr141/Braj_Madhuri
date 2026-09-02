@@ -16,9 +16,10 @@ export default function CategoryGalleries({
   activeProductId,
   addToCart,
   onClearFilter,
+  defaultSortOrder = "default",
 }) {
   const { categories, isLoaded } = useProducts();
-  const [sortOrder, setSortOrder] = useState("low-to-high");
+  const [sortOrder, setSortOrder] = useState(defaultSortOrder);
   const INITIAL_BATCH_SIZE = 16;
   const [displayLimit, setDisplayLimit] = useState(INITIAL_BATCH_SIZE);
 
@@ -365,6 +366,11 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
   return (
     <article ref={revealRef} className="image-card reveal" onClick={() => setIsQuickViewOpen(true)} style={{ cursor: 'pointer' }}>
       <div className="image-card-img-wrapper">
+        {product.isBestseller && (
+          <span className="bestseller-badge" style={{ position: 'absolute', top: '10px', left: '10px', background: '#fbc02d', color: '#000', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', zIndex: 2, boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+            🔥 Bestseller
+          </span>
+        )}
         {isOutOfStock ? (
           <span className="discount-badge" style={{ background: '#d32f2f', color: '#fff' }}>OUT OF STOCK</span>
         ) : discount ? (

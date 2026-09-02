@@ -36,7 +36,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
     subheading: '',
     colors: '',
     images: [],
-    variants: []
+    variants: [],
+    isBestseller: false
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -59,7 +60,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
         images: Array.isArray(editingProduct.images) && editingProduct.images.length > 0 
           ? editingProduct.images 
           : (editingProduct.imageUrl ? [editingProduct.imageUrl] : []),
-        variants: Array.isArray(editingProduct.variants) ? editingProduct.variants : []
+        variants: Array.isArray(editingProduct.variants) ? editingProduct.variants : [],
+        isBestseller: editingProduct.isBestseller || false
       });
     } else {
       setProductForm({
@@ -75,7 +77,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
         subheading: '',
         colors: '',
         images: [],
-        variants: []
+        variants: [],
+        isBestseller: false
       });
     }
   }, [editingProduct]);
@@ -241,7 +244,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
         onSaved();
         if (stayOpen) {
           setProductForm({
-            title: '', categoryId: '', subcategoryId: '', price: '', originalPrice: '', stock: '10', imageUrl: '', description: '', size: '', subheading: '', colors: '', images: [], variants: []
+            title: '', categoryId: '', subcategoryId: '', price: '', originalPrice: '', stock: '10', imageUrl: '', description: '', size: '', subheading: '', colors: '', images: [], variants: [], isBestseller: false
           });
         } else {
           onClose();
@@ -407,6 +410,20 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                 onChange={e => setProductForm({...productForm, subheading: e.target.value})} 
               />
             </div>
+            <div className="form-col" style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '10px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600 }}>
+                <input 
+                  type="checkbox" 
+                  checked={productForm.isBestseller}
+                  onChange={e => setProductForm({...productForm, isBestseller: e.target.checked})}
+                  style={{ width: '18px', height: '18px' }}
+                />
+                ⭐ Mark as Bestseller
+              </label>
+            </div>
+          </div>
+
+          <div className="form-row">
             <div className="form-col">
               <label className="form-label">Sizes (comma-separated)</label>
               <input 
