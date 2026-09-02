@@ -234,10 +234,6 @@
   }
 
   .checkout-trust-badge {
-    padding: 4px 8px;
-  }
-
-  .checkout-trust-sub {
     display: none;
   }
 }
