@@ -1,7 +1,7 @@
 import { verifyAdminToken } from '../../../../lib/auth.js';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { getSupabase } from '../../../../lib/supabase.js';
+import { getSupabaseAdmin } from '../../../../lib/supabase.js';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,10 +47,10 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Vercel configuration error: SUPABASE_SERVICE_ROLE_KEY is missing. Please add it to your Vercel Environment Variables and REDEPLOY.' }, { status: 500 });
     }
 
-    const supabase = getSupabase();
+    const supabase = getSupabaseAdmin();
     const arrayBuffer = await file.arrayBuffer();
 
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from('products')
       .upload(filePath, arrayBuffer, {
         contentType: file.type,

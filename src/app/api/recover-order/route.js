@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { finalizePaidOrder } from '../../../lib/orderService.js';
 import { getPrisma } from '../../../lib/prisma.js';
+import { generateOrderAccessToken } from '../../../lib/auth.js';
 
 /**
  * POST /api/recover-order
@@ -76,6 +77,7 @@ export async function POST(request) {
         return NextResponse.json({
           success: true,
           orderNumber: existingOrder.orderNumber,
+          orderToken: generateOrderAccessToken(existingOrder.orderNumber),
           alreadyConfirmed: true,
           message: 'Your order was already confirmed. Please check your email for the confirmation.',
         });
@@ -109,6 +111,7 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       orderNumber: result.order.orderNumber,
+      orderToken: generateOrderAccessToken(result.order.orderNumber),
       alreadyConfirmed: !result.isNewOrUpdated,
       message: result.isNewOrUpdated
         ? 'Your order has been recovered and confirmed! A confirmation email will be sent shortly.'

@@ -28,31 +28,61 @@ function SuccessContent() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [authError, setAuthError] = useState(false);
+  const [verifyInput, setVerifyInput] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState("");
 
   useEffect(() => {
     const idFromUrl = searchParams?.get("orderId");
+    const tokenFromUrl = searchParams?.get("token");
     if (idFromUrl) {
       setOrderId(idFromUrl);
-      fetchOrderDetails(idFromUrl);
+      fetchOrderDetails(idFromUrl, tokenFromUrl);
     } else {
       setLoading(false);
     }
   }, [searchParams]);
 
-  const fetchOrderDetails = async (id) => {
+  const fetchOrderDetails = async (id, token = null, credential = null) => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/orders/${encodeURIComponent(id)}`);
+      setVerifyError("");
+      
+      const params = new URLSearchParams();
+      const activeToken = token || searchParams?.get("token");
+      if (activeToken) {
+        params.append("token", activeToken);
+      }
+      if (credential) {
+        if (credential.includes("@")) {
+          params.append("email", credential.trim());
+        } else {
+          params.append("phone", credential.trim());
+        }
+      }
+
+      const queryString = params.toString();
+      const endpoint = `/api/orders/${encodeURIComponent(id)}${queryString ? `?${queryString}` : ""}`;
+      const res = await fetch(endpoint);
+      
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.order) {
           setOrder(data.order);
+          setAuthError(false);
+        }
+      } else if (res.status === 401 || res.status === 403) {
+        setAuthError(true);
+        if (credential) {
+          setVerifyError("Verification failed. The email or phone does not match this order.");
         }
       }
     } catch (err) {
       console.error("Error fetching order receipt:", err);
     } finally {
       setLoading(false);
+      setVerifying(false);
     }
   };
 
@@ -773,6 +803,96 @@ function SuccessContent() {
                 </Link>
               </div>
             </>
+          ) : authError ? (
+            /* Verification Prompt if Access Token is Missing/Invalid */
+            <div style={{ textAlign: "center", padding: "24px 16px", maxWidth: "480px", margin: "0 auto" }}>
+              <div
+                style={{
+                  width: "56px",
+                  height: "56px",
+                  borderRadius: "50%",
+                  background: "rgba(201, 151, 42, 0.12)",
+                  color: "#C9972A",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 16px",
+                  border: "1px solid rgba(201, 151, 42, 0.3)",
+                }}
+              >
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+
+              <h3 style={{ fontSize: "20px", color: "#4A1521", margin: "0 0 8px", fontFamily: "'Playfair Display', serif" }}>
+                Receipt Verification Required
+              </h3>
+
+              <p style={{ color: "#6B5B53", fontSize: "14px", lineHeight: "1.5", marginBottom: "20px" }}>
+                To protect customer privacy, please enter the <strong>email address</strong> or <strong>phone number</strong> used when placing order <strong>{orderId}</strong>.
+              </p>
+
+              {verifyError && (
+                <div
+                  style={{
+                    background: "#FEE2E2",
+                    color: "#991B1B",
+                    padding: "10px 14px",
+                    borderRadius: "8px",
+                    fontSize: "13px",
+                    marginBottom: "16px",
+                  }}
+                >
+                  {verifyError}
+                </div>
+              )}
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (verifyInput.trim() && orderId) {
+                    setVerifying(true);
+                    fetchOrderDetails(orderId, null, verifyInput.trim());
+                  }
+                }}
+                style={{ display: "flex", gap: "8px", marginBottom: "24px" }}
+              >
+                <input
+                  type="text"
+                  placeholder="Enter email or phone"
+                  value={verifyInput}
+                  onChange={(e) => setVerifyInput(e.target.value)}
+                  style={{
+                    padding: "12px 14px",
+                    borderRadius: "8px",
+                    border: "1px solid #D4AF37",
+                    flex: 1,
+                    fontSize: "14px",
+                    outline: "none",
+                  }}
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={verifying}
+                  className="btn-primary"
+                  style={{ whiteSpace: "nowrap", padding: "12px 20px" }}
+                >
+                  {verifying ? "Verifying..." : "View Receipt"}
+                </button>
+              </form>
+
+              <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+                <Link href="/login" className="btn-secondary" style={{ fontSize: "13px" }}>
+                  Sign In to Account
+                </Link>
+                <Link href="/shop" className="btn-secondary" style={{ fontSize: "13px" }}>
+                  Continue Shopping
+                </Link>
+              </div>
+            </div>
           ) : (
             /* Fallback if order not found in DB */
             <div style={{ textAlign: "center", padding: "20px 0" }}>

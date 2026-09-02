@@ -2,7 +2,7 @@ import { verifyAdminToken } from '../../../../lib/auth.js';
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { revalidateTag, revalidatePath } from 'next/cache';
-import { getSupabase } from '../../../../lib/supabase.js';
+import { getSupabaseAdmin } from '../../../../lib/supabase.js';
 import { getPrisma } from '../../../../lib/prisma.js';
 
 export const dynamic = 'force-dynamic';
@@ -43,7 +43,7 @@ export async function PUT(request) {
     const fileName = `category-${categoryId}-${Date.now()}.${fileExt}`;
     const filePath = `product-images/${fileName}`;
 
-    const supabase = getSupabase();
+    const supabase = getSupabaseAdmin();
     const arrayBuffer = await file.arrayBuffer();
 
     const { error: uploadError } = await supabase.storage

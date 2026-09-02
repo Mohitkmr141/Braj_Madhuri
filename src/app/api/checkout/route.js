@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { finalizePaidOrder } from '../../../lib/orderService.js';
+import { generateOrderAccessToken } from '../../../lib/auth.js';
 
 export async function POST(request) {
   try {
     const body = await request.json();
     const {
       formData,
-      cartItems,
       cartTotal,
       shippingCost,
       paymentMethod,
@@ -94,9 +94,12 @@ export async function POST(request) {
 
     console.log(`[Checkout] Order ${result.order.orderNumber} confirmed. Payment ID: ${razorpay_payment_id}`);
 
+    const orderToken = generateOrderAccessToken(result.order.orderNumber);
+
     return NextResponse.json({
       success: true,
       orderNumber: result.order.orderNumber,
+      orderToken,
     });
 
   } catch (error) {

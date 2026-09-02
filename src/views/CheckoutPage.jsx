@@ -244,7 +244,8 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (data.success) {
         emptyCart();
-        router.push(`/success?orderId=${data.orderNumber}`);
+        const tokenQuery = data.orderToken ? `&token=${encodeURIComponent(data.orderToken)}` : "";
+        router.push(`/success?orderId=${encodeURIComponent(data.orderNumber)}${tokenQuery}`);
       } else {
         setError(data.error || "Could not recover your order. Please contact support with your Payment ID.");
       }
@@ -368,7 +369,8 @@ export default function CheckoutPage() {
             const data = await verifyRes.json();
             if (data.success) {
               emptyCart();
-              router.push(`/success?orderId=${data.orderNumber}`);
+              const tokenQuery = data.orderToken ? `&token=${encodeURIComponent(data.orderToken)}` : "";
+              router.push(`/success?orderId=${encodeURIComponent(data.orderNumber)}${tokenQuery}`);
             } else {
               setError(data.error || `Payment verification failed. Your payment was received (ID: ${capturedPaymentId}). Click "Recover My Order" below.`);
               window.scrollTo({ top: 0, behavior: "smooth" });
