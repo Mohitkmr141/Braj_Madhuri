@@ -48,7 +48,23 @@
     50% { transform: translateY(-6px); }
   }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Universal Media & Form Containment */
+  img, svg, video, canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  input, select, textarea, button {
+    box-sizing: border-box;
+    max-width: 100%;
+    font-family: inherit;
+  }
 
   html {
     scroll-behavior: smooth;
