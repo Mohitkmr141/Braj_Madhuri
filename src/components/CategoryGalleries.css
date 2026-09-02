@@ -120,18 +120,61 @@
   margin-top: 20px;
 }
 
+/* ── Sort Control ───────────────────────────────────────────── */
+.sort-control-wrap {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.sort-control-label {
+  font-family: var(--font-body, Inter, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted, #6B5B53);
+  letter-spacing: 0.02em;
+}
+
+.sort-control-select {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1.5px solid rgb(201 150 12 / 30%);
+  background: #fff;
+  color: var(--dark, #1F1A17);
+  font-family: var(--font-body, Inter, sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.sort-control-select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgb(201 150 12 / 15%);
+}
+
 @media (width <= 1100px) {
   .image-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 }
 
 @media (width <= 768px) {
-  .image-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  .galleries-wrapper { padding: 32px 16px 60px; }
+  .image-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .galleries-wrapper { padding: 28px 14px 50px; }
+  .sort-control-wrap {
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 14px;
+  }
 }
 
-@media (width <= 420px) {
-  .image-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .galleries-wrapper { padding: 20px 8px 60px; }
+@media (width <= 480px) {
+  .image-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .galleries-wrapper { padding: 20px 8px 50px; }
+  .sort-control-label { font-size: 12px; }
+  .sort-control-select { font-size: 12px; padding: 6px 10px; }
 }
 
 /* ── Card ───────────────────────────────────────────────────── */
@@ -606,14 +649,32 @@
   .item-title {
     font-size: 13px;
     line-height: 1.3;
+    min-height: calc(1.3em * 2);
+  }
+
+  .item-description {
+    font-size: 12px;
+    line-height: 1.35;
+    min-height: calc(1.35em * 2);
+  }
+
+  .item-pricing {
+    gap: 6px;
+    padding-top: 6px;
+    min-height: 32px;
   }
 
   .item-price {
-    font-size: 15px;
+    font-size: 14.5px;
   }
 
   .item-original-price {
     font-size: 11.5px;
+  }
+
+  .save-chip {
+    font-size: 10px;
+    padding: 1px 6px;
   }
 
   .gallery-cart-btn {
@@ -624,12 +685,12 @@
   }
 
   .discount-badge {
-    font-size: 9.5px;
+    font-size: 9px;
     padding: 3px 8px 3px 12px;
   }
 
   .new-badge {
-    font-size: 9.5px;
+    font-size: 9px;
     padding: 3px 12px 3px 8px;
   }
 }

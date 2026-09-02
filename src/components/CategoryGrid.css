@@ -2,10 +2,22 @@
    SECTION WRAPPER
 ═══════════════════════════════════════════════════════════════════════════ */
 .category-section {
-  padding: 72px 24px 56px;
+  padding: 56px 24px 44px;
   max-width: 1320px;
   margin: 0 auto;
   text-align: center;
+}
+
+@media (width <= 768px) {
+  .category-section {
+    padding: 32px 16px 24px;
+  }
+}
+
+@media (width <= 480px) {
+  .category-section {
+    padding: 24px 12px 16px;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -21,9 +33,9 @@
 
 @media (width <= 1100px) { .category-grid { grid-template-columns: repeat(5, 1fr); } }
 
-@media (width <= 768px)  { .category-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; } }
+@media (width <= 768px)  { .category-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; } }
 
-@media (width <= 480px)  { .category-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; } }
+@media (width <= 480px)  { .category-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; } }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    CELL WRAPPER  (holds button + dropdown)
@@ -186,19 +198,29 @@
    CATEGORY LABEL  (below circle)
 ═══════════════════════════════════════════════════════════════════════════ */
 .category-name {
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   font-family: Inter, sans-serif;
   font-size: clamp(11px, 2.5vw, 13px);
   font-weight: 600;
   color: #2e1a0a;
   letter-spacing: 0.01em;
-  line-height: 1.3;
+  line-height: 1.25;
   overflow-wrap: anywhere;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
+  min-height: 32px;
+  justify-content: flex-start;
   transition: color 0.2s ease;
+}
+
+@media (width <= 480px) {
+  .category-name {
+    font-size: 11px;
+    min-height: 28px;
+    margin-top: 6px;
+  }
 }
 
 .category-cell:hover .category-name {

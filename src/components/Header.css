@@ -312,8 +312,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px;
-  height: 58px;
+  padding: 0 14px;
+  height: 56px;
   gap: 8px;
 }
 
@@ -335,6 +335,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .bm-nav__mobile-actions {
@@ -346,16 +347,16 @@
 
 /* Mobile Icon Buttons */
 .bm-nav__mobile-actions .bm-icon-btn {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border-radius: 9px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .bm-nav__mobile-actions .bm-icon-btn svg {
-  width: 19px;
-  height: 19px;
+  width: 18px;
+  height: 18px;
 }
 
 .bm-icon-btn--cart {
@@ -375,10 +376,32 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(255, 255, 255, 0.08);
   cursor: pointer;
-  padding: 10px 8px;
+  padding: 9px 8px;
   box-shadow: none;
   flex-shrink: 0;
   transition: var(--transition);
+}
+
+@media (max-width: 380px) {
+  .bm-nav__mobile-bar {
+    padding: 0 10px;
+    gap: 6px;
+  }
+  .bm-nav__mobile-title {
+    font-size: 14.5px;
+  }
+  .bm-nav__mobile-actions {
+    gap: 5px;
+  }
+  .bm-nav__mobile-actions .bm-icon-btn {
+    width: 33px;
+    height: 33px;
+  }
+  .bm-hamburger-plain {
+    width: 33px;
+    height: 33px;
+    padding: 8px 6px;
+  }
 }
 
 .bm-hamburger-plain:hover {
@@ -617,6 +640,8 @@
   transform: translateX(100%);
   transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: -8px 0 36px rgba(0, 0, 0, 0.3);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .bm-drawer.open {

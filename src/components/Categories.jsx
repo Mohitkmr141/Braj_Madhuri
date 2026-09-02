@@ -90,17 +90,17 @@ export default function CategoryGalleries({
           </button>
         )}
         <div className="section-divider" />
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '15px' }}>
-          <label htmlFor="price-sort" style={{ marginRight: '10px', alignSelf: 'center', fontWeight: 'bold' }}>Sort by Price:</label>
+        <div className="sort-control-wrap">
+          <label htmlFor="price-sort" className="sort-control-label">Sort by Price:</label>
           <select 
             id="price-sort" 
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
-            style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', background: '#fff', cursor: 'pointer' }}
+            className="sort-control-select"
           >
-            <option value="default">Default</option>
-            <option value="low-to-high">Low to High</option>
-            <option value="high-to-low">High to Low</option>
+            <option value="default">Featured / Default</option>
+            <option value="low-to-high">Price: Low to High</option>
+            <option value="high-to-low">Price: High to Low</option>
           </select>
         </div>
       </div>
