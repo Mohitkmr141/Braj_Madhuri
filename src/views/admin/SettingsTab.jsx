@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import './Admin.css';
+
 
 export default function SettingsTab() {
   const [settings, setSettings] = useState({
@@ -91,26 +91,26 @@ export default function SettingsTab() {
   };
 
   if (isLoading) {
-    return <div className="admin-card-padded" style={{ textAlign: 'center', padding: '60px' }}>Loading Settings...</div>;
+    return <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 mb-6" style={{ textAlign: 'center', padding: '60px' }}>Loading Settings...</div>;
   }
 
   return (
-    <div className="admin-card-padded">
+    <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 mb-6">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h2 className="admin-card-title" style={{ margin: 0, fontSize: '22px' }}>Marketing & Sitewide Settings</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-2" style={{ margin: 0, fontSize: '22px' }}>Marketing & Sitewide Settings</h2>
           <p className="text-sm text-muted" style={{ margin: '4px 0 0' }}>Manage sitewide discounts, promotion banners, and announcements</p>
         </div>
         <button 
           onClick={handleSave} 
           disabled={isSaving}
-          className="btn btn-primary"
+          className="bg-[#4A1521] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#3A0F19] transition-all"
         >
           {isSaving ? 'Saving...' : '💾 Save Settings'}
         </button>
       </div>
 
-      <div className="form-group" style={{ marginBottom: '32px', background: 'var(--admin-bg)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
+      <div className="flex flex-col gap-2 mb-5" style={{ marginBottom: '32px', background: 'var(--admin-bg)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-light)' }}>
         <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', fontSize: '16px', fontWeight: '600', color: 'var(--text-main)' }}>
           <input 
             type="checkbox" 
@@ -127,32 +127,32 @@ export default function SettingsTab() {
 
       <div className="form-row">
         <div className="form-col">
-          <label className="form-label">Discount Percentage (%)</label>
+          <label className="text-sm font-semibold text-slate-700">Discount Percentage (%)</label>
           <input 
             type="number" 
             min="0"
             max="100"
             value={settings.saleDiscountPercentage} 
             onChange={(e) => setSettings({ ...settings, saleDiscountPercentage: parseFloat(e.target.value) || 0 })}
-            className="form-input"
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all"
             placeholder="e.g. 15"
           />
         </div>
 
         <div className="form-col">
-          <label className="form-label">Announcement Bar Promo Text</label>
+          <label className="text-sm font-semibold text-slate-700">Announcement Bar Promo Text</label>
           <input 
             type="text" 
             value={settings.saleTitle} 
             onChange={(e) => setSettings({ ...settings, saleTitle: e.target.value })}
-            className="form-input"
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all"
             placeholder="e.g. 🎉 SPECIAL SALE: FLAT 15% OFF on Total Order Value!"
           />
         </div>
       </div>
 
-      <div className="form-group" style={{ marginTop: '24px' }}>
-        <label className="form-label">Homepage Sale Banner Image</label>
+      <div className="flex flex-col gap-2 mb-5" style={{ marginTop: '24px' }}>
+        <label className="text-sm font-semibold text-slate-700">Homepage Sale Banner Image</label>
         {settings.saleBannerUrl && (
           <div style={{ marginBottom: '16px', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--border-light)', maxWidth: '600px' }}>
             <img 

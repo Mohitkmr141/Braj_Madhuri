@@ -105,19 +105,18 @@ export default function CategoryImagesTab() {
   };
 
   return (
-    <div className="tab-pane">
-      <div className="admin-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap justify-between items-center gap-4 p-5 bg-white border-b border-slate-200">
         <div>
-          <h2 className="font-semibold text-maroon" style={{margin:0, fontSize: '20px'}}>Category Images</h2>
-          <p className="text-muted text-sm" style={{margin:'4px 0 0 0'}}>Upload dedicated thumbnails for your categories.</p>
+          <h2 className="font-serif text-2xl font-bold text-[#4A1521] m-0 leading-tight">Category Images</h2>
+          <p className="text-slate-500 text-sm mt-1">Upload dedicated thumbnails for your categories.</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '12px', color: '#6b7280' }}>Format:</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-500">Format:</span>
           <select 
-            className="form-select" 
+            className="border border-slate-300 rounded-lg text-slate-700 py-1 pl-2 pr-7 text-sm focus:outline-none focus:ring-2 focus:ring-[#4A1521]" 
             value={uploadFormat} 
             onChange={e => setUploadFormat(e.target.value)}
-            style={{ padding: '4px 28px 4px 8px', fontSize: '13px', width: 'auto', minHeight: 'auto' }}
           >
             <option value="image/webp">WebP (Recommended)</option>
             <option value="image/png">PNG</option>
@@ -126,34 +125,34 @@ export default function CategoryImagesTab() {
       </div>
 
       {loading ? (
-        <div className="loading-state">Loading categories...</div>
+        <div className="p-8 text-center text-slate-500">Loading categories...</div>
       ) : (
-        <div className="cat-images-grid">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
           {categories.map((cat) => (
-            <div key={cat.id} className="cat-image-card">
-              <div className="cat-image-preview">
+            <div key={cat.id} className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
+              <div className="w-full aspect-square bg-slate-50 relative border-b border-slate-100">
                 {cat.thumbnailUrl ? (
-                  <Image src={cat.thumbnailUrl} alt={cat.title} className="thumbnail" width={150} height={150} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
+                  <Image src={cat.thumbnailUrl} alt={cat.title} className="w-full h-full object-cover" width={150} height={150} />
                 ) : (
-                  <div className="placeholder-thumbnail">No Thumbnail</div>
+                  <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">No Thumbnail</div>
                 )}
               </div>
-              <div className="cat-image-info">
-                <h3>{cat.title}</h3>
-                <div className="cat-image-actions">
-                  <label className="cat-image-upload-label">
+              <div className="p-4 flex flex-col gap-3 flex-1">
+                <h3 className="text-base font-bold text-slate-900 m-0 truncate">{cat.title}</h3>
+                <div className="flex gap-2 mt-auto">
+                  <label className="cursor-pointer text-center bg-white text-slate-700 border border-slate-300 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-all flex-1">
                     {catImageUploading === cat.id ? 'Uploading...' : 'Upload'}
                     <input
                       type="file"
                       accept="image/*"
-                      className="hidden-input"
+                      className="hidden"
                       onChange={(e) => handleCategoryImageUpload(cat.id, e.target.files[0])}
                       disabled={catImageUploading === cat.id || catImageRemoving === cat.id}
                     />
                   </label>
                   {cat.thumbnailUrl && (
                     <button
-                      className="btn btn-danger btn-sm"
+                      className="text-center bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-red-100 transition-all flex-1"
                       onClick={() => handleCategoryImageRemove(cat.id)}
                       disabled={catImageUploading === cat.id || catImageRemoving === cat.id}
                     >

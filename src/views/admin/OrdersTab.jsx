@@ -213,23 +213,23 @@ const OrdersTab = () => {
   };
 
   return (
-    <div className="admin-content-card">
-      <div className="admin-card-header">
-        <h2 className="admin-card-title">Orders Management</h2>
+    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
+      <div className="p-5 border-b border-slate-200">
+        <h2 className="text-xl font-bold text-slate-900 mb-2">Orders Management</h2>
       </div>
       
-      <div className="admin-toolbar">
-        <div className="admin-search-container">
+      <div className="flex flex-wrap justify-between items-center gap-4 p-5 bg-white border-b border-slate-200">
+        <div className="relative w-full max-w-xs">
           <input
             type="text"
-            className="admin-search-input"
+            className="w-full max-w-xs pl-10 pr-4 py-2 text-sm rounded-full border border-slate-300 bg-white focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all"
             placeholder="Search by order ID, Razorpay ID, name, or phone..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
         </div>
         
-        <div className="filter-bar">
+        <div className="flex flex-wrap gap-2 items-center">
           {[
             { key: '', label: 'All' },
             { key: 'Pending', label: 'Paid / Pending' },
@@ -240,7 +240,7 @@ const OrdersTab = () => {
           ].map(tab => (
             <button
               key={tab.key}
-              className={`filter-chip ${statusFilter === tab.key ? 'active' : ''}`}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${statusFilter === tab.key ? 'bg-[#4A1521] text-white border-[#4A1521]' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
               onClick={() => setStatusFilter(tab.key)}
             >
               {tab.label}
@@ -248,8 +248,7 @@ const OrdersTab = () => {
           ))}
           {selectedOrders.length > 0 && (
             <button 
-              className="btn btn-primary"
-              style={{ backgroundColor: '#dc3545', borderColor: '#dc3545', padding: '6px 12px', fontSize: '14px', marginLeft: 'auto' }}
+              className="bg-red-50 text-red-700 border border-red-200 px-4 py-2 rounded-lg font-semibold hover:bg-red-100 transition-all ml-auto text-sm"
               onClick={handleDeleteSelected}
               disabled={isDeleting}
             >
@@ -257,8 +256,7 @@ const OrdersTab = () => {
             </button>
           )}
           <button
-            className="filter-chip"
-            style={{ background: '#fff3cd', borderColor: '#ffc107', color: '#856404', marginLeft: selectedOrders.length > 0 ? '8px' : 'auto' }}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors bg-yellow-50 border-yellow-200 text-yellow-700 hover:bg-yellow-100 ${selectedOrders.length > 0 ? 'ml-2' : 'ml-auto'}`}
             onClick={handleCleanup}
             disabled={actionLoading === 'cleanup'}
           >
@@ -268,30 +266,30 @@ const OrdersTab = () => {
       </div>
 
       {loading ? (
-        <div className="skeleton-table-wrapper" style={{ marginTop: '24px' }}>
+        <div className="animate-pulse flex flex-col gap-4 p-5">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="skeleton-row">
-              <div className="skeleton-cell" style={{ flex: '0.5' }}></div>
-              <div className="skeleton-cell" style={{ flex: '1' }}></div>
-              <div className="skeleton-cell" style={{ flex: '1.5' }}></div>
-              <div className="skeleton-cell" style={{ flex: '1' }}></div>
-              <div className="skeleton-cell" style={{ flex: '1' }}></div>
-              <div className="skeleton-cell" style={{ flex: '0.5' }}></div>
-              <div className="skeleton-cell" style={{ flex: '1' }}></div>
+            <div key={i} className="flex gap-4">
+              <div className="h-10 bg-slate-200 rounded flex-[0.5]"></div>
+              <div className="h-10 bg-slate-200 rounded flex-1"></div>
+              <div className="h-10 bg-slate-200 rounded flex-[1.5]"></div>
+              <div className="h-10 bg-slate-200 rounded flex-1"></div>
+              <div className="h-10 bg-slate-200 rounded flex-1"></div>
+              <div className="h-10 bg-slate-200 rounded flex-[0.5]"></div>
+              <div className="h-10 bg-slate-200 rounded flex-1"></div>
             </div>
           ))}
         </div>
       ) : orders.length === 0 ? (
-        <div className="admin-empty-state">No orders found.</div>
+        <div className="p-8 text-center text-slate-500 font-medium">No orders found.</div>
       ) : (
-        <div className="admin-table-container">
-          <table className="admin-table">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
             <thead>
               <tr>
-                <th style={{ width: '40px' }}>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200 w-10">
                   <input 
                     type="checkbox"
-                    style={{ cursor: 'pointer' }}
+                    className="cursor-pointer rounded border-slate-300 text-[#4A1521] focus:ring-[#4A1521]"
                     checked={orders.length > 0 && orders.every(o => selectedOrders.includes(o.id))}
                     onChange={(e) => {
                       if (e.target.checked) {
@@ -302,14 +300,14 @@ const OrdersTab = () => {
                     }}
                   />
                 </th>
-                <th>Order ID</th>
-                <th>Date</th>
-                <th>Customer</th>
-                <th>Contact</th>
-                <th>Items</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Shiprocket Actions</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Order ID</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Date</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Customer</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Contact</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Items</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Total</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Status</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Shiprocket Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -326,11 +324,11 @@ const OrdersTab = () => {
                 }
 
                 return (
-                  <tr key={order.id}>
-                    <td data-label="Select" className="admin-checkbox-cell">
+                  <tr key={order.id} className="hover:bg-slate-50">
+                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
                       <input 
                         type="checkbox"
-                        className="admin-checkbox"
+                        className="cursor-pointer rounded border-slate-300 text-[#4A1521] focus:ring-[#4A1521]"
                         checked={selectedOrders.includes(order.id)}
                         onChange={(e) => {
                           if (e.target.checked) {
@@ -341,45 +339,45 @@ const OrdersTab = () => {
                         }}
                       />
                     </td>
-                    <td data-label="Order ID">
-                      <div className="order-id-cell">
-                        <span className="awb-badge">{order.orderNumber}</span>
+                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-semibold text-slate-900">{order.orderNumber}</span>
                         {order.razorpayPaymentId && (
-                          <div className="text-xs text-muted font-mono" title="Razorpay Payment ID">
+                          <div className="text-xs text-slate-400 font-mono" title="Razorpay Payment ID">
                             💳 {order.razorpayPaymentId}
                           </div>
                         )}
                       </div>
                     </td>
-                    <td data-label="Date">
-                      <span className="order-date-text">{formatDate(order.createdAt)}</span>
+                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                      <span className="whitespace-nowrap">{formatDate(order.createdAt)}</span>
                     </td>
-                    <td data-label="Customer">
-                      <div className="font-semibold text-main">{order.customerName || 'N/A'}</div>
-                      <div className="text-xs text-muted mt-1">
+                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                      <div className="font-semibold text-slate-900">{order.customerName || 'N/A'}</div>
+                      <div className="text-xs text-slate-500 mt-1">
                         {order.address}, {order.city} - {order.pincode}
                       </div>
                     </td>
-                    <td data-label="Contact">
+                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
                       <div className="text-sm font-medium">{order.phone || 'N/A'}</div>
-                      <div className="text-xs text-muted mt-1 text-truncate">{order.email || 'N/A'}</div>
+                      <div className="text-xs text-slate-500 mt-1 truncate max-w-[120px]" title={order.email}>{order.email || 'N/A'}</div>
                     </td>
-                    <td data-label="Items">
-                      <div className="order-items-list">
+                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                      <div className="flex flex-col gap-1.5">
                         {items.length > 0 ? items.map((item, index) => (
-                          <div key={index} className="order-item-chip">
-                            <span className="order-item-qty">{item.quantity}×</span>
-                            <span className="order-item-title">
+                          <div key={index} className="text-xs bg-slate-50 px-2 py-1 rounded border border-slate-100 flex items-start gap-1">
+                            <span className="font-medium text-slate-700 whitespace-nowrap">{item.quantity}×</span>
+                            <span className="text-slate-600">
                               {item.title || item.name} 
-                              {item.size && <span className="product-size">Size: {item.size}</span>}
-                              {item.color && <span className="product-color">Color: {item.color}</span>}
+                              {item.size && <span className="text-slate-400 ml-1">Size: {item.size}</span>}
+                              {item.color && <span className="text-slate-400 ml-1">Color: {item.color}</span>}
                             </span>
                           </div>
-                        )) : <span className="text-xs text-muted italic">No items</span>}
+                        )) : <span className="text-xs text-slate-400 italic">No items</span>}
                       </div>
                     </td>
-                    <td data-label="Total" className="font-semibold">
-                      <div className="text-main">{formatCurrency(order.totalAmount)}</div>
+                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700 font-semibold">
+                      <div className="text-slate-900">{formatCurrency(order.totalAmount)}</div>
                       {(() => {
                         const itemsSubtotal = items.reduce((acc, it) => acc + ((parseFloat(it.price) || 0) * (parseInt(it.quantity, 10) || 1)), 0);
                         const shipping = parseFloat(order.shippingCost) || 0;
@@ -388,12 +386,12 @@ const OrdersTab = () => {
                         return (
                           <>
                             {discount > 0 && (
-                              <div className="text-xs text-success font-medium">
+                              <div className="text-xs text-green-600 font-medium">
                                 Disc: −{formatCurrency(discount)}
                               </div>
                             )}
                             {shipping > 0 && (
-                              <div className="text-xs text-muted">
+                              <div className="text-xs text-slate-400">
                                 +₹{shipping} ship
                               </div>
                             )}
@@ -401,10 +399,16 @@ const OrdersTab = () => {
                         );
                       })()}
                     </td>
-                    <td data-label="Status">
-                      <div className="status-cell-wrapper">
+                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                      <div className="relative">
                         <select
-                          className={`status-select status-select--${(order.status || 'pending').toLowerCase()}`}
+                          className={`px-3 py-1.5 text-sm font-medium rounded-full border shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4A1521]/20 focus:border-[#4A1521] appearance-none pr-8 ${
+                            order.status === 'Pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            order.status === 'Shipped' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                            order.status === 'Delivered' ? 'bg-green-50 text-green-700 border-green-200' :
+                            order.status === 'Cancelled' ? 'bg-red-50 text-red-700 border-red-200' :
+                            'bg-slate-50 text-slate-700 border-slate-200'
+                          }`}
                           value={order.status}
                           onChange={(e) => handleStatusChange(order.id, e.target.value)}
                           disabled={actionLoading === `${order.id}-status`}
@@ -417,17 +421,17 @@ const OrdersTab = () => {
                           <option value="Payment_Failed">Payment Failed</option>
                         </select>
                         {actionLoading === `${order.id}-status` && (
-                          <span className="text-xs text-maroon font-medium">Updating...</span>
+                          <span className="text-xs text-red-700 font-medium ml-2">Updating...</span>
                         )}
                       </div>
                     </td>
-                    <td data-label="Actions">
+                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
                       {!order.shiprocketOrderId ? (
-                        <div className="shiprocket-actions-wrapper">
+                        <div className="flex flex-col gap-2">
                           {order.status === 'Payment_Pending' && order.razorpayOrderId && (
                             <button
                               type="button"
-                              style={{ background: '#856404', color: '#fff', border: 'none', borderRadius: '4px', padding: '5px 10px', fontSize: '12px', cursor: 'pointer', width: '100%', marginBottom: '6px' }}
+                              className="bg-yellow-600 text-white rounded px-2.5 py-1.5 text-xs font-medium hover:bg-yellow-700 transition-colors w-full"
                               onClick={() => handleForceRecover(order.id, order.razorpayOrderId, order.orderNumber)}
                               disabled={!!actionLoading}
                               title="Verify payment with Razorpay and confirm this order"
@@ -437,25 +441,25 @@ const OrdersTab = () => {
                           )}
                           <button
                             type="button"
-                            className="btn btn-primary btn-sm btn-shiprocket-sync"
+                            className="bg-[#4A1521] text-white px-3 py-1.5 text-sm rounded font-semibold hover:bg-[#3A0F19] transition-all"
                             onClick={() => handleShiprocketAction(order.id, 'sync_order')}
                             disabled={!!actionLoading}
                           >
                             🚀 Sync Shiprocket
                           </button>
                           {actionLoading === `${order.id}-sync_order` && (
-                            <span className="text-maroon text-xs font-medium">Syncing...</span>
+                            <span className="text-red-700 text-xs font-medium">Syncing...</span>
                           )}
                         </div>
                       ) : (
-                        <div className="shiprocket-actions-wrapper">
+                        <div className="flex flex-col gap-2">
                           {order.awbCode && (
-                            <div className="awb-badge">
+                            <div className="px-2.5 py-1 rounded-full text-xs font-bold border inline-block bg-slate-100 text-slate-700 border-slate-200 self-start">
                               AWB: {order.awbCode}
                             </div>
                           )}
                           <select 
-                            className="action-select"
+                            className="px-3 py-1.5 text-sm font-medium rounded border border-slate-200 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4A1521]/20 appearance-none w-full"
                             onChange={(e) => {
                               if (e.target.value) {
                                 handleShiprocketAction(order.id, e.target.value);
@@ -474,15 +478,15 @@ const OrdersTab = () => {
                             {order.awbCode && <option value="track_awb">Track AWB</option>}
                           </select>
                           {actionLoading && actionLoading.startsWith(order.id) && (
-                            <div className="text-maroon text-xs font-medium">Processing...</div>
+                            <div className="text-red-700 text-xs font-medium">Processing...</div>
                           )}
                         </div>
                       )}
                       {order.razorpayPaymentId && (
-                        <div style={{ marginTop: '6px' }}>
+                        <div className="mt-2">
                           <button
                             type="button"
-                            style={{ background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', padding: '4px 10px', fontSize: '12px', cursor: 'pointer', width: '100%' }}
+                            className="bg-red-50 text-red-700 border border-red-200 px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-red-100 transition-all w-full"
                             onClick={() => handleRefund(order.id, order.orderNumber, order.totalAmount)}
                             disabled={!!actionLoading}
                           >
@@ -500,19 +504,19 @@ const OrdersTab = () => {
       )}
 
       {totalPages > 0 && (
-        <div className="pagination">
+        <div className="flex justify-between items-center p-5 border-t border-slate-200 bg-white">
           <button 
-            className="pagination-btn" 
+            className="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-semibold hover:bg-slate-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
             disabled={currentPage <= 1} 
             onClick={() => setCurrentPage(p => p - 1)}
           >
             ← Prev
           </button>
-          <span className="pagination-info">
+          <span className="text-sm font-medium text-slate-600">
             Page {currentPage} of {totalPages} ({totalOrders} orders)
           </span>
           <button 
-            className="pagination-btn" 
+            className="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-semibold hover:bg-slate-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
             disabled={currentPage >= totalPages} 
             onClick={() => setCurrentPage(p => p + 1)}
           >

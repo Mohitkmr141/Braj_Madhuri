@@ -106,9 +106,9 @@ export default function CategoriesTab() {
 
   return (
     <div className="tab-pane">
-      <div className="admin-toolbar">
+      <div className="flex flex-wrap justify-between items-center gap-4 p-5 bg-white border-b border-slate-200">
         <button 
-          className="btn btn-primary" 
+          className="bg-[#4A1521] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#3A0F19] transition-all" 
           onClick={() => { setEditingCategory(null); setIsCategoryModalOpen(true); }}
         >
           + Add New Category

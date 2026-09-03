@@ -256,120 +256,118 @@ export default function ProductsTab() {
   });
 
   return (
-    <div className="admin-inventory">
+    <div className="space-y-6">
       {/* ── Top Metrics Bar ── */}
-      <div className="inventory-metrics-bar">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div 
-          className={`inventory-metric-card ${stockFilter === 'all' ? 'inventory-metric-card--active' : ''}`}
+          className={`p-4 rounded-xl border cursor-pointer transition-all bg-white ${stockFilter === 'all' ? 'ring-2 ring-[#4A1521] shadow-md border-transparent' : 'border-slate-200 hover:border-slate-300'}`}
           onClick={() => setStockFilter('all')}
         >
-          <span className="metric-label">Total Products</span>
-          <span className="metric-value">{metrics.total}</span>
+          <span className="block text-sm font-medium text-slate-500 mb-1">Total Products</span>
+          <span className="block text-2xl font-bold text-slate-900">{metrics.total}</span>
         </div>
         <div 
-          className={`inventory-metric-card card-danger ${stockFilter === 'out_of_stock' ? 'inventory-metric-card--active' : ''}`}
+          className={`p-4 rounded-xl border cursor-pointer transition-all bg-red-50 ${stockFilter === 'out_of_stock' ? 'ring-2 ring-red-500 shadow-md border-transparent' : 'border-red-200 hover:border-red-300'}`}
           onClick={() => setStockFilter('out_of_stock')}
         >
-          <span className="metric-label">🔴 Out of Stock</span>
-          <span className="metric-value">{metrics.outOfStock}</span>
+          <span className="block text-sm font-medium text-red-600 mb-1">🔴 Out of Stock</span>
+          <span className="block text-2xl font-bold text-red-900">{metrics.outOfStock}</span>
         </div>
         <div 
-          className={`inventory-metric-card card-warning ${stockFilter === 'low_stock' ? 'inventory-metric-card--active' : ''}`}
+          className={`p-4 rounded-xl border cursor-pointer transition-all bg-orange-50 ${stockFilter === 'low_stock' ? 'ring-2 ring-orange-500 shadow-md border-transparent' : 'border-orange-200 hover:border-orange-300'}`}
           onClick={() => setStockFilter('low_stock')}
         >
-          <span className="metric-label">🟡 Low Stock (≤3)</span>
-          <span className="metric-value">{metrics.lowStock}</span>
+          <span className="block text-sm font-medium text-orange-600 mb-1">🟡 Low Stock (≤3)</span>
+          <span className="block text-2xl font-bold text-orange-900">{metrics.lowStock}</span>
         </div>
         <div 
-          className={`inventory-metric-card card-success ${stockFilter === 'in_stock' ? 'inventory-metric-card--active' : ''}`}
+          className={`p-4 rounded-xl border cursor-pointer transition-all bg-green-50 ${stockFilter === 'in_stock' ? 'ring-2 ring-green-500 shadow-md border-transparent' : 'border-green-200 hover:border-green-300'}`}
           onClick={() => setStockFilter('in_stock')}
         >
-          <span className="metric-label">🟢 Healthy Stock</span>
-          <span className="metric-value">{metrics.inStock}</span>
+          <span className="block text-sm font-medium text-green-600 mb-1">🟢 Healthy Stock</span>
+          <span className="block text-2xl font-bold text-green-900">{metrics.inStock}</span>
         </div>
       </div>
 
       {/* ── Filter Pills & Toolbar ── */}
-      <div className="inventory-filter-tabs">
+      <div className="flex flex-wrap gap-2 mb-6">
         <button 
-          className={`inventory-filter-pill ${stockFilter === 'all' ? 'active' : ''}`}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${stockFilter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
           onClick={() => setStockFilter('all')}
         >
-          All Products <span className="pill-count">{metrics.total}</span>
+          All Products <span className="ml-1 px-2 py-0.5 rounded-full bg-black/10 text-xs">{metrics.total}</span>
         </button>
         <button 
-          className={`inventory-filter-pill ${stockFilter === 'out_of_stock' ? 'active' : ''}`}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${stockFilter === 'out_of_stock' ? 'bg-red-600 text-white' : 'bg-red-50 text-red-700 hover:bg-red-100'}`}
           onClick={() => setStockFilter('out_of_stock')}
         >
-          🔴 Out of Stock <span className="pill-count">{metrics.outOfStock}</span>
+          🔴 Out of Stock <span className="ml-1 px-2 py-0.5 rounded-full bg-black/10 text-xs">{metrics.outOfStock}</span>
         </button>
         <button 
-          className={`inventory-filter-pill ${stockFilter === 'low_stock' ? 'active' : ''}`}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${stockFilter === 'low_stock' ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-700 hover:bg-orange-100'}`}
           onClick={() => setStockFilter('low_stock')}
         >
-          🟡 Low Stock (≤3) <span className="pill-count">{metrics.lowStock}</span>
+          🟡 Low Stock (≤3) <span className="ml-1 px-2 py-0.5 rounded-full bg-black/10 text-xs">{metrics.lowStock}</span>
         </button>
         <button 
-          className={`inventory-filter-pill ${stockFilter === 'in_stock' ? 'active' : ''}`}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${stockFilter === 'in_stock' ? 'bg-green-600 text-white' : 'bg-green-50 text-green-700 hover:bg-green-100'}`}
           onClick={() => setStockFilter('in_stock')}
         >
-          🟢 In Stock <span className="pill-count">{metrics.inStock}</span>
+          🟢 In Stock <span className="ml-1 px-2 py-0.5 rounded-full bg-black/10 text-xs">{metrics.inStock}</span>
         </button>
         <button 
-          className={`inventory-filter-pill ${stockFilter === 'bestseller' ? 'active' : ''}`}
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${stockFilter === 'bestseller' ? 'bg-yellow-500 text-white border-yellow-500' : 'bg-white text-yellow-600 border-yellow-400 hover:bg-yellow-50'}`}
           onClick={() => setStockFilter('bestseller')}
-          style={{ borderColor: 'var(--admin-gold, #fbc02d)', color: 'var(--admin-gold, #fbc02d)' }}
         >
-          ⭐ Pinned Bestsellers <span className="pill-count">{metrics.bestsellers}</span>
+          ⭐ Pinned Bestsellers <span className="ml-1 px-2 py-0.5 rounded-full bg-black/10 text-xs">{metrics.bestsellers}</span>
         </button>
       </div>
 
-      <div className="admin-toolbar">
-        <div className="search-bar">
+      <div className="flex flex-wrap justify-between items-center gap-4 p-5 bg-white border-b border-slate-200">
+        <div className="search-bar flex-1">
           <input
             type="text"
             placeholder="Search by ID, Name, or Category..."
             value={productSearchQuery}
             onChange={(e) => setProductSearchQuery(e.target.value)}
-            className="admin-search-input"
+            className="w-full max-w-xs pl-10 pr-4 py-2 text-sm rounded-full border border-slate-300 bg-white focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all"
           />
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           {selectedProducts.length > 0 && (
             <button 
-              className="btn btn-primary"
-              style={{ backgroundColor: '#dc3545', borderColor: '#dc3545' }}
+              className="bg-red-50 text-red-700 border border-red-200 px-4 py-2 rounded-lg font-semibold hover:bg-red-100 transition-all"
               onClick={handleDeleteSelected}
               disabled={isDeleting}
             >
               {isDeleting ? 'Deleting...' : `Delete Selected (${selectedProducts.length})`}
             </button>
           )}
-          <button className="btn btn-primary" onClick={() => handleOpenModal()}>
+          <button className="bg-[#4A1521] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#3A0F19] transition-all" onClick={() => handleOpenModal()}>
             + Add New Product
           </button>
         </div>
       </div>
 
       {loading ? (
-        <div className="skeleton-table-wrapper" style={{ marginTop: '24px' }}>
+        <div className="w-full mt-6 space-y-4">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="skeleton-row">
-              <div className="skeleton-cell" style={{ flex: '0.5' }}></div>
-              <div className="skeleton-cell" style={{ flex: '2' }}></div>
-              <div className="skeleton-cell" style={{ flex: '1.5' }}></div>
-              <div className="skeleton-cell" style={{ flex: '0.5' }}></div>
-              <div className="skeleton-cell" style={{ flex: '0.5' }}></div>
-              <div className="skeleton-cell" style={{ flex: '1' }}></div>
+            <div key={i} className="flex gap-4 p-4 border border-slate-200 rounded-lg animate-pulse">
+              <div className="h-4 bg-slate-200 rounded w-1/12"></div>
+              <div className="h-4 bg-slate-200 rounded w-4/12"></div>
+              <div className="h-4 bg-slate-200 rounded w-3/12"></div>
+              <div className="h-4 bg-slate-200 rounded w-1/12"></div>
+              <div className="h-4 bg-slate-200 rounded w-1/12"></div>
+              <div className="h-4 bg-slate-200 rounded w-2/12"></div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="table-responsive">
-          <table className="admin-table">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
             <thead>
               <tr>
-                <th style={{ width: '40px' }}>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200" style={{ width: '40px' }}>
                   <input 
                     type="checkbox"
                     style={{ cursor: 'pointer' }}
@@ -383,13 +381,13 @@ export default function ProductsTab() {
                     }}
                   />
                 </th>
-                <th>Product ID</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Sales</th>
-                <th>Current Stock (Quick-Edit)</th>
-                <th>Actions</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Product ID</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Name</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Category</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Price</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Sales</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Current Stock (Quick-Edit)</th>
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -401,11 +399,11 @@ export default function ProductsTab() {
                   const isExpandedThis = expandedVariantId === product.id;
 
                   return (
-                    <tr key={product.id}>
-                      <td data-label="Select" className="admin-checkbox-cell">
+                    <tr key={product.id} className="hover:bg-slate-50">
+                      <td data-label="Select" className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
                         <input 
                           type="checkbox"
-                          className="admin-checkbox"
+                          className="w-4 h-4 text-[#4A1521] border-slate-300 rounded focus:ring-[#4A1521]"
                           checked={selectedProducts.includes(product.id)}
                           onChange={(e) => {
                             if (e.target.checked) {
@@ -416,18 +414,18 @@ export default function ProductsTab() {
                           }}
                         />
                       </td>
-                      <td data-label="Product ID">{product.id}</td>
-                      <td data-label="Name">
-                        <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>{product.title}</span>
-                        {product.isBestseller && <span style={{ marginLeft: '6px', fontSize: '12px' }}>⭐</span>}
-                        {product.size && <span className="product-size"> ({product.size})</span>}
+                      <td data-label="Product ID" className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">{product.id}</td>
+                      <td data-label="Name" className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                        <span className="font-semibold text-slate-900">{product.title}</span>
+                        {product.isBestseller && <span className="ml-1.5 text-xs">⭐</span>}
+                        {product.size && <span className="text-xs text-slate-500"> ({product.size})</span>}
                       </td>
-                      <td data-label="Category">
+                      <td data-label="Category" className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
                         {product.category?.title || "Unknown"}
-                        {product.subcategory?.title && <span className="product-subcategory"> - {product.subcategory.title}</span>}
+                        {product.subcategory?.title && <span className="text-xs text-slate-500"> - {product.subcategory.title}</span>}
                       </td>
-                      <td data-label="Price">{formatCurrency(product.price)}</td>
-                      <td data-label="Sales" style={{ fontWeight: 'bold', color: 'var(--admin-primary)' }}>
+                      <td data-label="Price" className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">{formatCurrency(product.price)}</td>
+                      <td data-label="Sales" className="px-6 py-4 border-b border-slate-100 text-sm font-bold text-[#4A1521]">
                         {product.salesCount || 0}
                       </td>
                       <td data-label="Current Stock">
@@ -443,19 +441,19 @@ export default function ProductsTab() {
 
                               return (
                                 <div>
-                                  <div className={totalVariantStock > 0 ? 'text-success font-semibold' : 'text-danger font-semibold'} style={{ fontSize: '14px' }}>
+                                  <div className={`text-sm ${totalVariantStock > 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}`}>
                                     {totalVariantStock} units total
                                   </div>
-                                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                                  <div className="text-[11px] text-slate-500 mt-0.5">
                                     across {variants.length} variant{variants.length > 1 ? 's' : ''}
                                   </div>
                                   {outOfStockCount > 0 && (
-                                    <div style={{ fontSize: '11px', color: '#c62828', fontWeight: '600', marginTop: '3px', background: '#ffebee', padding: '1px 6px', borderRadius: '4px', display: 'inline-block' }}>
+                                    <div className="text-[11px] text-red-700 font-semibold mt-1 bg-red-50 px-1.5 py-0.5 rounded inline-block">
                                       🔴 {outOfStockCount} variant{outOfStockCount > 1 ? 's' : ''} out of stock
                                     </div>
                                   )}
                                   {lowStockCount > 0 && (
-                                    <div style={{ fontSize: '11px', color: '#e65100', fontWeight: '600', marginTop: '3px', marginLeft: outOfStockCount > 0 ? '4px' : '0', background: '#fff3e0', padding: '1px 6px', borderRadius: '4px', display: 'inline-block' }}>
+                                    <div className={`text-[11px] text-orange-700 font-semibold mt-1 ${outOfStockCount > 0 ? 'ml-1' : ''} bg-orange-50 px-1.5 py-0.5 rounded inline-block`}>
                                       🟡 {lowStockCount} low
                                     </div>
                                   )}
@@ -463,7 +461,7 @@ export default function ProductsTab() {
                                   <div>
                                     <button 
                                       type="button" 
-                                      className="variant-quick-toggle"
+                                      className="text-xs text-[#4A1521] font-semibold hover:underline mt-1 bg-transparent border-none p-0 cursor-pointer"
                                       onClick={() => handleToggleVariantDrawer(product)}
                                     >
                                       {isExpandedThis ? '▲ Close Variants' : '⚙️ Quick-Edit Variants'}
@@ -471,25 +469,25 @@ export default function ProductsTab() {
                                   </div>
 
                                   {isExpandedThis && (
-                                    <div className="variant-quick-drawer">
-                                      <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--admin-maroon)', marginBottom: '4px' }}>
+                                    <div className="mt-2 p-3 bg-slate-50 rounded-lg border border-slate-200 flex flex-col gap-2">
+                                      <div className="text-xs font-bold text-[#4A1521] mb-1">
                                         Variant Stock Breakdown
                                       </div>
                                       {(variantDrafts[product.id] || []).map((v, vIdx) => (
-                                        <div key={vIdx} className="variant-quick-row">
-                                          <div className="variant-quick-label">
+                                        <div key={vIdx} className="flex justify-between items-center text-sm">
+                                          <div className="text-slate-700 font-medium">
                                             {v.size ? `Size: ${v.size}` : ''} {v.color ? `Color: ${v.color}` : ''}
                                             {(!v.size && !v.color) ? `Option ${vIdx + 1}` : ''}
                                           </div>
-                                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                          <div className="flex items-center gap-1.5">
                                             <input 
                                               type="number"
                                               min="0"
                                               value={v.stock ?? 0}
                                               onChange={(e) => handleVariantDraftChange(product.id, vIdx, 'stock', Math.max(0, parseInt(e.target.value, 10) || 0))}
-                                              className="inline-stock-input"
+                                              className="w-16 px-2 py-1 text-sm border border-slate-300 rounded focus:outline-none focus:border-[#4A1521]"
                                             />
-                                            <span style={{ fontSize: '11px', color: (parseInt(v.stock, 10) || 0) > 0 ? '#2e7d32' : '#c62828' }}>
+                                            <span className={`text-[11px] ${(parseInt(v.stock, 10) || 0) > 0 ? 'text-green-700' : 'text-red-700'}`}>
                                               {(parseInt(v.stock, 10) || 0) > 0 ? 'in stock' : 'sold out'}
                                             </span>
                                           </div>
@@ -497,10 +495,9 @@ export default function ProductsTab() {
                                       ))}
                                       <button 
                                         type="button"
-                                        className="btn btn-primary btn-sm"
+                                        className="bg-[#4A1521] text-white px-3 py-1 rounded-md text-sm font-semibold hover:bg-[#3A0F19] transition-all mt-1.5 self-end"
                                         disabled={isUpdatingStock}
                                         onClick={() => handleSaveVariantStocks(product.id)}
-                                        style={{ marginTop: '6px', alignSelf: 'flex-end' }}
                                       >
                                         {isUpdatingStock ? 'Saving...' : 'Save All Variants'}
                                       </button>
@@ -511,7 +508,7 @@ export default function ProductsTab() {
                             })()}
                           </div>
                         ) : isEditingThis ? (
-                          <div className="inline-stock-editor">
+                          <div className="flex items-center gap-1">
                             <input 
                               type="number"
                               min="0"
@@ -521,12 +518,12 @@ export default function ProductsTab() {
                                 if (e.key === 'Enter') handleSaveSimpleStock(product.id);
                                 if (e.key === 'Escape') setEditingStockId(null);
                               }}
-                              className="inline-stock-input"
+                              className="w-16 px-2 py-1 text-sm border border-slate-300 rounded focus:outline-none focus:border-[#4A1521]"
                               autoFocus
                             />
                             <button 
                               type="button" 
-                              className="inline-stock-btn btn-save"
+                              className="p-1 text-green-600 hover:bg-green-50 rounded"
                               onClick={() => handleSaveSimpleStock(product.id)}
                               disabled={isUpdatingStock}
                               title="Save"
@@ -535,7 +532,7 @@ export default function ProductsTab() {
                             </button>
                             <button 
                               type="button" 
-                              className="inline-stock-btn btn-cancel"
+                              className="p-1 text-red-600 hover:bg-red-50 rounded"
                               onClick={() => setEditingStockId(null)}
                               title="Cancel"
                             >
@@ -543,25 +540,15 @@ export default function ProductsTab() {
                             </button>
                           </div>
                         ) : (
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div className="flex items-center">
                             <span 
-                              className={
-                                (parseInt(product.stock, 10) || 0) <= 0 
-                                  ? 'text-danger font-semibold' 
-                                  : (parseInt(product.stock, 10) || 0) <= 3 
-                                  ? 'font-semibold' 
-                                  : 'text-success font-semibold'
-                              }
-                              style={{ 
-                                fontSize: '14px', 
-                                color: (parseInt(product.stock, 10) || 0) > 0 && (parseInt(product.stock, 10) || 0) <= 3 ? '#e65100' : undefined 
-                              }}
+                              className={`text-sm ${(parseInt(product.stock, 10) || 0) <= 0 ? 'text-red-600 font-semibold' : (parseInt(product.stock, 10) || 0) <= 3 ? 'text-orange-600 font-semibold' : 'text-green-600 font-semibold'}`}
                             >
                               {parseInt(product.stock, 10) || 0} units
                             </span>
                             <button 
                               type="button"
-                              className="stock-edit-trigger"
+                              className="ml-2 text-xs text-slate-500 hover:text-[#4A1521] cursor-pointer"
                               onClick={() => {
                                 setEditingStockId(product.id);
                                 setTempStockValue(String(parseInt(product.stock, 10) || 0));
@@ -573,10 +560,10 @@ export default function ProductsTab() {
                           </div>
                         )}
                       </td>
-                      <td data-label="Actions">
-                        <div className="action-button-group vertical">
+                      <td data-label="Actions" className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                        <div className="flex flex-col gap-2">
                           <button
-                            className="btn btn-outline btn-sm"
+                            className="bg-white text-slate-700 border border-slate-300 px-3 py-1 rounded-md text-sm font-semibold hover:bg-slate-50 transition-all w-full text-left"
                             onClick={async () => {
                               try {
                                 const res = await fetch('/api/admin/products/bestseller', {
@@ -599,13 +586,13 @@ export default function ProductsTab() {
                             {product.isBestseller ? '⭐ Unpin' : '⭐ Pin'}
                           </button>
                           <button
-                            className="btn btn-outline btn-sm"
+                            className="bg-white text-slate-700 border border-slate-300 px-3 py-1 rounded-md text-sm font-semibold hover:bg-slate-50 transition-all w-full text-left"
                             onClick={() => handleOpenModal(product)}
                           >
                             Edit Full
                           </button>
                           <button
-                            className="btn btn-danger btn-sm"
+                            className="bg-red-50 text-red-700 border border-red-200 px-3 py-1 rounded-md text-sm font-semibold hover:bg-red-100 transition-all w-full text-left"
                             onClick={() => handleDeleteProduct(product.id)}
                           >
                             Delete
@@ -616,8 +603,8 @@ export default function ProductsTab() {
                   );
                 })
               ) : (
-                <tr>
-                  <td colSpan="8" className="text-center" style={{ padding: '24px' }}>
+                <tr className="hover:bg-slate-50">
+                  <td colSpan="8" className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700 text-center" style={{ padding: '24px' }}>
                     No products found matching this filter.
                   </td>
                 </tr>

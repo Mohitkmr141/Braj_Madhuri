@@ -7,13 +7,13 @@ import imageCompression from 'browser-image-compression';
 export const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel, confirmText = 'Delete', cancelText = 'Cancel', isDangerous = true }) => {
   if (!isOpen) return null;
   return (
-    <div className="modal-overlay">
-      <div className="confirm-dialog">
-        <h3 className="confirm-dialog-title">{title}</h3>
-        <p className="confirm-dialog-message">{message}</p>
-        <div className="confirm-dialog-actions flex gap-2 justify-center">
-          <button className="btn btn-outline" onClick={onCancel}>{cancelText}</button>
-          <button className={`btn ${isDangerous ? 'btn-danger' : 'btn-primary'}`} onClick={onConfirm}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative p-6">
+        <h3 className="font-serif text-2xl font-bold text-[#4A1521] m-0 mb-4">{title}</h3>
+        <p className="text-slate-600 mb-6">{message}</p>
+        <div className="flex gap-2 justify-center">
+          <button className="bg-white text-slate-700 border border-slate-300 px-5 py-2.5 rounded-lg font-semibold hover:bg-slate-50 transition-all" onClick={onCancel}>{cancelText}</button>
+          <button className={`px-5 py-2.5 rounded-lg font-semibold transition-all ${isDangerous ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-[#4A1521] text-white hover:bg-[#3A0F19]'}`} onClick={onConfirm}>
             {confirmText}
           </button>
         </div>
@@ -263,27 +263,27 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
   const subcategories = selectedCategory?.subcategories || [];
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <button className="modal-close" onClick={onClose}>&times;</button>
-        <h2 className="modal-title">{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden relative">
+        <button className="text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 rounded-full p-2 transition-all absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-xl" onClick={onClose}>&times;</button>
+        <h2 className="font-serif text-2xl font-bold text-[#4A1521] m-0 p-6 border-b border-slate-200">{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
         
-        <form className="modal-form" onSubmit={handleSave}>
-          <div className="form-row">
-            <div className="form-col">
-              <label className="form-label">Title *</label>
+        <form className="p-6 overflow-y-auto max-h-[70vh]" onSubmit={handleSave}>
+          <div className="flex flex-col md:flex-row gap-4 mb-5">
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Title *</label>
               <input 
                 type="text" 
-                className="form-input" 
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
                 required 
                 value={productForm.title} 
                 onChange={e => setProductForm({...productForm, title: e.target.value})} 
               />
             </div>
-            <div className="form-col">
-              <label className="form-label">Category *</label>
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Category *</label>
               <select 
-                className="form-select" 
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
                 required 
                 value={productForm.categoryId} 
                 onChange={e => setProductForm({...productForm, categoryId: e.target.value, subcategoryId: ''})}
@@ -296,11 +296,11 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-col">
-              <label className="form-label">Subcategory</label>
+          <div className="flex flex-col md:flex-row gap-4 mb-5">
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Subcategory</label>
               <select 
-                className="form-select" 
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
                 disabled={!productForm.categoryId || subcategories.length === 0} 
                 value={productForm.subcategoryId} 
                 onChange={e => setProductForm({...productForm, subcategoryId: e.target.value})}
@@ -313,12 +313,12 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-col">
-              <label className="form-label">Price *</label>
+          <div className="flex flex-col md:flex-row gap-4 mb-5">
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Price *</label>
               <input 
                 type="number" 
-                className="form-input" 
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
                 required 
                 min="0"
                 step="0.01"
@@ -326,11 +326,11 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                 onChange={e => setProductForm({...productForm, price: e.target.value})} 
               />
             </div>
-            <div className="form-col">
-              <label className="form-label">Original Price</label>
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Original Price</label>
               <input 
                 type="number" 
-                className="form-input" 
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
                 min="0"
                 step="0.01"
                 value={productForm.originalPrice} 
@@ -342,11 +342,11 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                 </span>
               )}
             </div>
-            <div className="form-col">
-              <label className="form-label">Stock *</label>
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Stock *</label>
               <input 
                 type="number" 
-                className="form-input" 
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
                 required 
                 min="0"
                 value={productForm.stock} 
@@ -355,13 +355,13 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-col">
-              <label className="form-label">Product Images</label>
+          <div className="flex flex-col md:flex-row gap-4 mb-5">
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Product Images</label>
               <div style={{ marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontSize: '12px', color: '#6b7280' }}>Format:</span>
                 <select 
-                  className="form-select" 
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
                   value={uploadFormat} 
                   onChange={e => setUploadFormat(e.target.value)}
                   style={{ padding: '4px 28px 4px 8px', fontSize: '13px', width: 'auto', minHeight: 'auto' }}
@@ -372,7 +372,7 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
               </div>
               <input 
                 type="file" 
-                className="form-input" 
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
                 accept="image/*" 
                 multiple
                 onChange={handleImageUpload} 
@@ -400,18 +400,18 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-col">
-              <label className="form-label">Subheading</label>
+          <div className="flex flex-col md:flex-row gap-4 mb-5">
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Subheading</label>
               <input 
                 type="text" 
-                className="form-input" 
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
                 value={productForm.subheading} 
                 onChange={e => setProductForm({...productForm, subheading: e.target.value})} 
               />
             </div>
-            <div className="form-col">
-              <label className="form-label">&nbsp;</label>
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">&nbsp;</label>
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, height: '40px' }}>
                 <input 
                   type="checkbox" 
@@ -424,22 +424,22 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-col">
-              <label className="form-label">Sizes (comma-separated)</label>
+          <div className="flex flex-col md:flex-row gap-4 mb-5">
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Sizes (comma-separated)</label>
               <input 
                 type="text" 
-                className="form-input" 
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
                 placeholder="e.g. 0, 1, 2 or S, M, L"
                 value={productForm.size} 
                 onChange={e => setProductForm({...productForm, size: e.target.value})} 
               />
             </div>
-            <div className="form-col">
-              <label className="form-label">Colors (comma-separated)</label>
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Colors (comma-separated)</label>
               <input 
                 type="text"
-                className="form-input" 
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
                 placeholder="e.g. Red, Green, Blue" 
                 value={productForm.colors} 
                 onChange={e => setProductForm({...productForm, colors: e.target.value})} 
@@ -447,11 +447,11 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-col">
-              <label className="form-label">Description</label>
+          <div className="flex flex-col md:flex-row gap-4 mb-5">
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-sm font-semibold text-slate-700">Description</label>
               <textarea 
-                className="form-textarea" 
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
                 rows="4" 
                 value={productForm.description} 
                 onChange={e => setProductForm({...productForm, description: e.target.value})} 
@@ -459,10 +459,10 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
             </div>
           </div>
 
-          <div className="form-row" style={{ marginTop: '20px' }}>
-            <div className="form-col" style={{ flex: '1 1 100%' }}>
+          <div className="flex flex-col md:flex-row gap-4 mb-5" style={{ marginTop: '20px' }}>
+            <div className="flex-1 flex flex-col gap-2" style={{ flex: '1 1 100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <label className="form-label" style={{ margin: 0 }}>Product Variants (Specific Size/Color Pricing)</label>
+                <label className="text-sm font-semibold text-slate-700" style={{ margin: 0 }}>Product Variants (Specific Size/Color Pricing)</label>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button type="button" onClick={() => {
                     setProductForm(prev => ({
@@ -470,9 +470,9 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                       variants: prev.variants.map(v => ({ ...v, price: prev.price, originalPrice: prev.originalPrice }))
                     }));
                     toast.success('Synced variant prices with base price!');
-                  }} className="btn" style={{ padding: '4px 12px', fontSize: '0.85rem', background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db' }}>🔄 Sync Prices</button>
-                  <button type="button" onClick={generateCombinations} className="btn" style={{ padding: '4px 12px', fontSize: '0.85rem', background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db' }}>🪄 Generate Combinations</button>
-                  <button type="button" onClick={addVariant} className="btn btn-secondary" style={{ padding: '4px 12px', fontSize: '0.85rem' }}>+ Add Variant</button>
+                  }} className="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-semibold hover:bg-slate-50 transition-all" style={{ padding: '4px 12px', fontSize: '0.85rem', background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db' }}>🔄 Sync Prices</button>
+                  <button type="button" onClick={generateCombinations} className="bg-white text-slate-700 border border-slate-300 px-4 py-2 rounded-lg font-semibold hover:bg-slate-50 transition-all" style={{ padding: '4px 12px', fontSize: '0.85rem', background: '#f3f4f6', color: '#374151', border: '1px solid #d1d5db' }}>🪄 Generate Combinations</button>
+                  <button type="button" onClick={addVariant} className="bg-white text-slate-700 border border-slate-300 px-5 py-2.5 rounded-lg font-semibold hover:bg-slate-50 transition-all" style={{ padding: '4px 12px', fontSize: '0.85rem' }}>+ Add Variant</button>
                 </div>
               </div>
               
@@ -541,15 +541,15 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
             </div>
           </div>
 
-          <div className="form-actions mt-4 flex justify-end gap-2">
-            <button type="button" className="btn btn-outline mr-2" onClick={onClose}>Cancel</button>
-            <button type="submit" className={`btn btn-primary ${saving || uploading ? 'btn-disabled' : ''}`} disabled={saving || uploading}>
+          <div className="p-6 border-t border-slate-200 bg-slate-50 flex justify-end gap-3 mt-4">
+            <button type="button" className="bg-white text-slate-700 border border-slate-300 px-5 py-2.5 rounded-lg font-semibold hover:bg-slate-50 transition-all mr-2" onClick={onClose}>Cancel</button>
+            <button type="submit" className={`bg-[#4A1521] text-white px-5 py-2.5 rounded-lg font-semibold transition-all ${saving || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#3A0F19]'}`} disabled={saving || uploading}>
               {saving ? 'Saving...' : 'Save Product'}
             </button>
             {!editingProduct && (
               <button 
                 type="button" 
-                className={`btn btn-secondary ${saving || uploading ? 'btn-disabled' : ''}`} 
+                className={`bg-white text-slate-700 border border-slate-300 px-5 py-2.5 rounded-lg font-semibold transition-all ${saving || uploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-slate-50'}`} 
                 disabled={saving || uploading}
                 onClick={(e) => {
                   const form = e.currentTarget.closest('form');
@@ -617,35 +617,35 @@ export const CategoryModal = ({ isOpen, onClose, editingCategory, onSaved }) => 
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content modal-content-sm">
-        <button className="modal-close" onClick={onClose}>&times;</button>
-        <h2 className="modal-title">{editingCategory ? 'Edit Category' : 'Add New Category'}</h2>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative">
+        <button className="text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 rounded-full p-2 transition-all absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-xl" onClick={onClose}>&times;</button>
+        <h2 className="font-serif text-2xl font-bold text-[#4A1521] m-0 p-6 border-b border-slate-200">{editingCategory ? 'Edit Category' : 'Add New Category'}</h2>
         
-        <form className="modal-form" onSubmit={handleSave}>
-          <div className="form-col mb-4">
-            <label className="form-label">Title *</label>
+        <form className="p-6 overflow-y-auto max-h-[70vh]" onSubmit={handleSave}>
+          <div className="flex-1 flex flex-col gap-2 mb-4">
+            <label className="text-sm font-semibold text-slate-700">Title *</label>
             <input 
               type="text" 
-              className="form-input" 
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
               required 
               value={form.title} 
               onChange={e => setForm({...form, title: e.target.value})} 
             />
           </div>
-          <div className="form-col mb-4">
-            <label className="form-label">Description</label>
+          <div className="flex-1 flex flex-col gap-2 mb-4">
+            <label className="text-sm font-semibold text-slate-700">Description</label>
             <textarea 
-              className="form-textarea" 
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
               rows="3" 
               value={form.description} 
               onChange={e => setForm({...form, description: e.target.value})} 
             />
           </div>
           
-          <div className="form-actions mt-4 flex justify-end gap-2">
-            <button type="button" className="btn btn-outline mr-2" onClick={onClose}>Cancel</button>
-            <button type="submit" className={`btn btn-primary ${saving ? 'btn-disabled' : ''}`} disabled={saving}>
+          <div className="p-6 border-t border-slate-200 bg-slate-50 flex justify-end gap-3 mt-4">
+            <button type="button" className="bg-white text-slate-700 border border-slate-300 px-5 py-2.5 rounded-lg font-semibold hover:bg-slate-50 transition-all mr-2" onClick={onClose}>Cancel</button>
+            <button type="submit" className={`bg-[#4A1521] text-white px-5 py-2.5 rounded-lg font-semibold transition-all ${saving ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#3A0F19]'}`} disabled={saving}>
               {saving ? 'Saving...' : 'Save Category'}
             </button>
           </div>
@@ -702,16 +702,16 @@ export const SubcategoryModal = ({ isOpen, onClose, editingSubcategory, categori
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content modal-content-sm">
-        <button className="modal-close" onClick={onClose}>&times;</button>
-        <h2 className="modal-title">{editingSubcategory ? 'Edit Subcategory' : 'Add New Subcategory'}</h2>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative">
+        <button className="text-slate-400 hover:text-red-500 bg-slate-50 hover:bg-red-50 rounded-full p-2 transition-all absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-xl" onClick={onClose}>&times;</button>
+        <h2 className="font-serif text-2xl font-bold text-[#4A1521] m-0 p-6 border-b border-slate-200">{editingSubcategory ? 'Edit Subcategory' : 'Add New Subcategory'}</h2>
         
-        <form className="modal-form" onSubmit={handleSave}>
-          <div className="form-col mb-4">
-            <label className="form-label">Parent Category *</label>
+        <form className="p-6 overflow-y-auto max-h-[70vh]" onSubmit={handleSave}>
+          <div className="flex-1 flex flex-col gap-2 mb-4">
+            <label className="text-sm font-semibold text-slate-700">Parent Category *</label>
             <select 
-              className="form-select" 
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
               required 
               value={form.categoryId} 
               onChange={e => setForm({...form, categoryId: e.target.value})}
@@ -722,29 +722,29 @@ export const SubcategoryModal = ({ isOpen, onClose, editingSubcategory, categori
               ))}
             </select>
           </div>
-          <div className="form-col mb-4">
-            <label className="form-label">Title *</label>
+          <div className="flex-1 flex flex-col gap-2 mb-4">
+            <label className="text-sm font-semibold text-slate-700">Title *</label>
             <input 
               type="text" 
-              className="form-input" 
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
               required 
               value={form.title} 
               onChange={e => setForm({...form, title: e.target.value})} 
             />
           </div>
-          <div className="form-col mb-4">
-            <label className="form-label">Description</label>
+          <div className="flex-1 flex flex-col gap-2 mb-4">
+            <label className="text-sm font-semibold text-slate-700">Description</label>
             <textarea 
-              className="form-textarea" 
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all" 
               rows="3" 
               value={form.description} 
               onChange={e => setForm({...form, description: e.target.value})} 
             />
           </div>
           
-          <div className="form-actions mt-4 flex justify-end gap-2">
-            <button type="button" className="btn btn-outline mr-2" onClick={onClose}>Cancel</button>
-            <button type="submit" className={`btn btn-primary ${saving ? 'btn-disabled' : ''}`} disabled={saving}>
+          <div className="p-6 border-t border-slate-200 bg-slate-50 flex justify-end gap-3 mt-4">
+            <button type="button" className="bg-white text-slate-700 border border-slate-300 px-5 py-2.5 rounded-lg font-semibold hover:bg-slate-50 transition-all mr-2" onClick={onClose}>Cancel</button>
+            <button type="submit" className={`bg-[#4A1521] text-white px-5 py-2.5 rounded-lg font-semibold transition-all ${saving ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#3A0F19]'}`} disabled={saving}>
               {saving ? 'Saving...' : 'Save Subcategory'}
             </button>
           </div>
