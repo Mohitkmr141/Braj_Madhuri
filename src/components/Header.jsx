@@ -79,22 +79,25 @@ const Header = ({ cartCount = 0, cartTotal = 0, wishlistCount = 0 }) => {
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
-    if (menuOpen) {
+    if (menuOpen || searchOpen) {
       document.body.style.overflow = "hidden";
     }
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [menuOpen]);
+  }, [menuOpen, searchOpen]);
 
   useEffect(() => {
-    if (!menuOpen) return undefined;
+    if (!menuOpen && !searchOpen) return undefined;
     const handleEscape = (event) => {
-      if (event.key === "Escape") closeMenu();
+      if (event.key === "Escape") {
+        if (searchOpen) closeSearch();
+        if (menuOpen) closeMenu();
+      }
     };
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
-  }, [menuOpen]);
+  }, [menuOpen, searchOpen]);
 
   // Close account dropdown when clicking outside
   useEffect(() => {

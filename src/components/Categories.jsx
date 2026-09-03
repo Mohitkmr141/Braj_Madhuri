@@ -118,16 +118,20 @@ export default function CategoryGalleries({
           ))
         ) : (
           <div className="empty-state">
-            <p className="empty-state__title">No products found for this category.</p>
+            <p className="empty-state__title">
+              {searchQuery ? `No products found for "${searchQuery}".` : "No products found for this category."}
+            </p>
             <p className="empty-state__body">
-              Try another collection to continue browsing the catalog.
+              {searchQuery 
+                ? "Try searching with broader keywords or browse all our devotional collections."
+                : "Try another collection to continue browsing the catalog."}
             </p>
             <button
               className="explore-btn empty-state__button"
               type="button"
               onClick={onClearFilter}
             >
-              View All Collections
+              {searchQuery ? "Clear Search & View Catalog" : "View All Collections"}
             </button>
           </div>
         )}

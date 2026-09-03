@@ -71,17 +71,38 @@ export function resolveFilter(filterFolder, searchQuery, allProducts) {
   }
 
   if (searchQuery) {
-    const query = searchQuery.trim().toLowerCase();
+    const rawQuery = searchQuery.trim().toLowerCase();
+    const tokens = rawQuery.split(/\s+/).filter(t => t.length > 0);
     
-    products = products.filter(p => {
-      const imgTitle = (p.title || "").toLowerCase();
-      const imgDesc = (p.description || p.categoryDesc || "").toLowerCase();
-      return imgTitle.includes(query) || imgDesc.includes(query);
-    });
+    const isMatch = (p) => {
+      const searchTarget = [
+        p.title || "",
+        p.subheading || "",
+        p.description || "",
+        p.categoryTitle || "",
+        p.categoryDesc || "",
+        p.subcategory?.title || "",
+        Array.isArray(p.colors) ? p.colors.join(" ") : "",
+        p.size || "",
+      ].join(" ").toLowerCase();
+
+      // Full phrase match or all tokens matched
+      if (searchTarget.includes(rawQuery)) return true;
+      return tokens.every(token => searchTarget.includes(token));
+    };
+
+    // If searching, search across all products to avoid restricting users who had a filter selected
+    const searchSource = filterFolder && !filterFolder.includes("bestsellers") ? products : allProducts;
+    let matchedProducts = searchSource.filter(isMatch);
+
+    // If no products matched in current category filter, fallback to searching all products
+    if (matchedProducts.length === 0 && searchSource !== allProducts) {
+      matchedProducts = allProducts.filter(isMatch);
+    }
 
     return {
-      products,
-      title: filterFolder && !isAll ? title : `Search Results for "${searchQuery}"`,
+      products: matchedProducts,
+      title: `Search Results for "${searchQuery}"`,
       isAll: false,
     };
   }
