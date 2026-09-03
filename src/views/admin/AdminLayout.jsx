@@ -7,6 +7,7 @@ import ProductsTab from './ProductsTab';
 import CategoriesTab from './CategoriesTab';
 import CategoryImagesTab from './CategoryImagesTab';
 import SettingsTab from './SettingsTab';
+import './AdminReset.css';
 
 export default function AdminLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,7 +55,7 @@ export default function AdminLayout() {
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="admin-dashboard min-h-screen flex items-center justify-center bg-slate-50">
         <p className="text-slate-500 text-sm font-medium">Loading Admin Workspace...</p>
       </div>
     );
@@ -62,7 +63,7 @@ export default function AdminLayout() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+      <div className="admin-dashboard min-h-screen flex items-center justify-center bg-slate-50 p-6">
         <div className="bg-white border border-slate-200/60 rounded-2xl shadow-xl shadow-slate-200/40 p-10 max-w-md w-full text-center">
           <form onSubmit={handleLogin} className="flex flex-col">
             <h2 className="font-serif text-3xl font-bold text-[#4A1521] mb-8 tracking-tight">Admin Access</h2>
@@ -95,7 +96,7 @@ export default function AdminLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 text-slate-900 font-sans p-4 md:p-8 pb-24 selection:bg-[#4A1521]/10 selection:text-[#4A1521]">
+    <div className="admin-dashboard min-h-screen bg-slate-50/50 text-slate-900 font-sans p-4 md:p-8 pb-24 selection:bg-[#4A1521]/10 selection:text-[#4A1521]">
       <Toaster position="top-right" toastOptions={{ duration: 3000, style: { borderRadius: '12px', padding: '16px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' } }} />
       <div className="max-w-7xl mx-auto w-full">
         

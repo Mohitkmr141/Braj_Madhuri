@@ -286,10 +286,10 @@ const OrdersTab = () => {
         <div className="p-8 text-center text-slate-500 font-medium">No orders found.</div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse min-w-[1000px]">
             <thead>
               <tr>
-                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200 w-10">
+                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200/60 w-10">
                   <input 
                     type="checkbox"
                     className="cursor-pointer rounded border-slate-300 text-[#4A1521] focus:ring-[#4A1521]"
@@ -303,32 +303,22 @@ const OrdersTab = () => {
                     }}
                   />
                 </th>
-                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Order ID</th>
-                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Date</th>
-                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Customer</th>
-                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Contact</th>
-                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Items</th>
-                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Total</th>
-                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Status</th>
-                <th className="bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200">Shiprocket Actions</th>
+                <th className="bg-slate-50 text-slate-500 font-medium text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200/60 whitespace-nowrap">Order ID</th>
+                <th className="bg-slate-50 text-slate-500 font-medium text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200/60 whitespace-nowrap">Date</th>
+                <th className="bg-slate-50 text-slate-500 font-medium text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200/60 min-w-[200px]">Customer</th>
+                <th className="bg-slate-50 text-slate-500 font-medium text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200/60 min-w-[150px]">Contact</th>
+                <th className="bg-slate-50 text-slate-500 font-medium text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200/60 min-w-[200px]">Items</th>
+                <th className="bg-slate-50 text-slate-500 font-medium text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200/60 whitespace-nowrap">Total</th>
+                <th className="bg-slate-50 text-slate-500 font-medium text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200/60 whitespace-nowrap">Status</th>
+                <th className="bg-slate-50 text-slate-500 font-medium text-xs uppercase tracking-wider px-6 py-4 border-b border-slate-200/60 whitespace-nowrap text-right">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100">
               {orders.map((order) => {
-                let items = [];
-                try {
-                  items = typeof order.cartItems === 'string' ? JSON.parse(order.cartItems) : order.cartItems;
-                } catch {
-                  items = [];
-                }
-                
-                if (!Array.isArray(items)) {
-                  items = [];
-                }
-
+                const items = Array.isArray(order.items) ? order.items : [];
                 return (
-                  <tr key={order.id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                  <tr key={order.id} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4 text-sm text-slate-700">
                       <input 
                         type="checkbox"
                         className="cursor-pointer rounded border-slate-300 text-[#4A1521] focus:ring-[#4A1521]"
@@ -342,34 +332,34 @@ const OrdersTab = () => {
                         }}
                       />
                     </td>
-                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                    <td className="px-6 py-4 text-sm text-slate-700 whitespace-nowrap">
                       <div className="flex flex-col gap-1">
                         <span className="font-semibold text-slate-900">{order.orderNumber}</span>
                         {order.razorpayPaymentId && (
-                          <div className="text-xs text-slate-400 font-mono" title="Razorpay Payment ID">
+                          <div className="text-xs text-slate-400 font-mono tracking-tighter" title="Razorpay Payment ID">
                             💳 {order.razorpayPaymentId}
                           </div>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
-                      <span className="whitespace-nowrap">{formatDate(order.createdAt)}</span>
+                    <td className="px-6 py-4 text-sm text-slate-700 whitespace-nowrap">
+                      <span>{formatDate(order.createdAt)}</span>
                     </td>
-                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                    <td className="px-6 py-4 text-sm text-slate-700">
                       <div className="font-semibold text-slate-900">{order.customerName || 'N/A'}</div>
-                      <div className="text-xs text-slate-500 mt-1">
+                      <div className="text-xs text-slate-500 mt-1 leading-relaxed">
                         {order.address}, {order.city} - {order.pincode}
                       </div>
                     </td>
-                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
-                      <div className="text-sm font-medium">{order.phone || 'N/A'}</div>
-                      <div className="text-xs text-slate-500 mt-1 truncate max-w-[120px]" title={order.email}>{order.email || 'N/A'}</div>
+                    <td className="px-6 py-4 text-sm text-slate-700 whitespace-nowrap">
+                      <div className="text-sm font-medium text-slate-800">{order.phone || 'N/A'}</div>
+                      <div className="text-xs text-slate-500 mt-1 truncate max-w-[150px]" title={order.email}>{order.email || 'N/A'}</div>
                     </td>
-                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                    <td className="px-6 py-4 text-sm text-slate-700">
                       <div className="flex flex-col gap-1.5">
                         {items.length > 0 ? items.map((item, index) => (
-                          <div key={index} className="text-xs bg-slate-50 px-2 py-1 rounded border border-slate-100 flex items-start gap-1">
-                            <span className="font-medium text-slate-700 whitespace-nowrap">{item.quantity}×</span>
+                          <div key={index} className="text-xs bg-slate-50 px-2 py-1.5 rounded border border-slate-100 flex items-start gap-1.5 leading-tight">
+                            <span className="font-semibold text-slate-700 whitespace-nowrap">{item.quantity}×</span>
                             <span className="text-slate-600">
                               {item.title || item.name} 
                               {item.size && <span className="text-slate-400 ml-1">Size: {item.size}</span>}
@@ -379,17 +369,15 @@ const OrdersTab = () => {
                         )) : <span className="text-xs text-slate-400 italic">No items</span>}
                       </div>
                     </td>
-                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700 font-semibold">
-                      <div className="text-slate-900">{formatCurrency(order.totalAmount)}</div>
+                    <td className="px-6 py-4 text-sm text-slate-700 whitespace-nowrap">
+                      <div className="font-bold text-slate-900">{formatCurrency(order.totalAmount)}</div>
                       {(() => {
-                        const itemsSubtotal = items.reduce((acc, it) => acc + ((parseFloat(it.price) || 0) * (parseInt(it.quantity, 10) || 1)), 0);
-                        const shipping = parseFloat(order.shippingCost) || 0;
-                        const total = parseFloat(order.totalAmount) || 0;
-                        const discount = Math.max(0, Math.round(itemsSubtotal + shipping - total));
+                        const discount = parseFloat(order.discountApplied) || 0;
+                        const shipping = parseFloat(order.shippingFee) || 0;
                         return (
-                          <>
+                          <div className="mt-1 flex flex-col gap-0.5">
                             {discount > 0 && (
-                              <div className="text-xs text-green-600 font-medium">
+                              <div className="text-xs text-emerald-600 font-medium">
                                 Disc: −{formatCurrency(discount)}
                               </div>
                             )}
@@ -398,19 +386,19 @@ const OrdersTab = () => {
                                 +₹{shipping} ship
                               </div>
                             )}
-                          </>
+                          </div>
                         );
                       })()}
                     </td>
-                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                    <td className="px-6 py-4 text-sm text-slate-700 whitespace-nowrap">
                       <div className="relative">
                         <select
-                          className={`px-3 py-1.5 text-sm font-medium rounded-full border shadow-sm focus:outline-none focus:ring-2 focus:ring-[#4A1521]/20 focus:border-[#4A1521] appearance-none pr-8 ${
-                            order.status === 'Pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                            order.status === 'Shipped' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                            order.status === 'Delivered' ? 'bg-green-50 text-green-700 border-green-200' :
-                            order.status === 'Cancelled' ? 'bg-red-50 text-red-700 border-red-200' :
-                            'bg-slate-50 text-slate-700 border-slate-200'
+                          className={`appearance-none outline-none pl-3 pr-8 py-1.5 text-xs font-semibold rounded-lg ring-1 ring-inset focus:ring-2 focus:ring-[#4A1521]/30 transition-all cursor-pointer ${
+                            order.status === 'Pending' ? 'bg-amber-50 text-amber-700 ring-amber-600/20' :
+                            order.status === 'Shipped' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
+                            order.status === 'Delivered' ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20' :
+                            order.status === 'Cancelled' ? 'bg-rose-50 text-rose-700 ring-rose-600/20' :
+                            'bg-slate-50 text-slate-700 ring-slate-200'
                           }`}
                           value={order.status}
                           onChange={(e) => handleStatusChange(order.id, e.target.value)}
@@ -424,11 +412,11 @@ const OrdersTab = () => {
                           <option value="Payment_Failed">Payment Failed</option>
                         </select>
                         {actionLoading === `${order.id}-status` && (
-                          <span className="text-xs text-red-700 font-medium ml-2">Updating...</span>
+                          <span className="text-xs text-rose-700 font-medium ml-2 animate-pulse">Updating...</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 border-b border-slate-100 text-sm text-slate-700">
+                    <td className="px-6 py-4 text-sm text-slate-700 text-right whitespace-nowrap">
                       {!order.shiprocketOrderId ? (
                         <div className="flex flex-col gap-2">
                           {order.status === 'Payment_Pending' && order.razorpayOrderId && (
