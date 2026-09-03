@@ -257,97 +257,66 @@ export default function ProductsTab() {
 
   return (
     <div className="space-y-6">
-      {/* ── Top Metrics Bar ── */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 mb-8">
         <div 
-          className={`p-4 rounded-xl border cursor-pointer transition-all bg-white ${stockFilter === 'all' ? 'ring-2 ring-[#4A1521] shadow-md border-transparent' : 'border-slate-200 hover:border-slate-300'}`}
+          className={`p-6 rounded-2xl border cursor-pointer transition-all ${stockFilter === 'all' ? 'bg-slate-900 border-slate-900 shadow-md ring-1 ring-slate-900/10' : 'bg-white border-slate-200/60 shadow-sm hover:border-slate-300 hover:shadow-md'}`}
           onClick={() => setStockFilter('all')}
         >
-          <span className="block text-sm font-medium text-slate-500 mb-1">Total Products</span>
-          <span className="block text-2xl font-bold text-slate-900">{metrics.total}</span>
+          <span className={`block text-sm font-medium mb-2 ${stockFilter === 'all' ? 'text-slate-300' : 'text-slate-500'}`}>Total Products</span>
+          <span className={`block text-3xl font-bold tracking-tight ${stockFilter === 'all' ? 'text-white' : 'text-slate-900'}`}>{metrics.total}</span>
         </div>
         <div 
-          className={`p-4 rounded-xl border cursor-pointer transition-all bg-red-50 ${stockFilter === 'out_of_stock' ? 'ring-2 ring-red-500 shadow-md border-transparent' : 'border-red-200 hover:border-red-300'}`}
+          className={`p-6 rounded-2xl border cursor-pointer transition-all ${stockFilter === 'out_of_stock' ? 'bg-rose-50 border-rose-200 ring-1 ring-rose-500/20 shadow-md' : 'bg-white border-slate-200/60 shadow-sm hover:border-rose-200 hover:shadow-md'}`}
           onClick={() => setStockFilter('out_of_stock')}
         >
-          <span className="block text-sm font-medium text-red-600 mb-1">🔴 Out of Stock</span>
-          <span className="block text-2xl font-bold text-red-900">{metrics.outOfStock}</span>
+          <span className="block text-sm font-medium text-rose-600 mb-2 flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>Out of Stock</span>
+          <span className="block text-3xl font-bold text-rose-950 tracking-tight">{metrics.outOfStock}</span>
         </div>
         <div 
-          className={`p-4 rounded-xl border cursor-pointer transition-all bg-orange-50 ${stockFilter === 'low_stock' ? 'ring-2 ring-orange-500 shadow-md border-transparent' : 'border-orange-200 hover:border-orange-300'}`}
+          className={`p-6 rounded-2xl border cursor-pointer transition-all ${stockFilter === 'low_stock' ? 'bg-amber-50 border-amber-200 ring-1 ring-amber-500/20 shadow-md' : 'bg-white border-slate-200/60 shadow-sm hover:border-amber-200 hover:shadow-md'}`}
           onClick={() => setStockFilter('low_stock')}
         >
-          <span className="block text-sm font-medium text-orange-600 mb-1">🟡 Low Stock (≤3)</span>
-          <span className="block text-2xl font-bold text-orange-900">{metrics.lowStock}</span>
+          <span className="block text-sm font-medium text-amber-600 mb-2 flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500"></span>Low Stock (≤3)</span>
+          <span className="block text-3xl font-bold text-amber-950 tracking-tight">{metrics.lowStock}</span>
         </div>
         <div 
-          className={`p-4 rounded-xl border cursor-pointer transition-all bg-green-50 ${stockFilter === 'in_stock' ? 'ring-2 ring-green-500 shadow-md border-transparent' : 'border-green-200 hover:border-green-300'}`}
+          className={`p-6 rounded-2xl border cursor-pointer transition-all ${stockFilter === 'in_stock' ? 'bg-emerald-50 border-emerald-200 ring-1 ring-emerald-500/20 shadow-md' : 'bg-white border-slate-200/60 shadow-sm hover:border-emerald-200 hover:shadow-md'}`}
           onClick={() => setStockFilter('in_stock')}
         >
-          <span className="block text-sm font-medium text-green-600 mb-1">🟢 Healthy Stock</span>
-          <span className="block text-2xl font-bold text-green-900">{metrics.inStock}</span>
+          <span className="block text-sm font-medium text-emerald-600 mb-2 flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500"></span>Healthy Stock</span>
+          <span className="block text-3xl font-bold text-emerald-950 tracking-tight">{metrics.inStock}</span>
         </div>
       </div>
 
-      {/* ── Filter Pills & Toolbar ── */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        <button 
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${stockFilter === 'all' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
-          onClick={() => setStockFilter('all')}
-        >
-          All Products <span className="ml-1 px-2 py-0.5 rounded-full bg-black/10 text-xs">{metrics.total}</span>
-        </button>
-        <button 
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${stockFilter === 'out_of_stock' ? 'bg-red-600 text-white' : 'bg-red-50 text-red-700 hover:bg-red-100'}`}
-          onClick={() => setStockFilter('out_of_stock')}
-        >
-          🔴 Out of Stock <span className="ml-1 px-2 py-0.5 rounded-full bg-black/10 text-xs">{metrics.outOfStock}</span>
-        </button>
-        <button 
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${stockFilter === 'low_stock' ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-700 hover:bg-orange-100'}`}
-          onClick={() => setStockFilter('low_stock')}
-        >
-          🟡 Low Stock (≤3) <span className="ml-1 px-2 py-0.5 rounded-full bg-black/10 text-xs">{metrics.lowStock}</span>
-        </button>
-        <button 
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${stockFilter === 'in_stock' ? 'bg-green-600 text-white' : 'bg-green-50 text-green-700 hover:bg-green-100'}`}
-          onClick={() => setStockFilter('in_stock')}
-        >
-          🟢 In Stock <span className="ml-1 px-2 py-0.5 rounded-full bg-black/10 text-xs">{metrics.inStock}</span>
-        </button>
-        <button 
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${stockFilter === 'bestseller' ? 'bg-yellow-500 text-white border-yellow-500' : 'bg-white text-yellow-600 border-yellow-400 hover:bg-yellow-50'}`}
-          onClick={() => setStockFilter('bestseller')}
-        >
-          ⭐ Pinned Bestsellers <span className="ml-1 px-2 py-0.5 rounded-full bg-black/10 text-xs">{metrics.bestsellers}</span>
-        </button>
-      </div>
-
-      <div className="flex flex-wrap justify-between items-center gap-4 p-5 bg-white border-b border-slate-200">
-        <div className="search-bar flex-1">
-          <input
-            type="text"
-            placeholder="Search by ID, Name, or Category..."
-            value={productSearchQuery}
-            onChange={(e) => setProductSearchQuery(e.target.value)}
-            className="w-full max-w-xs pl-10 pr-4 py-2 text-sm rounded-full border border-slate-300 bg-white focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all"
-          />
-        </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          {selectedProducts.length > 0 && (
-            <button 
-              className="bg-red-50 text-red-700 border border-red-200 px-4 py-2 rounded-lg font-semibold hover:bg-red-100 transition-all"
-              onClick={handleDeleteSelected}
-              disabled={isDeleting}
-            >
-              {isDeleting ? 'Deleting...' : `Delete Selected (${selectedProducts.length})`}
+      <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm overflow-hidden ring-1 ring-slate-900/5">
+        <div className="flex flex-wrap justify-between items-center gap-4 p-5 md:px-8 border-b border-slate-200/60 bg-slate-50/50">
+          <div className="relative w-full max-w-sm">
+            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search by ID, Name, or Category..."
+              value={productSearchQuery}
+              onChange={(e) => setProductSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:border-[#4A1521] focus:ring-4 focus:ring-[#4A1521]/10 outline-none transition-all shadow-sm placeholder-slate-400"
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            {selectedProducts.length > 0 && (
+              <button 
+                className="bg-rose-50 text-rose-700 border border-rose-200/80 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-rose-100 transition-all"
+                onClick={handleDeleteSelected}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : `Delete Selected (${selectedProducts.length})`}
+              </button>
+            )}
+            <button className="bg-[#4A1521] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#3A0F19] transition-all shadow-md active:scale-95" onClick={() => handleOpenModal()}>
+              + Add New Product
             </button>
-          )}
-          <button className="bg-[#4A1521] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#3A0F19] transition-all" onClick={() => handleOpenModal()}>
-            + Add New Product
-          </button>
+          </div>
         </div>
-      </div>
 
       {loading ? (
         <div className="w-full mt-6 space-y-4">

@@ -213,17 +213,20 @@ const OrdersTab = () => {
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-6">
-      <div className="p-5 border-b border-slate-200">
-        <h2 className="text-xl font-bold text-slate-900 mb-2">Orders Management</h2>
+    <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm overflow-hidden mb-8 ring-1 ring-slate-900/5">
+      <div className="p-6 md:px-8 border-b border-slate-200/60 bg-white/50">
+        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Orders Management</h2>
       </div>
       
-      <div className="flex flex-wrap justify-between items-center gap-4 p-5 bg-white border-b border-slate-200">
-        <div className="relative w-full max-w-xs">
+      <div className="flex flex-wrap justify-between items-center gap-4 p-4 md:px-8 bg-slate-50/50 border-b border-slate-200/60">
+        <div className="relative w-full max-w-sm">
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
           <input
             type="text"
-            className="w-full max-w-xs pl-10 pr-4 py-2 text-sm rounded-full border border-slate-300 bg-white focus:border-[#4A1521] focus:ring-2 focus:ring-[#4A1521]/20 outline-none transition-all"
-            placeholder="Search by order ID, Razorpay ID, name, or phone..."
+            className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-slate-200 bg-white focus:border-[#4A1521] focus:ring-4 focus:ring-[#4A1521]/10 outline-none transition-all shadow-sm placeholder-slate-400"
+            placeholder="Search by order ID, Razorpay ID, name..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />

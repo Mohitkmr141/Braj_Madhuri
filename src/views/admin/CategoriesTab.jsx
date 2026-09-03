@@ -105,58 +105,54 @@ export default function CategoriesTab() {
   };
 
   return (
-    <div className="tab-pane">
-      <div className="flex flex-wrap justify-between items-center gap-4 p-5 bg-white border-b border-slate-200">
-        <button 
-          className="bg-[#4A1521] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#3A0F19] transition-all" 
-          onClick={() => { setEditingCategory(null); setIsCategoryModalOpen(true); }}
-        >
-          + Add New Category
-        </button>
-        <button 
-          className="btn btn-outline"
-          onClick={() => { setEditingSubcategory(null); setIsSubcategoryModalOpen(true); }}
-        >
-          + Add New Subcategory
-        </button>
+    <div className="bg-white border border-slate-200/60 rounded-2xl shadow-sm overflow-hidden mb-8 ring-1 ring-slate-900/5">
+      <div className="p-6 md:px-8 border-b border-slate-200/60 bg-white/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Categories & Subcategories</h2>
+        <div className="flex gap-3 w-full sm:w-auto">
+          <button className="flex-1 sm:flex-none bg-[#4A1521] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#3A0F19] transition-all shadow-md active:scale-95" onClick={() => { setEditingCategory(null); setIsCategoryModalOpen(true); }}>
+            + Add Category
+          </button>
+          <button className="flex-1 sm:flex-none bg-slate-100 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-all shadow-sm active:scale-95 border border-slate-200" onClick={() => { setEditingSubcategory(null); setIsSubcategoryModalOpen(true); }}>
+            + Subcategory
+          </button>
+        </div>
       </div>
 
       {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '24px' }}>
+        <div className="p-6 md:p-8 space-y-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="skeleton-card" style={{ height: '120px' }}>
-              <div className="skeleton-text title" style={{ width: '30%' }}></div>
-              <div className="skeleton-text" style={{ width: '80%' }}></div>
-              <div className="skeleton-text short"></div>
+            <div key={i} className="animate-pulse bg-slate-50 border border-slate-100 rounded-xl p-6">
+              <div className="h-6 bg-slate-200 rounded w-1/4 mb-3"></div>
+              <div className="h-4 bg-slate-200 rounded w-3/4"></div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="category-list">
+        <div className="p-4 md:p-8 space-y-8">
           {categories.map(cat => (
-            <div key={cat.id} className="category-item">
-              <div className="category-header">
-                <div className="category-info">
-                  <h3>{cat.title}</h3>
-                  <p>{cat.description}</p>
+            <div key={cat.id} className="bg-slate-50 border border-slate-200/60 rounded-2xl overflow-hidden ring-1 ring-slate-900/5">
+              <div className="p-5 md:p-6 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200/60">
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900">{cat.title}</h3>
+                  <p className="text-sm text-slate-500 mt-1">{cat.description || 'No description provided'}</p>
                 </div>
-                <div className="category-actions flex flex-col gap-2">
-                  <button className="btn btn-outline btn-sm" onClick={() => handleEditCategory(cat)}>Edit</button>
-                  <button className="btn btn-danger btn-sm" onClick={() => handleDeleteCategory(cat.id)}>Delete</button>
+                <div className="flex gap-2">
+                  <button className="bg-white text-slate-700 border border-slate-200/80 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 shadow-sm" onClick={() => handleEditCategory(cat)}>Edit</button>
+                  <button className="bg-rose-50 text-rose-700 border border-rose-200/80 px-4 py-2 rounded-lg text-sm font-medium hover:bg-rose-100 shadow-sm" onClick={() => handleDeleteCategory(cat.id)}>Delete</button>
                 </div>
               </div>
 
               {cat.subcategories && cat.subcategories.length > 0 && (
-                <div className="subcategory-list">
+                <div className="p-5 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                   {cat.subcategories.map(sub => (
-                    <div key={sub.id} className="subcategory-item">
-                      <div className="subcategory-info">
-                        <h4>{sub.title}</h4>
-                        <p>{sub.description}</p>
+                    <div key={sub.id} className="bg-white border border-slate-200/60 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start gap-4 shadow-sm hover:shadow-md transition-shadow">
+                      <div>
+                        <h4 className="font-semibold text-slate-900">{sub.title}</h4>
+                        <p className="text-xs text-slate-500 mt-1">{sub.description}</p>
                       </div>
-                      <div className="subcategory-actions flex gap-2">
-                        <button className="btn btn-outline btn-sm" onClick={() => handleEditSubcategory(sub)}>Edit</button>
-                        <button className="btn btn-danger btn-sm" onClick={() => handleDeleteSubcategory(sub.id)}>Delete</button>
+                      <div className="flex gap-2 shrink-0">
+                        <button className="text-slate-500 hover:text-[#4A1521] px-2 py-1 text-sm font-medium transition-colors" onClick={() => handleEditSubcategory(sub)}>Edit</button>
+                        <button className="text-rose-500 hover:text-rose-700 px-2 py-1 text-sm font-medium transition-colors" onClick={() => handleDeleteSubcategory(sub.id)}>Delete</button>
                       </div>
                     </div>
                   ))}
