@@ -94,8 +94,8 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
       for (const originalFile of files) {
         // Compress image before upload
         const options = {
-          maxSizeMB: 1,
-          maxWidthOrHeight: 1920,
+          maxSizeMB: 0.2, // Drastically reduced to prevent high bandwidth usage
+          maxWidthOrHeight: 1080, // Reduced from 1920px for ecommerce grids
           useWebWorker: true,
           fileType: uploadFormat
         };
