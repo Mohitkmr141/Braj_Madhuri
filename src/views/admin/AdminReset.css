@@ -1,14 +1,18 @@
-.admin-dashboard button, .admin-dashboard input, .admin-dashboard select, .admin-dashboard textarea {
+:where(.admin-dashboard) button, 
+:where(.admin-dashboard) input, 
+:where(.admin-dashboard) select, 
+:where(.admin-dashboard) textarea {
   border-style: solid;
   border-width: 0;
-  background-color: transparent;
   outline: none;
+  font-family: inherit;
 }
 
-.admin-dashboard table {
+:where(.admin-dashboard) table {
   border-collapse: collapse;
 }
 
-.admin-dashboard th, .admin-dashboard td {
-  border-style: solid;
+:where(.admin-dashboard) th, 
+:where(.admin-dashboard) td {
+  border-width: 0;
 }

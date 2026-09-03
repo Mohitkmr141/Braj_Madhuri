@@ -315,7 +315,15 @@ const OrdersTab = () => {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {orders.map((order) => {
-                const items = Array.isArray(order.items) ? order.items : [];
+                let items = [];
+                try {
+                  items = typeof order.cartItems === 'string' ? JSON.parse(order.cartItems) : (order.cartItems || order.items || []);
+                } catch {
+                  items = [];
+                }
+                if (!Array.isArray(items)) {
+                  items = [];
+                }
                 return (
                   <tr key={order.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-4 text-sm text-slate-700">
