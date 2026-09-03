@@ -12,8 +12,9 @@ export default function cloudinaryLoader({ src, width, quality }) {
     // q_<quality>: auto quality compression
     const params = ['f_auto', 'c_limit', `w_${width}`, `q_${quality || 'auto'}`];
     
-    // Construct the Cloudinary Fetch URL
-    return `https://res.cloudinary.com/${cloudName}/image/fetch/${params.join(',')}/${src}`;
+    // Construct the Cloudinary Fetch URL. We encode the src URL to prevent 
+    // query parameters or special characters in the remote URL from breaking it.
+    return `https://res.cloudinary.com/${cloudName}/image/fetch/${params.join(',')}/${encodeURIComponent(src)}`;
   }
 
   // If it's a local static asset (like /Logo.jpeg), serve it normally
