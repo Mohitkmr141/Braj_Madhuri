@@ -410,13 +410,14 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                 onChange={e => setProductForm({...productForm, subheading: e.target.value})} 
               />
             </div>
-            <div className="form-col" style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: '10px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600 }}>
+            <div className="form-col">
+              <label className="form-label">&nbsp;</label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, height: '40px' }}>
                 <input 
                   type="checkbox" 
                   checked={productForm.isBestseller}
                   onChange={e => setProductForm({...productForm, isBestseller: e.target.checked})}
-                  style={{ width: '18px', height: '18px' }}
+                  style={{ width: '18px', height: '18px', margin: 0 }}
                 />
                 ⭐ Mark as Bestseller
               </label>
@@ -434,6 +435,16 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                 onChange={e => setProductForm({...productForm, size: e.target.value})} 
               />
             </div>
+            <div className="form-col">
+              <label className="form-label">Colors (comma-separated)</label>
+              <input 
+                type="text"
+                className="form-input" 
+                placeholder="e.g. Red, Green, Blue" 
+                value={productForm.colors} 
+                onChange={e => setProductForm({...productForm, colors: e.target.value})} 
+              />
+            </div>
           </div>
 
           <div className="form-row">
@@ -444,16 +455,6 @@ export const ProductModal = ({ isOpen, onClose, editingProduct, categories, onSa
                 rows="4" 
                 value={productForm.description} 
                 onChange={e => setProductForm({...productForm, description: e.target.value})} 
-              />
-            </div>
-            <div className="form-col">
-              <label className="form-label">Colors (comma-separated)</label>
-              <textarea 
-                className="form-textarea" 
-                rows="4"
-                placeholder="e.g. Red, Green, Blue" 
-                value={productForm.colors} 
-                onChange={e => setProductForm({...productForm, colors: e.target.value})} 
               />
             </div>
           </div>
