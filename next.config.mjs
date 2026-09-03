@@ -2,7 +2,8 @@
 const nextConfig = {
   compress: true,
   images: {
-    unoptimized: false,
+    loader: 'custom',
+    loaderFile: './src/lib/cloudinaryLoader.js',
     remotePatterns: [
       {
         protocol: 'https',
