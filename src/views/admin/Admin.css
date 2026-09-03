@@ -732,6 +732,14 @@
   font-weight: 700;
   color: var(--admin-maroon);
   margin: 0 0 24px;
+  flex-shrink: 0;
+}
+
+.modal-form {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 8px;
 }
 
 .form-actions {
@@ -739,8 +747,13 @@
   justify-content: flex-end;
   gap: 10px;
   margin-top: 24px;
-  padding-top: 20px;
+  padding: 20px 0;
   border-top: 1px solid var(--admin-border);
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  background: var(--admin-surface);
+  z-index: 10;
 }
 
 /* ==========================================================================
