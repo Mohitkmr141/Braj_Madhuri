@@ -582,6 +582,7 @@ export default function ProductsTab() {
           </table>
         </div>
       )}
+      </div>
 
       {isModalOpen && (
         <ProductModal
