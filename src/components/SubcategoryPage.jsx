@@ -293,31 +293,33 @@ function ProductDetailCard({ product, addToCart, priority = false }) {
     <article ref={revealRef} className="subcat-product-card reveal" onClick={() => setIsZoomed(true)} style={{ cursor: 'pointer' }}>
       {/* ── Image panel ─────────────────────────────────────── */}
       <div className="subcat-img-panel">
-        {product.isBestseller && (
-          <span className="bestseller-badge" style={{ position: 'absolute', top: '10px', left: '10px', background: '#fbc02d', color: '#000', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', zIndex: 2, boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
-            🔥 Bestseller
-          </span>
-        )}
+        <div className="subcat-badge-stack">
+          {product.isBestseller && (
+            <span className="bestseller-badge">
+              🔥 Bestseller
+            </span>
+          )}
+          {displayStock === 0 && (
+            <div className="stock-badge stock-badge--soldout">Sold Out</div>
+          )}
+          {displayStock > 0 && displayStock <= 3 && (
+            <div className="stock-badge stock-badge--low">Only {displayStock} Left!</div>
+          )}
+        </div>
         {mainImage ? (
           <Image
             src={mainImage}
             alt={displayTitle}
-          decoding="async"
-          fill
-          priority={priority}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            decoding="async"
+            fill
+            priority={priority}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             style={{ objectFit: "cover", opacity: displayStock === 0 ? 0.5 : 1 }}
           />
         ) : (
           <div style={{ width: '100%', height: '100%', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ color: '#aaa' }}>No Image</span>
           </div>
-        )}
-        {displayStock === 0 && (
-          <div className="stock-badge stock-badge--soldout">Sold Out</div>
-        )}
-        {displayStock > 0 && displayStock <= 3 && (
-          <div className="stock-badge stock-badge--low">Only {displayStock} Left!</div>
         )}
         <button 
           className={`wishlist-toggle-btn ${isFav ? 'active' : ''}`}

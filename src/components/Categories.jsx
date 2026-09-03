@@ -366,16 +366,18 @@ function ProductCard({ product, addToCart, autoOpen, priority = false }) {
   return (
     <article ref={revealRef} className="image-card reveal" onClick={() => setIsQuickViewOpen(true)} style={{ cursor: 'pointer' }}>
       <div className="image-card-img-wrapper">
-        {product.isBestseller && (
-          <span className="bestseller-badge" style={{ position: 'absolute', top: '10px', left: '10px', background: '#fbc02d', color: '#000', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', zIndex: 2, boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
-            🔥 Bestseller
-          </span>
-        )}
-        {isOutOfStock ? (
-          <span className="discount-badge" style={{ background: '#d32f2f', color: '#fff' }}>OUT OF STOCK</span>
-        ) : discount ? (
-          <span className="discount-badge">{discount}% OFF</span>
-        ) : null}
+        <div className="card-badge-container">
+          {product.isBestseller && (
+            <span className="bestseller-badge">
+              🔥 Bestseller
+            </span>
+          )}
+          {isOutOfStock ? (
+            <span className="discount-badge" style={{ background: '#d32f2f', color: '#fff' }}>OUT OF STOCK</span>
+          ) : discount ? (
+            <span className="discount-badge">{discount}% OFF</span>
+          ) : null}
+        </div>
 
         <Image
           src={displayImage}
