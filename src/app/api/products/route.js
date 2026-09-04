@@ -2,8 +2,6 @@ import { getPrisma } from '../../../lib/prisma.js';
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 
-export const revalidate = 60; // Cache the response for 60 seconds to improve load speeds
-
 const getCachedCategories = unstable_cache(
   async () => {
     const prisma = getPrisma();
@@ -19,7 +17,7 @@ const getCachedCategories = unstable_cache(
     });
   },
   ['api-products-categories-cache'],
-  { revalidate: 60, tags: ['categories'] }
+  { tags: ['categories'] }
 );
 
 export async function GET() {

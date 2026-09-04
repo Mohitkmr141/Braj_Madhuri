@@ -125,7 +125,7 @@ const fetchInitialCategories = unstable_cache(
     }
   },
   ["initial-categories-cache"],
-  { revalidate: 300, tags: ["categories"] }
+  { tags: ["categories"] }
 );
 
 export default async function RootLayout({ children }) {
